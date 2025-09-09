@@ -1,6 +1,544 @@
-@import "tailwindcss";
+@import 'tailwindcss';
 
 @theme {
-  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif,
-    "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
+	--breakpoint-xs: 350px;
+}
+
+/* Palette */
+:root {
+	--white: #ffffff;
+	--red: #dc2626;
+	--green: #10b981;
+	--light-blue: #60a5fa;
+	--blue: #3b82f6;
+	--light-gray: #cbd5e1;
+	--gray: #64748b;
+	--black: #0f172a;
+}
+
+/* Light Mode */
+:root {
+	--color-white: var(--white);
+	--color-red: var(--red);
+	--color-green: var(--green);
+	--color-light-blue: var(--light-blue);
+	--color-blue: var(--blue);
+	--color-light-gray: var(--light-gray);
+	--color-gray: var(--gray);
+	--color-black: var(--black);
+	color-scheme: light;
+}
+
+/* Dark Mode */
+.dark {
+	--color-white: var(--black);
+	--color-light-blue: var(--blue);
+	--color-blue: var(--light-blue);
+	--color-light-gray: var(--gray);
+	--color-gray: var(--light-gray);
+	--color-black: var(--white);
+	color-scheme: dark;
+}
+
+/* Elements */
+*:focus-visible {
+	outline: 2px solid var(--color-blue);
+	outline-offset: 2px;
+}
+
+body {
+	font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+	background-color: var(--color-light-gray);
+	color: var(--color-black);
+}
+
+button:not(:disabled) {
+	cursor: pointer;
+}
+
+label {
+	cursor: pointer;
+	font-weight: 500;
+}
+
+input,
+select,
+textarea {
+	background-color: var(--color-white);
+	border: 1px solid var(--color-black);
+	border-radius: 0.5rem;
+	color: var(--color-black);
+	padding: 0.5rem 0.75rem;
+	transition: border-color 0.2s ease;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+	border-color: var(--color-blue);
+	box-shadow: 0 0 0 1px var(--color-blue);
+	outline: none;
+}
+
+input::placeholder,
+textarea::placeholder {
+	color: var(--color-gray);
+}
+
+/* Label hover effects */
+label:hover + input,
+label:hover + textarea,
+label:hover + select {
+	border-color: var(--color-blue);
+}
+
+/* Direct hover effects for inputs without labels */
+input:hover,
+textarea:hover,
+select:hover {
+	border-color: var(--color-blue);
+}
+
+input[type='checkbox'],
+input[type='radio'] {
+	accent-color: var(--color-blue);
+	background-color: var(--color-white);
+	border: 1px solid var(--color-black);
+	border-radius: 0.25rem;
+	width: 1rem;
+	height: 1rem;
+	padding: 0;
+}
+
+input[type='checkbox']:focus,
+input[type='radio']:focus {
+	outline: none;
+	box-shadow:
+		0 0 0 2px var(--color-blue),
+		0 0 0 4px var(--color-white);
+}
+
+input[type='file'] {
+	padding: 0.5rem;
+}
+
+a {
+	text-decoration: none;
+}
+
+a:hover {
+	text-decoration: underline;
+}
+
+/* Utility Classes */
+/* Shadows */
+.shadow-xs {
+	box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.shadow-sm {
+	box-shadow:
+		0 1px 3px 0 rgba(0, 0, 0, 0.1),
+		0 1px 2px 0 rgba(0, 0, 0, 0.06);
+}
+
+.shadow-md {
+	box-shadow:
+		0 4px 6px -1px rgba(0, 0, 0, 0.1),
+		0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.shadow-lg {
+	box-shadow:
+		0 10px 15px -3px rgba(0, 0, 0, 0.1),
+		0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+.shadow-xl {
+	box-shadow:
+		0 20px 25px -5px rgba(0, 0, 0, 0.1),
+		0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Dark mode shadow adjustments */
+.dark .shadow-xs {
+	box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.2);
+}
+
+.dark .shadow-sm {
+	box-shadow:
+		0 1px 3px 0 rgba(0, 0, 0, 0.3),
+		0 1px 2px 0 rgba(0, 0, 0, 0.2);
+}
+
+.dark .shadow-md {
+	box-shadow:
+		0 4px 6px -1px rgba(0, 0, 0, 0.3),
+		0 2px 4px -1px rgba(0, 0, 0, 0.2);
+}
+
+.dark .shadow-lg {
+	box-shadow:
+		0 10px 15px -3px rgba(0, 0, 0, 0.3),
+		0 4px 6px -2px rgba(0, 0, 0, 0.2);
+}
+
+.dark .shadow-xl {
+	box-shadow:
+		0 20px 25px -5px rgba(0, 0, 0, 0.3),
+		0 10px 10px -5px rgba(0, 0, 0, 0.2);
+}
+
+/* Background */
+.bg-white {
+	background-color: var(--color-white);
+}
+
+.bg-light-blue {
+	background-color: var(--color-light-blue);
+}
+
+.bg-blue {
+	background-color: var(--color-blue);
+}
+
+.bg-light-gray {
+	background-color: var(--color-light-gray);
+}
+
+.bg-gray {
+	background-color: var(--color-gray);
+}
+
+.bg-black {
+	background-color: var(--color-black);
+}
+
+.bg-red {
+	background-color: var(--color-red);
+}
+
+.bg-green {
+	background-color: var(--color-green);
+}
+
+/* Border */
+.border-white {
+	border-color: var(--color-white);
+}
+
+.border-light-blue {
+	border-color: var(--color-light-blue);
+}
+
+.border-blue {
+	border-color: var(--color-blue);
+}
+
+.border-light-gray {
+	border-color: var(--color-light-gray);
+}
+
+.border-gray {
+	border-color: var(--color-gray);
+}
+
+.border-black {
+	border-color: var(--color-black);
+}
+
+.border-red {
+	border-color: var(--color-red);
+}
+
+.border-green {
+	border-color: var(--color-green);
+}
+
+/* Color */
+.text-white {
+	color: var(--color-white);
+}
+
+.text-light-blue {
+	color: var(--color-light-blue);
+}
+
+.text-blue {
+	color: var(--color-blue);
+}
+
+.text-light-gray {
+	color: var(--color-light-gray);
+}
+
+.text-gray {
+	color: var(--color-gray);
+}
+
+.text-black {
+	color: var(--color-black);
+}
+
+.text-red {
+	color: var(--color-red);
+}
+
+.text-green {
+	color: var(--color-green);
+}
+
+/* Focus Ring */
+.focus\:ring-blue:focus {
+	--tw-ring-color: var(--color-blue);
+}
+
+.focus\:ring-red:focus {
+	--tw-ring-color: var(--color-red);
+}
+
+/* Focus Border */
+.focus\:border-blue:focus {
+	border-color: var(--color-blue);
+}
+
+.focus\:border-red:focus {
+	border-color: var(--color-red);
+}
+
+/* Hover Background */
+.hover\:bg-white:hover {
+	background-color: var(--color-white);
+}
+
+.hover\:bg-light-blue:hover {
+	background-color: var(--color-light-blue);
+}
+
+.hover\:bg-blue:hover {
+	background-color: var(--color-blue);
+}
+
+.hover\:bg-light-gray:hover {
+	background-color: var(--color-light-gray);
+}
+
+.hover\:bg-gray:hover {
+	background-color: var(--color-gray);
+}
+
+.hover\:bg-black:hover {
+	background-color: var(--color-black);
+}
+
+.hover\:bg-red:hover {
+	background-color: var(--color-red);
+}
+
+.hover\:bg-green:hover {
+	background-color: var(--color-green);
+}
+
+/* Hover Border */
+.hover\:border-white:hover {
+	border-color: var(--color-white);
+}
+
+.hover\:border-light-blue:hover {
+	border-color: var(--color-light-blue);
+}
+
+.hover\:border-blue:hover {
+	border-color: var(--color-blue);
+}
+
+.hover\:border-light-gray:hover {
+	border-color: var(--color-light-gray);
+}
+
+.hover\:border-gray:hover {
+	border-color: var(--color-gray);
+}
+
+.hover\:border-black:hover {
+	border-color: var(--color-black);
+}
+
+.hover\:border-red:hover {
+	border-color: var(--color-red);
+}
+
+.hover\:border-green:hover {
+	border-color: var(--color-green);
+}
+
+/* Hover Text */
+.hover\:text-white:hover {
+	color: var(--color-white);
+}
+
+.hover\:text-light-blue:hover {
+	color: var(--color-light-blue);
+}
+
+.hover\:text-blue:hover {
+	color: var(--color-blue);
+}
+
+.hover\:text-light-gray:hover {
+	color: var(--color-light-gray);
+}
+
+.hover\:text-gray:hover {
+	color: var(--color-gray);
+}
+
+.hover\:text-black:hover {
+	color: var(--color-black);
+}
+
+.hover\:text-red:hover {
+	color: var(--color-red);
+}
+
+.hover\:text-green:hover {
+	color: var(--color-green);
+}
+
+/* Focus Background */
+.focus\:bg-white:focus {
+	background-color: var(--color-white);
+}
+
+.focus\:bg-light-blue:focus {
+	background-color: var(--color-light-blue);
+}
+
+.focus\:bg-blue:focus {
+	background-color: var(--color-blue);
+}
+
+.focus\:bg-light-gray:focus {
+	background-color: var(--color-light-gray);
+}
+
+.focus\:bg-gray:focus {
+	background-color: var(--color-gray);
+}
+
+.focus\:bg-black:focus {
+	background-color: var(--color-black);
+}
+
+.focus\:bg-red:focus {
+	background-color: var(--color-red);
+}
+
+.focus\:bg-green:focus {
+	background-color: var(--color-green);
+}
+
+/* Focus Border (additional colors) */
+.focus\:border-white:focus {
+	border-color: var(--color-white);
+}
+
+.focus\:border-light-blue:focus {
+	border-color: var(--color-light-blue);
+}
+
+.focus\:border-light-gray:focus {
+	border-color: var(--color-light-gray);
+}
+
+.focus\:border-gray:focus {
+	border-color: var(--color-gray);
+}
+
+.focus\:border-black:focus {
+	border-color: var(--color-black);
+}
+
+.focus\:border-green:focus {
+	border-color: var(--color-green);
+}
+
+/* Focus Text */
+.focus\:text-white:focus {
+	color: var(--color-white);
+}
+
+.focus\:text-light-blue:focus {
+	color: var(--color-light-blue);
+}
+
+.focus\:text-blue:focus {
+	color: var(--color-blue);
+}
+
+.focus\:text-light-gray:focus {
+	color: var(--color-light-gray);
+}
+
+.focus\:text-gray:focus {
+	color: var(--color-gray);
+}
+
+.focus\:text-black:focus {
+	color: var(--color-black);
+}
+
+.focus\:text-red:focus {
+	color: var(--color-red);
+}
+
+.focus\:text-green:focus {
+	color: var(--color-green);
+}
+
+/* Focus Ring (additional colors) */
+.focus\:ring-white:focus {
+	--tw-ring-color: var(--color-white);
+}
+
+.focus\:ring-light-blue:focus {
+	--tw-ring-color: var(--color-light-blue);
+}
+
+.focus\:ring-light-gray:focus {
+	--tw-ring-color: var(--color-light-gray);
+}
+
+.focus\:ring-gray:focus {
+	--tw-ring-color: var(--color-gray);
+}
+
+.focus\:ring-black:focus {
+	--tw-ring-color: var(--color-black);
+}
+
+.focus\:ring-green:focus {
+	--tw-ring-color: var(--color-green);
+}
+
+/* Text Shadow */
+.text-shadow {
+	font-weight: 500;
+	text-shadow: 0 1px 1px rgba(0, 0, 0, 0.25);
+}
+
+/* Reserve space for LastPass icon */
+input[data-lpignore='false'] {
+	padding-right: 24px !important;
+	box-sizing: border-box;
+}
+
+/* Handle browser extension injections */
+[data-lastpass-icon-root] {
+	display: none !important;
+}
+
+/* Suppress hydration warnings for browser extension elements */
+.FormFieldContainer {
+	suppresshydrationwarning: true;
 }
