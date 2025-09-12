@@ -15,7 +15,7 @@ export const FormLabel = forwardRef<HTMLLabelElement, FormLabelProps>(
 	({ children, className = '', ...props }, ref) => {
 		return (
 			<label
-				className={clsx('FormLabel block text-sm font-medium', className)}
+				className={clsx('FormLabel table text-sm font-medium', className)}
 				{...props}
 				ref={ref}
 			>
