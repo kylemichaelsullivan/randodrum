@@ -3,6 +3,7 @@
 import { FormField, FormLabel } from '../../forms';
 import { useFormStore } from '@/stores/form-store';
 
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, react/no-children-prop */
 type BeatsFieldProps = {
 	form: any; // Tanstack Form
 };

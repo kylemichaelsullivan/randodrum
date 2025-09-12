@@ -5,6 +5,7 @@ import { HelpButton } from '../../buttons';
 import { useFormStore } from '@/stores/form-store';
 import type { BeatFormData, DifficultyLevel } from '@/types';
 
+/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, react/no-children-prop */
 type DifficultyFieldProps = {
 	form: any; // Tanstack Form
 };
