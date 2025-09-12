@@ -5,7 +5,7 @@ import { createPortal } from 'react-dom';
 
 import { clsx } from 'clsx';
 
-import type { ReactNode, KeyboardEvent } from 'react';
+import type { ReactNode } from 'react';
 
 type ModalProps = {
 	title: string;
@@ -19,19 +19,20 @@ export function Modal({ title, isOpen, onClose, children, className = '' }: Moda
 	const modalRef = useRef<HTMLDivElement>(null);
 
 	useEffect(() => {
-		const handleEscape = (e: KeyboardEvent) => {
-			if (e.key === 'Escape') {
+		const handleEscape = (e: Event) => {
+			const keyboardEvent = e as KeyboardEvent;
+			if (keyboardEvent.key === 'Escape') {
 				onClose();
 			}
 		};
 
 		if (isOpen) {
-			document.addEventListener('keydown', handleEscape as any);
+			document.addEventListener('keydown', handleEscape);
 			document.body.style.overflow = 'hidden';
 		}
 
 		return () => {
-			document.removeEventListener('keydown', handleEscape as any);
+			document.removeEventListener('keydown', handleEscape);
 			document.body.style.overflow = 'unset';
 		};
 	}, [isOpen, onClose]);

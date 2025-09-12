@@ -8,7 +8,7 @@ import { useEffect, useState } from 'react';
  */
 export function HydrationManager({ children }: { children: React.ReactNode }) {
 	const [isHydrated, setIsHydrated] = useState(false);
-	const [hasExtensionInterference, setHasExtensionInterference] = useState(false);
+	const [, setHasExtensionInterference] = useState(false);
 
 	useEffect(() => {
 		// Check for browser extension interference

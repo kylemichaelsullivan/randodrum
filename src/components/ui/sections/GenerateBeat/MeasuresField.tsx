@@ -4,7 +4,7 @@ import { FormField, FormLabel } from '../../forms';
 import { useFormStore } from '@/stores/form-store';
 
 type MeasuresFieldProps = {
-	form: any; // TanStack Form instance
+	form: any; // Tanstack Form
 };
 
 export function MeasuresField({ form }: MeasuresFieldProps) {

@@ -4,7 +4,7 @@ import { FormField, FormLabel } from '../../forms';
 import { useFormStore } from '@/stores/form-store';
 
 type BeatsFieldProps = {
-	form: any; // TanStack Form instance
+	form: any; // Tanstack Form
 };
 
 export function BeatsField({ form }: BeatsFieldProps) {

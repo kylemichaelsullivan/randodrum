@@ -29,6 +29,6 @@ export function HydrationSafe({ children, fallback = null, className }: Hydratio
 /**
  * ThemeSafe ensures theme-dependent content renders consistently
  */
-export function ThemeSafe({ children, fallback }: HydrationSafeProps) {
+export function ThemeSafe({ children, fallback: _fallback }: HydrationSafeProps) {
 	return <HydrationSafe>{children}</HydrationSafe>;
 }

@@ -38,13 +38,14 @@ export const DIFFICULTY_LEVELS: DifficultyLevel[] = [
 	'Drumline!',
 ];
 
-export type ChartData = {
-	[difficulty: string]: {
+export type ChartData = Record<
+	string,
+	{
 		notes: string[];
 		techniques: string[];
 		restProbability: number;
-	};
-};
+	}
+>;
 
 export const CHART_DATA: ChartData = {
 	'I’m Too Young to Drum': {

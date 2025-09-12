@@ -32,12 +32,12 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
 	render() {
 		if (this.state.hasError) {
 			return (
-				this.props.fallback || (
+				this.props.fallback ?? (
 					<div className='flex items-center justify-center bg-red border border-red rounded-lg p-8'>
 						<div className='text-center'>
 							<h3 className='text-white text-lg font-semibold pb-2'>Something went wrong</h3>
 							<p className='text-white pb-4'>
-								{this.state.error?.message || 'An unexpected error occurred'}
+								{this.state.error?.message ?? 'An unexpected error occurred'}
 							</p>
 							<button
 								className='bg-red text-white rounded px-4 py-2 transition-colors hover:bg-red'

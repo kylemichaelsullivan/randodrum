@@ -3,11 +3,10 @@
 import { FormField, FormLabel, FormSelect } from '../../forms';
 import { HelpButton } from '../../buttons';
 import { useFormStore } from '@/stores/form-store';
-
 import type { BeatFormData, DifficultyLevel } from '@/types';
 
 type DifficultyFieldProps = {
-	form: any; // TanStack Form instance
+	form: any; // Tanstack Form
 };
 
 const DIFFICULTY_OPTIONS: DifficultyLevel[] = [
@@ -42,7 +41,7 @@ export function DifficultyField({ form }: DifficultyFieldProps) {
 					>
 						{DIFFICULTY_OPTIONS.map(option => (
 							<option value={option} key={option}>
-								{option.replace("'", '’')}
+								{option}
 							</option>
 						))}
 					</FormSelect>
