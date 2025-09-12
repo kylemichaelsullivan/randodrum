@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, useEffect, useState } from 'react';
+import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
 
 type DominantHand = 'left' | 'right';
 
@@ -8,24 +8,27 @@ type DominantHandContextType = {
 	dominantHand: DominantHand;
 	setDominantHand: (hand: DominantHand) => void;
 	toggleDominantHand: () => void;
+	isHydrated: boolean;
 };
 
 const DominantHandContext = createContext<DominantHandContextType | undefined>(undefined);
 
-export function DominantHandProvider({ children }: { children: React.ReactNode }) {
+export function DominantHandProvider({ children }: { children: ReactNode }) {
 	const [dominantHand, setDominantHandState] = useState<DominantHand>('right');
-	const [mounted, setMounted] = useState(false);
+	const [isHydrated, setIsHydrated] = useState(false);
 
 	useEffect(() => {
-		setMounted(true);
 		const savedHand = localStorage.getItem('dominantHand') as DominantHand;
 		const initialHand = savedHand || 'right';
 		setDominantHandState(initialHand);
+		setIsHydrated(true);
 	}, []);
 
 	const setDominantHand = (newHand: DominantHand) => {
 		setDominantHandState(newHand);
-		localStorage.setItem('dominantHand', newHand);
+		if (typeof localStorage !== 'undefined') {
+			localStorage.setItem('dominantHand', newHand);
+		}
 	};
 
 	const toggleDominantHand = () => {
@@ -33,19 +36,10 @@ export function DominantHandProvider({ children }: { children: React.ReactNode }
 		setDominantHand(newHand);
 	};
 
-	// Prevent hydration mismatch by not rendering until mounted
-	if (!mounted) {
-		return (
-			<DominantHandContext.Provider
-				value={{ dominantHand: 'right', setDominantHand, toggleDominantHand }}
-			>
-				{children}
-			</DominantHandContext.Provider>
-		);
-	}
-
 	return (
-		<DominantHandContext.Provider value={{ dominantHand, setDominantHand, toggleDominantHand }}>
+		<DominantHandContext.Provider
+			value={{ dominantHand, setDominantHand, toggleDominantHand, isHydrated }}
+		>
 			{children}
 		</DominantHandContext.Provider>
 	);

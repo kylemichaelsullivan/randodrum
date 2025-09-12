@@ -8,31 +8,36 @@ type ThemeContextType = {
 	theme: Theme;
 	setTheme: (theme: Theme) => void;
 	toggleTheme: () => void;
+	isHydrated: boolean;
 };
 
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: React.ReactNode }) {
 	const [theme, setThemeState] = useState<Theme>('light');
-	const [mounted, setMounted] = useState(false);
+	const [isHydrated, setIsHydrated] = useState(false);
 
 	useEffect(() => {
-		setMounted(true);
 		const savedTheme = localStorage.getItem('theme') as Theme;
 		const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 		const initialTheme = savedTheme || (prefersDark ? 'dark' : 'light');
 
 		setThemeState(initialTheme);
 		updateTheme(initialTheme);
+		setIsHydrated(true);
 	}, []);
 
 	const updateTheme = (newTheme: Theme) => {
-		if (newTheme === 'dark') {
-			document.documentElement.classList.add('dark');
-		} else {
-			document.documentElement.classList.remove('dark');
+		if (typeof document !== 'undefined') {
+			if (newTheme === 'dark') {
+				document.documentElement.classList.add('dark');
+			} else {
+				document.documentElement.classList.remove('dark');
+			}
 		}
-		localStorage.setItem('theme', newTheme);
+		if (typeof localStorage !== 'undefined') {
+			localStorage.setItem('theme', newTheme);
+		}
 	};
 
 	const setTheme = (newTheme: Theme) => {
@@ -45,17 +50,8 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
 		setTheme(newTheme);
 	};
 
-	// Prevent hydration mismatch by not rendering until mounted
-	if (!mounted) {
-		return (
-			<ThemeContext.Provider value={{ theme: 'light', setTheme, toggleTheme }}>
-				{children}
-			</ThemeContext.Provider>
-		);
-	}
-
 	return (
-		<ThemeContext.Provider value={{ theme, setTheme, toggleTheme }}>
+		<ThemeContext.Provider value={{ theme, setTheme, toggleTheme, isHydrated }}>
 			{children}
 		</ThemeContext.Provider>
 	);
