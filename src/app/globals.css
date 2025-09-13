@@ -542,3 +542,8 @@ input[data-lpignore='false'] {
 .FormFieldContainer {
 	suppresshydrationwarning: true;
 }
+
+/* Font Utility Classes */
+.font-musisync {
+	font-family: var(--font-musisync), monospace;
+}

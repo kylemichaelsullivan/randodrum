@@ -1,6 +1,7 @@
 import './globals.css';
 
 import { Geist } from 'next/font/google';
+import localFont from 'next/font/local';
 import { TRPCReactProvider } from '@/trpc/react';
 import {
 	DominantHandProvider,
@@ -22,9 +23,20 @@ const geist = Geist({
 	variable: '--font-geist-sans',
 });
 
+const musisync = localFont({
+	src: [
+		{
+			path: '../../public/Musisync.ttf',
+			weight: '400',
+			style: 'normal',
+		},
+	],
+	variable: '--font-musisync',
+});
+
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
 	return (
-		<html lang='en' className={`${geist.variable}`}>
+		<html lang='en' className={`${geist.variable} ${musisync.variable}`}>
 			<body>
 				<HydrationManager>
 					<HydrationErrorBoundary>
