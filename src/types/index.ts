@@ -11,22 +11,41 @@ export type BeatFormData = {
 	difficulty: DifficultyLevel;
 };
 
-export type BeatNote = {
-	value: number;
-	sticking: 'R' | 'L';
-	isTuplet: boolean;
-	isRest: boolean;
-	technique?: 'accent' | 'flam' | 'drag' | 'ghost';
-};
+export type Dynamic = 'ghost' | 'normal' | 'accent' | 'rimshot';
+export type Ornament = 'flam' | 'drag' | null;
 
-export type Beat = {
-	notes: BeatNote[];
-	totalValue: number; // Should always equal 8
-};
+export interface Note {
+	start: number;
+	dur: number;
+	isDominant: boolean;
+	dynamic: Dynamic;
+	ornament: Ornament;
+}
 
-export type Measure = {
-	beats: Beat[];
-};
+export type Measure = Note[]; // one bar (sum(dur) = gridSize)
+export type Exercise = Measure[];
+export type Samples = Record<string, Measure[]>;
+
+export interface DifficultyConfig {
+	// Rhythm generation
+	durations: number[];
+
+	// Sticking generation
+	runLengths: Record<number, number>;
+	switchProb: number;
+
+	dynamicScale: [number, number, number, number];
+
+	// Ornaments
+	flamThreshold: number;
+	dragThreshold: number;
+
+	// Balancing stage
+	allowBalancing: boolean;
+	maxClump?: number;
+	minRatio?: number;
+	maxRatio?: number;
+}
 
 export type GeneratedBeat = {
 	measures: Measure[];

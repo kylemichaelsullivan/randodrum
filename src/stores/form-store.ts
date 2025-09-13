@@ -11,7 +11,7 @@ type FormStore = {
 const defaultFormValues: BeatFormData = {
 	beats: 4,
 	measures: 4,
-	difficulty: 'Hey, Not Too Rough',
+	difficulty: 'Hey, Not Too Rough' as BeatFormData['difficulty'],
 };
 
 export const useFormStore = create<FormStore>()(
