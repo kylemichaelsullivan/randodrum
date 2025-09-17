@@ -1,6 +1,8 @@
 {
-	"peacock.darkForegroundColor": "#15202b",
+	"cSpell.words": ["rimshot"],
 	"peacock.color": "#E63946",
+	"peacock.darkForegroundColor": "#15202b",
+	"peacock.lightForegroundColor": "#F1FAEE",
 	"workbench.colorCustomizations": {
 		"activityBar.activeBackground": "#ec6670",
 		"activityBar.background": "#ec6670",
@@ -19,6 +21,5 @@
 		"titleBar.activeForeground": "#f1faee",
 		"titleBar.inactiveBackground": "#e6394699",
 		"titleBar.inactiveForeground": "#f1faee99"
-	},
-	"peacock.lightForegroundColor": "#F1FAEE"
+	}
 }
