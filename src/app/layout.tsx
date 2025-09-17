@@ -6,6 +6,7 @@ import { TRPCReactProvider } from '@/trpc/react';
 import {
 	DominantHandProvider,
 	HydrationErrorBoundary,
+	HydrationFix,
 	HydrationManager,
 	ThemeProvider,
 } from '@/components/providers';
@@ -24,20 +25,16 @@ const geist = Geist({
 });
 
 const musisync = localFont({
-	src: [
-		{
-			path: '../../public/Musisync.ttf',
-			weight: '400',
-			style: 'normal',
-		},
-	],
+	src: '../../public/Musisync.ttf',
 	variable: '--font-musisync',
+	display: 'swap',
 });
 
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
 	return (
 		<html lang='en' className={`${geist.variable} ${musisync.variable}`}>
 			<body>
+				<HydrationFix />
 				<HydrationManager>
 					<HydrationErrorBoundary>
 						<ThemeProvider>
