@@ -1,31 +1,27 @@
+import { beatFormDataSchema } from '@/utils';
 import { createTRPCRouter, publicProcedure } from '@/server/api/trpc';
-import { z } from 'zod';
-import { generateBeat } from '@/server/beat-generator';
+import { generateBeat } from '@/server';
+import type { BeatFormData, BeatGenerationResponse } from '@/types';
 
 export const beatRouter = createTRPCRouter({
 	generate: publicProcedure
-		.input(
-			z.object({
-				beats: z.number().min(1).max(16),
-				measures: z.number().min(1).max(32),
-				difficulty: z.enum([
-					'I’m Too Young to Drum',
-					'Hey, Not Too Rough',
-					'Hurt Me Plenty',
-					'Ultra-Violence',
-					'Drumline!',
-				]),
-			})
-		)
-		.mutation(async ({ input }) => {
-			const generatedBeat = generateBeat(input);
+		.input(beatFormDataSchema)
+		.mutation(async ({ input }): Promise<BeatGenerationResponse> => {
+			try {
+				const generatedBeat = generateBeat(input as BeatFormData);
 
-			return {
-				success: true,
-				beat: {
-					id: Math.random().toString(36).substring(2, 11),
-					...generatedBeat,
-				},
-			};
+				return {
+					success: true,
+					data: {
+						id: Math.random().toString(36).substring(2, 11),
+						beat: generatedBeat,
+					},
+				};
+			} catch (error) {
+				return {
+					success: false,
+					error: error instanceof Error ? error.message : 'Failed to generate beat',
+				};
+			}
 		}),
 });
