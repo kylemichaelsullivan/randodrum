@@ -1,4 +1,4 @@
-import { Export, Import } from '../buttons';
+import { Export, Import } from '@/components';
 
 export function Footer() {
 	const year = new Date().getFullYear();

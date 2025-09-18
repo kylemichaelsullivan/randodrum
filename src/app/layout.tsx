@@ -2,7 +2,7 @@ import './globals.css';
 
 import { Geist } from 'next/font/google';
 import localFont from 'next/font/local';
-import { TRPCReactProvider } from '@/trpc/react';
+import { TRPCReactProvider } from '@/trpc';
 import {
 	DominantHandProvider,
 	HydrationErrorBoundary,

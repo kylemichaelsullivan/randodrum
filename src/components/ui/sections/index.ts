@@ -1,2 +1,2 @@
-export { DisplayBeat } from './DisplayBeat';
-export { GenerateBeat } from './GenerateBeat';
+export * from './DisplayBeat';
+export * from './GenerateBeat';

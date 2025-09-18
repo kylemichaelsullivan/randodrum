@@ -1,6 +1,4 @@
-import { Header } from '@/components/ui/globals/Header';
-import { Main } from '@/components/ui/globals/Main';
-import { Footer } from '@/components/ui/globals/Footer';
+import { Header, Main, Footer } from '@/components';
 
 export default function Page() {
 	return (
