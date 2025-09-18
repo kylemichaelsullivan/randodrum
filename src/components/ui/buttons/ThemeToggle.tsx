@@ -3,8 +3,7 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMoon, faLightbulb } from '@fortawesome/free-solid-svg-icons';
 import { Button } from './Button';
-import { ThemeSafe } from '../../providers/hydration-safe';
-import { useTheme } from '../../providers/theme-provider';
+import { HydrationSafe, useTheme } from '@/components';
 
 export function ThemeToggle() {
 	const { theme, toggleTheme } = useTheme();
@@ -15,7 +14,7 @@ export function ThemeToggle() {
 	const size = 'w-5 h-5';
 
 	return (
-		<ThemeSafe
+		<HydrationSafe
 			fallback={
 				<Button variant='icon' title='Loading theme…' disabled>
 					<FontAwesomeIcon icon={faLightbulb} className={`text-gray ${size}`} />
@@ -25,6 +24,6 @@ export function ThemeToggle() {
 			<Button variant='icon' title={title} onClick={toggleTheme}>
 				<FontAwesomeIcon icon={icon} className={`text-black ${size}`} />
 			</Button>
-		</ThemeSafe>
+		</HydrationSafe>
 	);
 }

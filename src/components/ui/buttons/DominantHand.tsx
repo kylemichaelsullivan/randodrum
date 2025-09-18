@@ -1,8 +1,7 @@
 'use client';
 
-import { useDominantHand } from '../../providers/dominant-hand-provider';
-import { ThemeSafe } from '../../providers/hydration-safe';
 import { Button } from './Button';
+import { HydrationSafe, useDominantHand } from '@/components';
 
 export function DominantHand() {
 	const { dominantHand, toggleDominantHand } = useDominantHand();
@@ -15,7 +14,7 @@ export function DominantHand() {
 	const textColor = 'text-white';
 
 	return (
-		<ThemeSafe
+		<HydrationSafe
 			fallback={
 				<Button className='bg-gray hover:opacity-80' variant='icon' title='Loading…' disabled>
 					<span className='text-white text-lg font-bold'>R</span>
@@ -30,6 +29,6 @@ export function DominantHand() {
 			>
 				<span className={`${textColor} text-lg font-bold`}>{displayText}</span>
 			</Button>
-		</ThemeSafe>
+		</HydrationSafe>
 	);
 }

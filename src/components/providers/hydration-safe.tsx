@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, type ReactNode } from 'react';
+import { memo, useEffect, useState, type ReactNode } from 'react';
 
 type HydrationSafeProps = {
 	children: ReactNode;
@@ -12,7 +12,7 @@ type HydrationSafeProps = {
  * HydrationSafe ensures that content only renders after hydration is complete.
  * This prevents hydration mismatches by showing a fallback during SSR and initial hydration.
  */
-export function HydrationSafe({ children, fallback = null, className }: HydrationSafeProps) {
+function HydrationSafeComponent({ children, fallback = null, className }: HydrationSafeProps) {
 	const [isHydrated, setIsHydrated] = useState(false);
 
 	useEffect(() => {
@@ -26,9 +26,6 @@ export function HydrationSafe({ children, fallback = null, className }: Hydratio
 	return <div className={className}>{children}</div>;
 }
 
-/**
- * ThemeSafe ensures theme-dependent content renders consistently
- */
-export function ThemeSafe({ children, fallback: _fallback }: HydrationSafeProps) {
-	return <HydrationSafe>{children}</HydrationSafe>;
-}
+export const HydrationSafe = memo(HydrationSafeComponent);
+
+HydrationSafe.displayName = 'HydrationSafe';
