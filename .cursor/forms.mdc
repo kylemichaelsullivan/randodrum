@@ -1,0 +1,288 @@
+---
+globs:
+  ['**/forms/**/*.tsx', '**/forms/**/*.ts', '**/utils/validation.ts', '**/stores/form-store.ts']
+exclude: ['**/__tests__/**', '**/*.test.*', '**/*.spec.*']
+---
+
+# Form Development Standards
+
+## TanStack Form Integration
+
+- **TanStack Form**: Defer to TanStack Form and Zod whenever possible
+- **No reinvention**: Don't reinvent the wheel - use established patterns
+- **Type safety**: Ensure proper TypeScript typing for all forms
+- **State persistence**: Maintain state across form interactions using Zustand stores
+- **Schema-driven validation**: Use Zod schemas as the single source of truth for field requirements
+- **Manual validation**: Implement validation logic as needed for form fields
+- **Schema validation**: Use Zod schemas directly for validation in TanStack Form Field validators
+
+## Available Schemas
+
+### Beat Form Data Schema
+
+```typescript
+// src/utils/validation.ts
+export const beatFormDataSchema = z.object({
+	beats: z.number().min(1).max(16).int(),
+	measures: z.number().min(1).max(32).int(),
+	difficulty: difficultyLevelSchema,
+});
+```
+
+### Difficulty Level Schema
+
+```typescript
+export const difficultyLevelSchema = z.enum(DIFFICULTY_LEVELS as [string, ...string[]]);
+```
+
+### Note Schema
+
+```typescript
+export const noteSchema = z.object({
+	start: z.number().min(0),
+	dur: durationValueSchema,
+	dynamic: dynamicNameSchema,
+	isDominant: z.boolean(),
+	ornament: ornamentNameSchema,
+});
+```
+
+### Generated Beat Schema
+
+```typescript
+export const generatedBeatSchema = z.object({
+	measures: z.array(measureSchema),
+	beatsPerMeasure: z.number().min(1).max(16).int(),
+	difficulty: difficultyLevelSchema,
+});
+```
+
+## Utility Components
+
+Always use the project's utility components instead of creating custom HTML elements when possible:
+
+### Core Form Components
+
+- **Form** (`@/components/ui/forms/Form`) - Use for consistent form containers
+
+  - **Consistent styling**: Uses `Form` class for uniform appearance
+  - **Form handling**: Automatically handles `preventDefault` and `stopPropagation`
+  - **Flexible content**: Accepts any children components
+  - **Customizable**: Optional `className` prop for additional styling
+
+- **FormField** (`@/components/ui/forms/FormField`) - Use for all form input containers
+
+  - **Layout**: Uses `FormField flex flex-col gap-1` classes for consistent spacing
+  - **Flexible content**: Accepts any children components
+  - **Customizable**: Optional `className` prop for additional styling
+  - **Accessibility**: Properly forwards refs for accessibility
+
+- **FormLabel** (`@/components/ui/forms/FormLabel`) - Use for form labels
+
+  - **Typography**: Uses `text-sm font-medium` for consistent styling
+  - **Layout**: Uses `table` display for proper alignment
+  - **Accessibility**: Properly associates with form controls
+
+- **FormInput** (`@/components/ui/forms/FormInput`) - Use for text inputs
+
+  - **Layout**: Uses `FormInput w-full` classes for consistent styling and width
+  - **Customizable**: Optional `className` prop for additional styling
+  - **Accessibility**: Properly forwards refs for accessibility
+
+- **FormSelect** (`@/components/ui/forms/FormSelect`) - Use for select dropdowns
+
+  - **Layout**: Uses `FormSelect w-full` classes for consistent styling and width
+  - **Flexible content**: Accepts any children components (option elements)
+  - **Customizable**: Optional `className` prop for additional styling
+  - **Accessibility**: Properly forwards refs for accessibility
+
+#### TanStack Form Field Example
+
+```tsx
+import { FormField, FormLabel } from '@/components/ui/forms';
+import { useFormStore } from '@/stores';
+
+<form.Field
+	name='beats'
+	children={field => (
+		<FormField className='flex-1'>
+			<FormLabel htmlFor='beats'>Beats</FormLabel>
+			<input
+				type='number'
+				className='w-full'
+				value={field.state.value}
+				min='1'
+				max='16'
+				onChange={e => {
+					const newValue = parseInt(e.target.value) || 4;
+					field.handleChange(newValue);
+					setFormValues({ beats: newValue });
+				}}
+				id='beats'
+			/>
+		</FormField>
+	)}
+/>;
+```
+
+#### Example Usage
+
+```tsx
+// ✅ Use utility components with TanStack Form
+import { Form, FormField, FormLabel, FormSelect } from '@/components/ui/forms';
+import { useFormStore } from '@/stores';
+
+<Form className='BeatForm flex flex-col gap-4 w-full' onSubmit={handleSubmit}>
+  <FormField className='flex-1'>
+    <FormLabel htmlFor='beats'>Beats</FormLabel>
+    <input
+      type='number'
+      className='w-full'
+      value={beats}
+      onChange={e => {
+        const newValue = parseInt(e.target.value) || 4;
+        setBeats(newValue);
+        setFormValues({ beats: newValue });
+      }}
+      min='1'
+      max='16'
+      id='beats'
+    />
+  </FormField>
+
+  <FormField className='flex-1'>
+    <FormLabel htmlFor='difficulty'>Difficulty</FormLabel>
+    <FormSelect
+      id='difficulty'
+      value={difficulty}
+      onChange={e => {
+        const newValue = e.target.value;
+        setDifficulty(newValue);
+        setFormValues({ difficulty: newValue });
+      }}
+    >
+      {difficultyOptions.map(option => (
+        <option value={option} key={option}>
+          {option}
+        </option>
+      ))}
+    </FormSelect>
+  </FormField>
+
+  <Button type='submit'>
+    Generate Beat
+  </Button>
+</Form>
+
+// ❌ Don't create custom elements when utilities exist
+<form className='custom-form-classes' onSubmit={handleSubmit}>
+  <input className='custom-input-classes' />
+</form>
+```
+
+**Benefits of using utility components:**
+
+- Consistent styling and behavior across the application
+- Built-in accessibility features
+- Proper TypeScript typing
+- Reduced code duplication
+- Easier maintenance and updates
+
+## Form Patterns
+
+### Beat Generation Forms
+
+- **State persistence**: Use Zustand form store to maintain form state
+- **Real-time validation**: Validate fields as users type using Zod schemas
+- **Error display**: Show clear, accessible error messages
+- **Required field indicators**: Automatically show required field indicators
+
+### Form Validation
+
+- **Zod schemas**: Use Zod for all form validation
+- **Real-time validation**: Validate fields as users type
+- **Error display**: Show clear, accessible error messages
+- **Required field indicators**: Automatically show required field indicators
+
+### Form Accessibility
+
+- **Label association**: Properly associate labels with form controls
+- **Error association**: Associate error messages with form fields
+- **Keyboard navigation**: Support full keyboard navigation
+- **Screen reader support**: Ensure screen reader compatibility
+- **Focus management**: Implement proper focus management
+
+## Data Persistence
+
+### Zustand Persistence
+
+- **Persist middleware**: Use Zustand's persist middleware for data persistence
+- **Store structure**: Organize stores by feature (form, beat)
+- **State hydration**: Handle state hydration properly
+- **Storage keys**: Use descriptive storage keys for different stores
+
+### Form State Management
+
+- **Store integration**: Integrate forms with Zustand stores
+- **State synchronization**: Keep form state synchronized with store state
+- **Validation state**: Store validation state in stores
+- **Error state**: Store error state in stores
+
+## Schema Utilities
+
+### Available Validation Functions
+
+The project includes comprehensive validation functions in `src/utils/validation.ts`:
+
+- `validateBeatFormData(data: unknown): ValidatedBeatFormData`
+- `validateGeneratedBeat(data: unknown): ValidatedGeneratedBeat`
+- `validateMeasure(data: unknown): ValidatedMeasure`
+- `validateNote(data: unknown): ValidatedNote`
+- `safeValidateBeatFormData(data: unknown): { success: boolean; data?: ValidatedBeatFormData; error?: string }`
+- `safeValidateGeneratedBeat(data: unknown): { success: boolean; data?: ValidatedGeneratedBeat; error?: string }`
+
+### Type Guards
+
+- `isBeatFormData(data: unknown): data is ValidatedBeatFormData`
+- `isGeneratedBeat(data: unknown): data is ValidatedGeneratedBeat`
+- `isMeasure(data: unknown): data is ValidatedMeasure`
+- `isNote(data: unknown): data is ValidatedNote`
+
+## Form Store Integration
+
+### Form Store Usage
+
+```typescript
+import { useFormStore } from '@/stores';
+
+const { formValues, setFormValues, resetFormValues } = useFormStore();
+
+// Update form values
+setFormValues({ beats: 8, measures: 4 });
+
+// Reset to defaults
+resetFormValues();
+```
+
+### Default Form Values
+
+```typescript
+const defaultFormValues: BeatFormData = {
+	beats: 4,
+	measures: 4,
+	difficulty: 'Hey, Not Too Rough' as BeatFormData['difficulty'],
+};
+```
+
+## Typography Standards
+
+- **Apostrophes**: Use typographic apostrophe ' instead of straight apostrophe ' in all user-facing text
+- **Consistency**: Maintain consistent typography across all form elements
+- **Accessibility**: Ensure proper contrast and readability
+
+## Testing Standards
+
+- **Test coverage**: Maintain comprehensive test coverage for all form components
+- **Validation testing**: Test all validation scenarios
+- **Accessibility testing**: Ensure forms meet accessibility standards
+- **Integration testing**: Test form integration with stores and APIs

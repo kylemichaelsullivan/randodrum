@@ -1,0 +1,185 @@
+---
+globs: ['**/*.tsx', '**/*.ts', '**/*.css']
+exclude:
+  [
+    '**/__tests__/**',
+    '**/*.test.*',
+    '**/*.spec.*',
+    '**/config/**',
+    '**/lib/schemas.ts',
+    '**/lib/openai.ts',
+  ]
+---
+
+# Styling Standards
+
+## Typography
+
+- **Apostrophes**: ALL user-facing text MUST use the typographic apostrophe ’ instead of the straight apostrophe '
+- **Consistency**: Maintain consistent typography throughout the application
+
+## Tailwind CSS
+
+- **Color utilities**: Prefer color utility classes from globals.css that use CSS Custom Properties
+- **Compelling reasons**: Only avoid color utilities when there's a compelling reason not to
+- **Direct strings**: Use direct strings for simple cases without conditionals
+- **No margins**: Avoid using Tailwind margin classes (`m-*`, `mx-*`, `my-*`, `mt-*`, `mr-*`, `mb-*`, `ml-*`)
+- **No space utilities**: Avoid using `space-x-*` or `space-y-*` utilities - they rely on margins
+- **Prettier integration**: Leverage `prettier-plugin-tailwindcss` for automatic class sorting
+- **Utility function**: Use `clsx()` for conditional classes (not `cn()`)
+
+### ClassName Patterns
+
+```tsx
+// Component name should be first in className for debugging
+className='ComponentName bg-white rounded-lg border p-4'
+
+// Conditional cases - use clsx
+className={clsx(
+  'ComponentName base-classes',
+  isActive && 'active-classes',
+  isDisabled && 'disabled-classes',
+  className
+)}
+
+// Component props - use clsx
+className={clsx('ComponentName base-classes', className)}
+```
+
+### JSX Attribute Order
+
+Follow this specific order for JSX attributes:
+
+1. **type** - Element type (for form elements)
+2. **className** - CSS classes
+3. **Standard HTML attributes** - (alphabetically)
+4. **Event handlers** - (alphabetically, starting with 'on')
+5. **ARIA attributes** - (alphabetically)
+6. **Custom data attributes** - (alphabetically)
+7. **ref** - React ref (penultimate)
+8. **id** - Element identifier (always last)
+
+#### JSX Attribute Order Example
+
+```tsx
+<button
+	type='button'
+	className='Button rounded-lg border p-4 bg-white'
+	disabled={isDisabled}
+	title='Submit form'
+	onClick={handleClick}
+	onKeyDown={handleKeyDown}
+	aria-label='Submit form'
+	aria-describedby='submit-help'
+	data-testid='submit-button'
+	ref={buttonRef}
+	id='submit-button'
+>
+	Submit
+</button>
+```
+
+### Layout Principles
+
+- **Flexbox/Grid**: Use Flexbox and Grid for layouts
+- **Avoid margins**: Don't use CSS margins except for printing and where flex/grid won't work
+- **Avoid space- utilities**: Don't use `space-x-*` or `space-y-*` utilities - they rely on margins
+- **Use flex/gap**: Use `flex flex-col gap-*` for vertical spacing and `flex items-center gap-*` for horizontal spacing
+- **Consistent spacing**: Use Tailwind's spacing scale
+- **Theme variables**: Use CSS custom properties for theme colors
+
+### Spacing Patterns
+
+```tsx
+// Vertical spacing
+className = 'flex flex-col gap-2'; // Small gaps
+className = 'flex flex-col gap-4'; // Medium gaps
+className = 'flex flex-col gap-6'; // Large gaps
+
+// Horizontal spacing
+className = 'flex items-center gap-2';
+className = 'flex justify-between';
+
+// Responsive spacing
+className = 'flex flex-col gap-3 sm:gap-4';
+className = 'flex items-center gap-1.5 sm:gap-2';
+```
+
+### Component Structure
+
+- **Avoid superfluous wrappers**: Don't create unnecessary wrapper divs that add DOM complexity
+- **Simplify nesting**: Remove redundant wrapper elements when possible
+- **Keep meaningful wrappers**: Retain wrappers that serve styling, semantic, or organizational purposes
+
+#### Wrapper Removal Examples
+
+```tsx
+// ❌ Avoid - redundant wrapper
+<div className='flex flex-col gap-6'>
+  <div className='flex flex-col gap-6'>
+    <Component />
+  </div>
+</div>
+
+// ✅ Good - simplified structure
+<div className='flex flex-col gap-6'>
+  <Component />
+</div>
+```
+
+## Font Awesome Icons
+
+- **Preferred icon library**: Use Font Awesome icons for all icon needs
+- **Import pattern**: Import icons from `@fortawesome/free-solid-svg-icons`
+- **Component usage**: Use `FontAwesomeIcon` component from `@fortawesome/react-fontawesome`
+- **Library registration**: Add new icons to `src/lib/fontawesome.ts` library registration
+- **Accessibility**: Always include `aria-hidden="true"` on icons
+- **Size consistency**: Use consistent sizing classes (`h-3 w-3`, `h-4 w-4`, `h-5 w-5`)
+- **Responsive sizing**: Use responsive classes for different screen sizes
+
+#### Font Awesome Usage Example
+
+```tsx
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSort } from '@fortawesome/free-solid-svg-icons';
+
+<FontAwesomeIcon icon={faSort} className='h-3 w-3 sm:h-4 sm:w-4' aria-hidden='true' />;
+```
+
+#### Adding New Icons
+
+1. **Import the icon** in `src/lib/fontawesome.ts`:
+
+```tsx
+import { faNewIcon } from '@fortawesome/free-solid-svg-icons';
+```
+
+2. **Add to library registration**:
+
+```tsx
+library.add(faNewIcon);
+```
+
+3. **Use in components**:
+
+```tsx
+import { faNewIcon } from '@fortawesome/free-solid-svg-icons';
+```
+
+- **Icon selection**: Prefer solid icons over regular/light variants
+- **Semantic meaning**: Choose icons that clearly represent their function
+- **Consistency**: Use similar icons for similar actions across the application
+
+## Theme System
+
+- **Hydration safety**: Implement hydration-safe theme system
+- **CSS custom properties**: Use CSS custom properties for theme colors
+- **Accessible toggle**: Provide accessible theme toggle
+- **Browser extension handling**: Handle browser extension interference
+- **SuppressHydrationWarning**: Use sparingly and not applied to the `<body>` element
+
+## CSS Best Practices
+
+- **No !important**: Avoid using `!important` declarations in CSS
+- **TypeScript**: Avoid using the `any` type in TypeScript code
+- **Semantic HTML**: Use semantic HTML elements for better accessibility

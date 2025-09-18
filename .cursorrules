@@ -1,4 +1,12 @@
 # Cursor Rules for RandoDrum
 
 ## Typography
+
 ALL user-facing text MUST use the typographic apostrophe ’ instead of the straight apostrophe '.
+
+## Testing
+
+- Use `pnpm test:run` for running tests (not `pnpm test` which uses watch mode)
+- Watch mode can be resource-intensive and may cause issues in some environments
+- Use `pnpm test:ui` for interactive debugging of failing tests
+- Use `pnpm test:coverage` for coverage analysis before committing

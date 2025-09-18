@@ -1,0 +1,316 @@
+---
+globs: ['**/*.tsx', '**/*.ts']
+exclude:
+  [
+    '**/__tests__/**',
+    '**/*.test.*',
+    '**/*.spec.*',
+    '**/config/**',
+    '**/server/**',
+    '**/trpc/**',
+    '**/env.js',
+  ]
+---
+
+# React Development Standards for RandoDrum
+
+## Component Architecture
+
+### Single-Purpose Components
+
+- **One component per file**: Each file contains exactly one React component
+- **Bite-sized components**: Components should be focused and single-purpose (one thing == one component == one file)
+- **Descriptive naming**: Use PascalCase with descriptive names indicating visual purpose
+- **Component suffixes**: Use appropriate suffixes (e.g., `Container`, `Panel`, `Button`, `Display`, `Field`)
+
+### Component Guidelines
+
+- **TypeScript types**: Prefer `type` over `interface` for component props and data structures
+- **Named exports**: Export components as named exports using `export function` or `export const`
+- **Index files**: Create `index.ts` files for directory exports to enable clean imports
+- **Props interface**: Define clear, typed props with descriptive names
+- **forwardRef usage**: Use `forwardRef` for components that need to expose DOM refs (e.g., Button, FormInput)
+
+### Performance Optimization
+
+### React.memo Usage
+
+- **Import pattern**: Import `memo` from React for component memoization
+- **Component exports**: Apply `memo` to named exports for performance-critical components
+- **Memoization criteria**: Apply `memo` to components with stable props or frequent re-renders
+- **Current status**: Applied to display, form, and utility components
+
+#### Memoization Guidelines (Current Implementation)
+
+```typescript
+// ✅ Current memoization pattern
+import { memo } from 'react';
+
+function ComponentNameComponent({ prop1, prop2 }: ComponentProps) {
+  return <div>{/* component content */}</div>;
+}
+
+// Memoized component for performance optimization
+export const ComponentName = memo(ComponentNameComponent);
+
+ComponentName.displayName = 'ComponentName';
+```
+
+#### Performance Optimization Patterns
+
+```typescript
+// ✅ useCallback for event handlers
+import { memo, useCallback } from 'react';
+
+function FormFieldComponent({ form }: FormFieldProps) {
+  const { setFormValues } = useFormStore();
+
+  const handleChange = useCallback((e: React.ChangeEvent<HTMLInputElement>, field: any) => {
+    const newValue = parseInt(e.target.value) || 4;
+    field.handleChange(newValue);
+    setFormValues({ fieldName: newValue });
+  }, [setFormValues]);
+
+  return form.Field({
+    name: 'fieldName',
+    children: field => (
+      <input onChange={e => handleChange(e, field)} />
+    ),
+  });
+}
+
+export const FormField = memo(FormFieldComponent);
+```
+
+```typescript
+// ✅ useMemo for expensive computations
+import { memo, useMemo } from 'react';
+
+function DisplayComponent({ data }: DisplayProps) {
+  // Memoize expensive calculations
+  const processedData = useMemo(() => {
+    return data.map(item => expensiveCalculation(item));
+  }, [data]);
+
+  return <div>{/* render processed data */}</div>;
+}
+
+export const DisplayComponent = memo(DisplayComponent);
+```
+
+```typescript
+// ✅ Custom comparison function for complex props
+import { memo } from 'react';
+
+function ComplexComponent({ complexData }: ComplexProps) {
+  return <div>{/* component content */}</div>;
+}
+
+// Custom comparison for better performance
+export const ComplexComponent = memo(ComplexComponent, (prevProps, nextProps) => {
+  return (
+    prevProps.id === nextProps.id &&
+    JSON.stringify(prevProps.complexData) === JSON.stringify(nextProps.complexData)
+  );
+});
+```
+
+#### When to Use React.memo
+
+- **UI components**: Button, FormField, DisplayBeat, etc.
+- **Display components**: MeasureDisplay, NoteDisplay, HandLegend, etc.
+- **Form components**: FormField, FormInput, FormSelect, etc.
+- **Navigation components**: ThemeToggle, DominantHand, etc.
+
+#### When NOT to Use React.memo
+
+- **Context providers**: ThemeProvider, DominantHandProvider, etc.
+- **Layout components**: Header, Footer, Main, etc.
+- **Components with frequently changing props**
+- **Components that are already optimized**
+
+### HMR Optimization
+
+- **Component memoization**: Use `React.memo` to prevent unnecessary re-renders
+- **Context minimization**: Avoid deep context nesting that causes HMR issues
+- **Development tools**: Include HMR debug components for development
+- **Store structure**: Use Zustand stores to reduce HMR complexity
+
+### Performance Considerations
+
+### Memoization
+
+- **React.memo**: Use for components with stable props
+- **useMemo**: Use for expensive computations (e.g., beat generation, difficulty calculations)
+- **useCallback**: Use for event handlers passed as props
+
+### Bundle Optimization
+
+- **Tree shaking**: Import only necessary components
+- **Dynamic imports**: Use for large components when appropriate
+- **Code splitting**: Leverage Next.js automatic code splitting
+
+## State Management
+
+### Zustand Stores
+
+- **DevTools integration**: Include Zustand devtools middleware for development
+- **State management**: Use Zustand for all application state
+- **Store naming**: Use `use[Feature]Store` naming convention
+- **Store organization**: Create focused stores in `src/stores/`
+- **Store structure**: Separate state, setters, and actions clearly
+- **Persistence**: Use Zustand persist middleware for client-side state persistence
+
+#### Store Guidelines
+
+```typescript
+// ✅ Good store structure for RandoDrum
+export const useBeatStore = create<BeatStore>()(
+	persist(
+		(set, get) => ({
+			// State
+			currentBeat: null,
+			isLoading: false,
+
+			// Setters
+			setCurrentBeat: (beat: GeneratedBeat) => set({ currentBeat: beat }),
+			setIsLoading: (loading: boolean) => set({ isLoading: loading }),
+
+			// Actions
+			clearBeat: () => set({ currentBeat: null }),
+			clearCorruptedBeat: () => {
+				console.log('Clearing corrupted beat data');
+				localStorage.removeItem('beat-storage');
+				set({ currentBeat: null });
+			},
+		}),
+		{ name: 'beat-storage' }
+	)
+);
+```
+
+#### Store Usage
+
+```typescript
+// ✅ Use stores directly in components
+const { currentBeat, setCurrentBeat, isLoading } = useBeatStore();
+
+// ❌ Don't create wrapper hooks unless necessary
+const useBeatData = () => useBeatStore(state => state.currentBeat);
+```
+
+### Context Optimization
+
+- **Minimize context usage**: Prefer Zustand stores over React contexts
+- **Context nesting**: Avoid deep context nesting (max 2-3 levels)
+- **Context splitting**: Break large contexts into smaller, focused contexts
+- **Performance**: Use `React.memo` for context consumers
+- **Hydration safety**: Use contexts for theme and hydration management only
+
+## Browser Extension Safety
+
+### Hydration Safety
+
+- **Consistent rendering**: Ensure server and client render the same structure initially
+- **suppressHydrationWarning**: Use sparingly and not on the `<body>` element
+- **Client-only hooks**: Use utility hooks for browser APIs
+- **Mounting detection**: Check for client mounting before applying dynamic changes
+- **Hydration boundaries**: Use HydrationBoundary and HydrationSafe components
+
+### Extension Interference
+
+- **Graceful handling**: Handle browser extension interference gracefully
+- **Cleanup mechanisms**: Implement cleanup for extension interference
+- **Fallback states**: Provide fallback states for extension-modified content
+- **Browser extension handler**: Use BrowserExtensionHandler for managing interference
+
+## Accessibility Standards
+
+### ARIA and Semantics
+
+- **Proper ARIA labels**: Include appropriate ARIA labels and roles
+- **Keyboard navigation**: Support keyboard navigation with proper tabIndex
+- **Focus management**: Implement proper focus management
+- **Screen reader compatibility**: Ensure screen reader compatibility
+- **Color contrast**: Maintain proper color contrast ratios
+- **Semantic HTML**: Use semantic HTML structure
+
+### Error Handling
+
+- **Error message association**: Associate error messages with form fields
+- **Loading state announcements**: Announce loading states to screen readers
+- **Error boundaries**: Implement error boundaries for graceful error handling
+- **Beat generation errors**: Handle beat generation failures gracefully
+
+## RandoDrum-Specific Guidelines
+
+### Beat Generation Components
+
+- **DisplayBeat**: Use for rendering generated drum beats
+- **MeasureDisplay**: Handle individual measure rendering
+- **NoteDisplay**: Render individual notes with proper accessibility
+- **HandLegend**: Provide visual legend for hand notation
+
+### Form Components
+
+- **BeatForm**: Handle beat generation form logic
+- **FormField**: Reusable form field wrapper
+- **FormInput/FormSelect**: Specific input components with validation
+- **GenerateBeatButton**: Specialized button for beat generation
+
+### Theme and UI
+
+- **ThemeProvider**: Manage light/dark theme switching
+- **ThemeToggle**: Toggle between light and dark modes
+- **DominantHand**: Handle left/right hand preference
+- **Button variants**: Use appropriate button variants (default, icon, generate, help)
+
+### Typography
+
+- **Typographic apostrophe**: Use ' instead of ' in all user-facing text
+- **Consistent spacing**: Follow established spacing patterns
+- **Readable fonts**: Ensure good readability for beat notation
+
+### Testing Integration
+
+- **Component testing**: Test components with React Testing Library
+- **Store testing**: Test Zustand stores with proper mocking
+- **Beat fixtures**: Use beat fixtures for consistent testing data
+- **Mock services**: Mock beat generation services for testing
+
+## File Organization
+
+### Component Structure
+
+```
+src/components/
+├── ui/
+│   ├── buttons/          # Button components
+│   ├── forms/            # Form components
+│   ├── globals/          # Global layout components
+│   ├── modals/           # Modal components
+│   └── sections/         # Feature-specific sections
+├── providers/            # Context providers
+└── index.ts             # Component exports
+```
+
+### Store Structure
+
+```
+src/stores/
+├── beat-store.ts        # Beat generation and display state
+├── form-store.ts        # Form state management
+└── index.ts            # Store exports
+```
+
+### Type Structure
+
+```
+src/types/
+├── beat.ts             # Beat-related types
+├── difficulty.ts       # Difficulty level types
+├── duration.ts         # Duration and timing types
+├── noteType.ts         # Note type definitions
+├── store.ts            # Store type definitions
+└── index.ts            # Type exports
+```

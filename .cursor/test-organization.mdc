@@ -1,0 +1,249 @@
+# Test Organization Guide
+
+## Logical Test Grouping
+
+### Component Tests
+
+- **Forms**: Beat generation form components (`BeatForm`, `BeatsField`, `DifficultyField`, `MeasuresField`)
+- **UI**: Reusable UI components (`Button`, `Form`, `Modal`, `ThemeToggle`, etc.)
+- **Sections**: Feature-specific sections (`DisplayBeat`, `GenerateBeat`)
+- **Providers**: Context providers (`ThemeProvider`, `DominantHandProvider`, `ErrorBoundary`)
+- **Globals**: Layout components (`Header`, `Footer`, `Main`, `EmptyState`)
+
+### Service Tests
+
+- **Beat Generator**: Core beat generation logic (`beat-generator`)
+- **API**: tRPC API routes (`beat` router)
+- **Utils**: Utility functions (`beat`, `difficulty`, `validation`, `ui`)
+- **Stores**: State management (`beat-store`, `form-store`)
+
+### Integration Tests
+
+- **Beat Workflow**: Complete beat generation and display workflow
+- **Form Integration**: Form submission and validation flow
+- **Provider Integration**: Context provider interactions
+
+## Proposed Folder Structure
+
+```
+src/__tests__/
+├── components/
+│   ├── forms/
+│   │   ├── BeatForm.test.tsx
+│   │   ├── BeatsField.test.tsx
+│   │   ├── DifficultyField.test.tsx
+│   │   └── MeasuresField.test.tsx
+│   ├── ui/
+│   │   ├── buttons/
+│   │   │   ├── Button.test.tsx
+│   │   │   ├── DominantHand.test.tsx
+│   │   │   ├── Export.test.tsx
+│   │   │   ├── HelpButton.test.tsx
+│   │   │   ├── Import.test.tsx
+│   │   │   └── ThemeToggle.test.tsx
+│   │   ├── forms/
+│   │   │   ├── Form.test.tsx
+│   │   │   ├── FormField.test.tsx
+│   │   │   ├── FormInput.test.tsx
+│   │   │   ├── FormLabel.test.tsx
+│   │   │   └── FormSelect.test.tsx
+│   │   ├── globals/
+│   │   │   ├── EmptyState.test.tsx
+│   │   │   ├── Footer.test.tsx
+│   │   │   ├── Header.test.tsx
+│   │   │   └── Main.test.tsx
+│   │   └── modals/
+│   │       ├── Modal.test.tsx
+│   │       └── DifficultyExplanation/
+│   │           ├── DifficultyChart.test.tsx
+│   │           ├── DifficultyExplanation.test.tsx
+│   │           ├── NoteTypesTable.test.tsx
+│   │           ├── TechniqueDefinition.test.tsx
+│   │           ├── TechniqueDefinitions.test.tsx
+│   │           └── TechniquesTable.test.tsx
+│   ├── sections/
+│   │   ├── DisplayBeat/
+│   │   │   ├── DisplayBeat.test.tsx
+│   │   │   ├── HandLegend.test.tsx
+│   │   │   ├── MeasureContent.test.tsx
+│   │   │   ├── MeasureDisplay.test.tsx
+│   │   │   ├── MeasureError.test.tsx
+│   │   │   ├── MeasureHeader.test.tsx
+│   │   │   ├── MeasuresDisplay.test.tsx
+│   │   │   └── NoteDisplay.test.tsx
+│   │   └── GenerateBeat/
+│   │       ├── BeatForm.test.tsx
+│   │       ├── BeatsField.test.tsx
+│   │       ├── DifficultyField.test.tsx
+│   │       ├── GenerateBeat.test.tsx
+│   │       ├── GenerateBeatButton.test.tsx
+│   │       └── MeasuresField.test.tsx
+│   └── providers/
+│       ├── browser-extension-handler.test.tsx
+│       ├── dominant-hand-provider.test.tsx
+│       ├── error-boundary.test.tsx
+│       ├── hydration-boundary.test.tsx
+│       ├── hydration-fix.test.tsx
+│       ├── hydration-manager.test.tsx
+│       ├── hydration-safe.test.tsx
+│       └── theme-provider.test.tsx
+├── services/
+│   ├── beat-generator.test.ts
+│   └── api/
+│       └── beat.test.ts
+├── stores/
+│   ├── beat-store.test.ts
+│   └── form-store.test.ts
+├── utils/
+│   ├── beat.test.ts
+│   ├── difficulty.test.ts
+│   ├── validation.test.ts
+│   └── ui.test.ts
+├── integration/
+│   ├── beat-workflow.test.tsx
+│   ├── form-submission.test.tsx
+│   └── provider-integration.test.tsx
+├── fixtures/
+│   ├── beat-fixtures.ts
+│   ├── form-fixtures.ts
+│   └── api-responses.ts
+├── mocks/
+│   ├── beat-generator-mock.ts
+│   ├── stores-mock.ts
+│   └── external-deps-mock.ts
+└── utils/
+    ├── test-utils.tsx
+    └── render-helpers.tsx
+```
+
+## Test File Naming Standards
+
+### Component Tests
+
+- `ComponentName.test.tsx` - Main component test
+- `ComponentName.integration.test.tsx` - Integration test
+- `ComponentName.edge-cases.test.tsx` - Edge case tests
+
+### Service Tests
+
+- `serviceName.test.ts` - Main service test
+- `serviceName.integration.test.ts` - Integration test
+- `serviceName.error-handling.test.ts` - Error handling tests
+
+### Utility Tests
+
+- `utilityName.test.ts` - Main utility test
+- `utilityName.edge-cases.test.ts` - Edge case tests
+
+## Test Categories
+
+### 1. Unit Tests
+
+- Test individual components in isolation
+- Mock all external dependencies (stores, APIs, generators)
+- Focus on component behavior and props
+- Fast execution, high coverage
+
+### 2. Integration Tests
+
+- Test component interactions with stores
+- Test form workflows and validation
+- Test beat generation and display pipeline
+- Moderate execution time
+
+### 3. E2E Tests
+
+- Test complete beat generation workflow
+- Test form submission to beat display
+- Test with real browser environment
+- Slower execution, critical path coverage
+
+## Test Data Organization
+
+### Mock Data Files
+
+```
+src/__tests__/
+├── fixtures/
+│   ├── beat-fixtures.ts          # Beat data for testing
+│   ├── form-fixtures.ts          # Form data and validation scenarios
+│   └── api-responses.ts          # Mock API responses
+├── mocks/
+│   ├── beat-generator-mock.ts    # Beat generator mock
+│   ├── stores-mock.ts            # Store mocks
+│   └── external-deps-mock.ts     # External dependency mocks
+└── utils/
+    ├── test-utils.tsx            # Test utilities and helpers
+    └── render-helpers.tsx        # Custom render functions
+```
+
+### Shared Test Utilities
+
+- `createMockBeat()` - Beat data factory
+- `createMockForm()` - Form data factory
+- `createMockStore()` - Store mock factory
+- `renderWithProviders()` - Render with context providers
+- `createTestDifficulty()` - Difficulty test data factory
+
+## Test Execution Strategy
+
+### Local Development
+
+- Run unit tests on file changes
+- Run integration tests on component changes
+- Run beat workflow tests before commits
+
+### CI/CD Pipeline
+
+- Run all unit tests
+- Run integration tests
+- Run beat generation workflow tests
+- Generate coverage reports
+
+## Test Maintenance
+
+### Regular Tasks
+
+- Review test coverage monthly
+- Update beat fixtures when beat structure changes
+- Update mocks when beat generator changes
+- Refactor duplicate test code
+- Remove obsolete tests
+
+### Quality Gates
+
+- Minimum 80% code coverage
+- All critical beat generation paths covered
+- All form validation scenarios tested
+- No flaky tests
+- Fast test execution (< 30s for unit tests)
+
+## RandoDrum-Specific Testing Considerations
+
+### Beat Generation Testing
+
+- Test all difficulty levels
+- Test various measure counts
+- Test beat count variations
+- Test error handling for invalid inputs
+
+### Form Testing
+
+- Test form validation rules
+- Test form submission flow
+- Test form reset functionality
+- Test form error states
+
+### Display Testing
+
+- Test beat visualization
+- Test measure display
+- Test note rendering
+- Test hand legend display
+
+### Provider Testing
+
+- Test theme provider functionality
+- Test dominant hand provider
+- Test hydration boundary behavior
+- Test error boundary error handling

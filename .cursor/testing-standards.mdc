@@ -1,0 +1,461 @@
+---
+description: Testing standards and best practices for RandoDrum
+globs:
+  [
+    '**/__tests__/**/*.ts',
+    '**/__tests__/**/*.tsx',
+    '**/*.test.ts',
+    '**/*.test.tsx',
+    '**/*.spec.ts',
+    '**/*.spec.tsx',
+  ]
+alwaysApply: true
+---
+
+# Testing Standards and Best Practices
+
+## Test Structure and Organization
+
+### File Naming Convention
+
+- Use descriptive test file names: `ComponentName.test.tsx` for React components
+- Use `.test.ts` for utility functions and services
+- Use `.spec.ts` for end-to-end tests
+- Group related tests in logical folders
+
+### Test File Structure
+
+```typescript
+// 1. Imports (testing libraries first, then application code)
+import { render, screen, fireEvent } from '@testing-library/react';
+import { describe, it, expect, vi, beforeEach } from 'vitest';
+
+// 2. Mock external dependencies (before imports)
+vi.mock('@/stores', () => ({
+	useBeatStore: () => mockBeatStore,
+}));
+
+// 3. Import component under test (after mocks)
+import { ComponentName } from '@/components/path/ComponentName';
+
+// 4. Test suite
+describe('ComponentName', () => {
+	// Setup and teardown
+	beforeEach(() => {
+		vi.clearAllMocks();
+	});
+
+	// Test cases
+	it('should render correctly', () => {
+		// Test implementation
+	});
+});
+```
+
+## Testing Patterns
+
+### Component Testing
+
+```typescript
+// __tests__/components/Button.test.tsx
+import { render, screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { describe, it, expect, vi } from 'vitest';
+import { Button } from '@/components';
+
+describe('Button', () => {
+  it('renders with correct text', () => {
+    render(<Button title="Click me">Click me</Button>);
+    expect(screen.getByRole('button', { name: /click me/i })).toBeInTheDocument();
+  });
+
+  it('handles click events', async () => {
+    const handleClick = vi.fn();
+    const user = userEvent.setup();
+
+    render(<Button onClick={handleClick}>Click me</Button>);
+
+    await user.click(screen.getByRole('button'));
+    expect(handleClick).toHaveBeenCalledTimes(1);
+  });
+
+  it('applies correct classes based on props', () => {
+    render(
+      <Button className="custom-class" disabled>
+        Button
+      </Button>
+    );
+
+    const button = screen.getByRole('button');
+    expect(button).toHaveClass('Button', 'custom-class', 'opacity-50');
+  });
+
+  it('is accessible', () => {
+    render(<Button title="Submit form">Submit</Button>);
+    expect(screen.getByRole('button', { name: /submit form/i })).toBeInTheDocument();
+  });
+});
+```
+
+### Form Testing
+
+```typescript
+// __tests__/forms/BeatForm.test.tsx
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { describe, it, expect, vi } from 'vitest';
+import { BeatForm } from '@/components';
+
+describe('BeatForm', () => {
+  it('renders all form fields', () => {
+    render(<BeatForm />);
+
+    expect(screen.getByLabelText(/measures/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/beats per measure/i)).toBeInTheDocument();
+    expect(screen.getByLabelText(/difficulty/i)).toBeInTheDocument();
+  });
+
+  it('validates required fields', async () => {
+    const user = userEvent.setup();
+    render(<BeatForm />);
+
+    const submitButton = screen.getByRole('button', { name: /generate/i });
+    await user.click(submitButton);
+
+    await waitFor(() => {
+      expect(screen.getByText(/measures is required/i)).toBeInTheDocument();
+    });
+  });
+
+  it('submits form with valid data', async () => {
+    const mockSubmit = vi.fn();
+    const user = userEvent.setup();
+
+    render(<BeatForm onSubmit={mockSubmit} />);
+
+    await user.type(screen.getByLabelText(/measures/i), '4');
+    await user.type(screen.getByLabelText(/beats per measure/i), '4');
+    await user.click(screen.getByRole('button', { name: /generate/i }));
+
+    await waitFor(() => {
+      expect(mockSubmit).toHaveBeenCalledWith({
+        measures: 4,
+        beatsPerMeasure: 4,
+        difficulty: 'beginner',
+      });
+    });
+  });
+});
+```
+
+### Store Testing
+
+```typescript
+// __tests__/stores/beat-store.test.ts
+import { describe, it, expect, beforeEach } from 'vitest';
+import { renderHook, act } from '@testing-library/react';
+import { useBeatStore } from '@/stores';
+import { mockGeneratedBeat } from '@/__tests__/fixtures';
+
+describe('useBeatStore', () => {
+	beforeEach(() => {
+		// Clear store state before each test
+		const { result } = renderHook(() => useBeatStore());
+		act(() => {
+			result.current.clearCurrentBeat();
+		});
+	});
+
+	it('initializes with default state', () => {
+		const { result } = renderHook(() => useBeatStore());
+
+		expect(result.current.currentBeat).toBeNull();
+		expect(result.current.isGenerating).toBe(false);
+	});
+
+	it('updates current beat', () => {
+		const { result } = renderHook(() => useBeatStore());
+
+		act(() => {
+			result.current.setCurrentBeat(mockGeneratedBeat);
+		});
+
+		expect(result.current.currentBeat).toEqual(mockGeneratedBeat);
+	});
+
+	it('persists data across renders', () => {
+		const { result, rerender } = renderHook(() => useBeatStore());
+
+		act(() => {
+			result.current.setCurrentBeat(mockGeneratedBeat);
+		});
+
+		rerender();
+
+		expect(result.current.currentBeat).toEqual(mockGeneratedBeat);
+	});
+});
+```
+
+## Mocking Standards
+
+### External Dependencies
+
+- Mock all external dependencies at the top of the file
+- Use consistent mock implementations across tests
+- Mock FontAwesome icons with testable attributes
+- Mock Next.js router and navigation hooks
+
+### Store Mocking
+
+```typescript
+vi.mock('@/stores', () => ({
+	useBeatStore: () => mockBeatStore,
+	useFormStore: () => mockFormStore,
+}));
+```
+
+### Component Mocking
+
+```typescript
+vi.mock('@/components', () => ({
+  Button: ({ children, onClick, ...props }: any) => (
+    <button onClick={onClick} {...props}>
+      {children}
+    </button>
+  ),
+}));
+```
+
+### FontAwesome Mocking
+
+```typescript
+vi.mock('@fortawesome/react-fontawesome', () => ({
+  FontAwesomeIcon: ({ icon }: any) => (
+    <span data-testid='font-awesome-icon'>{icon?.iconName || 'icon'}</span>
+  ),
+}));
+```
+
+### tRPC Mocking
+
+```typescript
+vi.mock('@/trpc', () => ({
+	api: {
+		beat: {
+			generate: {
+				useMutation: () => ({
+					mutate: vi.fn(),
+					isLoading: false,
+					error: null,
+				}),
+			},
+		},
+	},
+}));
+```
+
+## Test Case Standards
+
+### Test Naming
+
+- Use descriptive test names that explain the expected behavior
+- Start with "should" or "renders" for clarity
+- Include the condition being tested
+
+### Test Structure (AAA Pattern)
+
+```typescript
+it('should call onRemoveSkill when remove button is clicked', () => {
+  // Arrange
+  render(<Component onRemoveSkill={mockOnRemoveSkill} />);
+
+  // Act
+  fireEvent.click(screen.getByRole('button'));
+
+  // Assert
+  expect(mockOnRemoveSkill).toHaveBeenCalledWith('expected-value');
+});
+```
+
+### Assertion Standards
+
+- Use specific assertions: `toBeInTheDocument()`, `toHaveClass()`, `toHaveAttribute()`
+- Test both positive and negative cases
+- Verify callback functions are called with correct parameters
+- Test accessibility attributes (aria-label, title, etc.)
+
+## Component Testing Patterns
+
+### Rendering Tests
+
+```typescript
+it('renders component with correct structure', () => {
+  render(<Component />);
+  expect(screen.getByTestId('component-container')).toBeInTheDocument();
+  expect(screen.getByRole('button')).toBeInTheDocument();
+});
+```
+
+### Interaction Tests
+
+```typescript
+it('handles user interactions correctly', () => {
+  const mockHandler = vi.fn();
+  render(<Component onAction={mockHandler} />);
+
+  fireEvent.click(screen.getByRole('button'));
+  expect(mockHandler).toHaveBeenCalledTimes(1);
+});
+```
+
+### Props Testing
+
+```typescript
+it('passes props correctly to child components', () => {
+  render(<Component showActions={false} />);
+  expect(screen.getByTestId('child-component')).toHaveAttribute('data-show-actions', 'false');
+});
+```
+
+### CSS Class Testing
+
+```typescript
+it('applies correct CSS classes', () => {
+  const { container } = render(<Component className="custom-class" />);
+  expect(container.firstChild).toHaveClass('ComponentName', 'custom-class');
+});
+```
+
+## Service and Utility Testing
+
+### API Integration Testing
+
+```typescript
+describe('Beat Generation API', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+		global.fetch = vi.fn();
+	});
+
+	it('should make successful API call', async () => {
+		const mockResponse = { data: 'success' };
+		(global.fetch as any).mockResolvedValueOnce({
+			ok: true,
+			json: async () => mockResponse,
+		});
+
+		const result = await generateBeat(mockFormData);
+		expect(result).toEqual(mockResponse);
+	});
+});
+```
+
+### Store Testing
+
+```typescript
+describe('Store Management', () => {
+	beforeEach(() => {
+		vi.clearAllMocks();
+		store.getState().clearData();
+	});
+
+	it('should update state correctly', () => {
+		const { updateField } = store.getState();
+		updateField('test', 'value');
+
+		expect(store.getState().data.test).toBe('value');
+	});
+});
+```
+
+## Error Handling and Edge Cases
+
+### Error State Testing
+
+```typescript
+it('displays error message when error is provided', () => {
+  render(<Component error="Test error" />);
+  expect(screen.getByTestId('error')).toBeInTheDocument();
+  expect(screen.getByText('Test error')).toBeInTheDocument();
+});
+
+it('does not display error when error is not provided', () => {
+  render(<Component />);
+  expect(screen.queryByTestId('error')).not.toBeInTheDocument();
+});
+```
+
+### Empty State Testing
+
+```typescript
+it('handles empty data gracefully', () => {
+  render(<Component data={[]} />);
+  expect(screen.getByTestId('empty-state')).toBeInTheDocument();
+});
+```
+
+## Accessibility Testing
+
+### ARIA Attributes
+
+```typescript
+it('has correct accessibility attributes', () => {
+  render(<Component />);
+  const button = screen.getByRole('button');
+  expect(button).toHaveAttribute('aria-label', 'Expected Label');
+  expect(button).toHaveAttribute('title', 'Expected Title');
+});
+```
+
+### Keyboard Navigation
+
+```typescript
+it('handles keyboard events correctly', () => {
+  render(<Component />);
+  const input = screen.getByRole('textbox');
+
+  fireEvent.keyDown(input, { key: 'Enter' });
+  expect(mockHandler).toHaveBeenCalled();
+});
+```
+
+## Test Data Management
+
+### Mock Data Creation
+
+```typescript
+const mockProps = {
+	currentBeat: mockGeneratedBeat,
+	onGenerate: vi.fn(),
+	onClear: vi.fn(),
+};
+```
+
+### Test Utilities
+
+- Use `test-utils.tsx` for shared mock data and utilities
+- Create reusable mock functions for common patterns
+- Use `beforeEach` for consistent test setup
+
+## Performance and Best Practices
+
+### Test Isolation
+
+- Each test should be independent
+- Use `beforeEach` to reset mocks and state
+- Avoid shared mutable state between tests
+
+### Test Coverage
+
+- Test all public methods and props
+- Test error conditions and edge cases
+- Test accessibility features
+- Test user interactions
+
+### Maintainability
+
+- Keep tests simple and focused
+- Use descriptive test names
+- Group related tests in describe blocks
+- Avoid complex test setup when possible

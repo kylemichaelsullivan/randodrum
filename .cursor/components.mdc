@@ -1,0 +1,335 @@
+---
+globs: ['**/components/**/*.tsx', '**/components/**/*.ts']
+exclude: ['**/__tests__/**', '**/*.test.*', '**/*.spec.*']
+---
+
+# RandoDrum Component Development Standards
+
+## File Organization
+
+```
+src/components/
+├── ui/                    # UI components by function
+│   ├── buttons/          # Button components (Button, DominantHand, Export, Import, HelpButton, ThemeToggle)
+│   ├── forms/            # Form components (Form, FormField, FormInput, FormLabel, FormSelect)
+│   ├── globals/          # Global layout components (Header, Footer, Main, EmptyState)
+│   ├── modals/           # Modal components (Modal, DifficultyExplanation)
+│   └── sections/         # Feature sections (DisplayBeat, GenerateBeat)
+├── providers/            # Context providers and hydration management
+└── index.ts              # Main component exports
+```
+
+## Component Structure Guidelines
+
+### Avoid Superfluous Wrappers
+
+- **Remove unnecessary wrapper divs**: Don't create wrapper divs that add DOM complexity without benefit
+- **Simplify component structure**: Remove redundant nesting when possible
+- **Keep meaningful wrappers**: Retain wrappers that serve styling, semantic, or organizational purposes
+
+### Spacing Guidelines
+
+- **Avoid `space-*` utilities**: Don't use `space-x-*` or `space-y-*` utilities - they rely on margin-based spacing
+- **Use flex/gap spacing**: Use `flex flex-col gap-*` for vertical spacing and `flex items-center gap-*` for horizontal spacing
+- **Maintain visual consistency**: All spacing changes should preserve the original visual appearance
+
+#### Spacing Examples
+
+```tsx
+// ❌ Avoid - margin-based spacing
+<div className='space-y-4'>
+  <Component />
+</div>
+
+// ✅ Good - flexbox-based spacing
+<div className='flex flex-col gap-4'>
+  <Component />
+</div>
+```
+
+```tsx
+// ❌ Avoid - redundant wrapper
+<div className='Container'>
+  <div className='flex flex-col gap-4'>
+    <Component />
+  </div>
+</div>
+
+// ✅ Good - simplified structure
+<div className='Container flex flex-col gap-4'>
+  <Component />
+</div>
+```
+
+## Utility Components
+
+Always use the project's utility components instead of creating custom HTML elements when possible:
+
+### Core UI Components
+
+- **Button** (`@/components/ui/buttons/Button`) - Use for all button interactions
+
+  - Supports variants: `default`, `icon`, `generate`, `help`
+  - Required props: `title`, `children`
+  - Optional props: `variant`, `aria-label`, `isDisabled`
+  - Includes proper accessibility attributes and keyboard navigation
+
+- **Form Components** (`@/components/ui/forms/`) - Use for all form interactions
+  - **Form** - Main form wrapper with validation
+  - **FormField** - Individual form field wrapper
+  - **FormInput** - Text input component
+  - **FormLabel** - Form label component
+  - **FormSelect** - Select dropdown component
+
+#### Example Usage
+
+```tsx
+// ✅ Use utility components
+import { Button } from '@/components/ui/buttons';
+import { Form, FormField, FormInput, FormLabel, FormSelect } from '@/components/ui/forms';
+
+<Form onSubmit={handleSubmit}>
+  <FormField>
+    <FormLabel htmlFor="difficulty">Difficulty Level</FormLabel>
+    <FormSelect
+      id="difficulty"
+      value={difficulty}
+      onChange={setDifficulty}
+      options={difficultyOptions}
+    />
+  </FormField>
+
+  <Button variant="generate" title="Generate Beat" type="submit">
+    Generate Beat
+  </Button>
+</Form>
+
+// ❌ Don't create custom elements when utilities exist
+<form className="custom-form-classes" onSubmit={handleSubmit}>
+  <input className="custom-input-classes" />
+</form>
+```
+
+### Specialized Button Components
+
+- **DominantHand** (`@/components/ui/buttons/DominantHand`) - Use for dominant hand selection
+- **Export** (`@/components/ui/buttons/Export`) - Use for beat export functionality
+- **Import** (`@/components/ui/buttons/Import`) - Use for beat import functionality
+- **HelpButton** (`@/components/ui/buttons/HelpButton`) - Use for help/explanation modals
+- **ThemeToggle** (`@/components/ui/buttons/ThemeToggle`) - Use for theme switching
+
+### Global Layout Components
+
+- **Header** (`@/components/ui/globals/Header`) - Main application header with title and controls
+- **Footer** (`@/components/ui/globals/Footer`) - Main application footer with import/export
+- **Main** (`@/components/ui/globals/Main`) - Main content area wrapper
+- **EmptyState** (`@/components/ui/globals/EmptyState`) - Use for empty state displays
+
+### Feature Section Components
+
+- **DisplayBeat** (`@/components/ui/sections/DisplayBeat`) - Use for displaying generated beats
+- **GenerateBeat** (`@/components/ui/sections/GenerateBeat`) - Use for beat generation forms
+
+### Modal Components
+
+- **Modal** (`@/components/ui/modals/Modal`) - Use for modal dialogs
+- **DifficultyExplanation** (`@/components/ui/modals/DifficultyExplanation`) - Use for difficulty level explanations
+
+## Component Guidelines
+
+### Single-Purpose Components
+
+- **One component per file**: Each file contains exactly one React component
+- **Bite-sized components**: Components should be focused and single-purpose (one thing == one component == one file)
+- **Descriptive naming**: Use PascalCase with descriptive names indicating visual purpose
+- **Component suffixes**: Use appropriate suffixes (e.g., `Container`, `Panel`, `Button`, `Display`)
+
+### Component Structure
+
+```tsx
+// Pattern 1: Function component with named export (most common)
+'use client';
+
+import type { ReactNode } from 'react';
+import clsx from 'clsx';
+
+type ComponentProps = {
+	title: string;
+	variant?: 'primary' | 'secondary';
+	children?: ReactNode;
+};
+
+export function ComponentName({ title, variant = 'primary', children }: ComponentProps) {
+	return (
+		<div
+			className={clsx('ComponentName base-classes', variant === 'secondary' && 'secondary-classes')}
+		>
+			{children}
+		</div>
+	);
+}
+
+// Pattern 2: forwardRef component with named export (for DOM refs)
+import { forwardRef } from 'react';
+
+export const ComponentName = forwardRef<HTMLDivElement, ComponentProps>(
+	({ title, variant = 'primary', children }, ref) => {
+		return (
+			<div
+				ref={ref}
+				className={clsx(
+					'ComponentName base-classes',
+					variant === 'secondary' && 'secondary-classes'
+				)}
+			>
+				{children}
+			</div>
+		);
+	}
+);
+```
+
+### Component Guidelines
+
+- **TypeScript types**: Prefer `type` over `interface` for component props and data structures
+- **Named exports**: Export components as named exports using `export function` or `export const`
+- **Index files**: Create `index.ts` files for directory exports to enable clean imports
+- **Memoization**: Use `React.memo` for performance-critical components (when implemented)
+- **Props interface**: Define clear, typed props with descriptive names
+- **forwardRef usage**: Use `forwardRef` for components that need to expose DOM refs (e.g., Button, FormInput)
+
+### Export Pattern with Index Files
+
+The project uses a consistent index.ts export pattern for clean imports:
+
+```tsx
+// Component file: src/components/ui/buttons/Button.tsx
+export function Button({ title, children, ...props }: ButtonProps) {
+	return <button {...props}>{children}</button>;
+}
+
+// Index file: src/components/ui/buttons/index.ts
+export { Button } from './Button';
+export { DominantHand } from './DominantHand';
+export { Export } from './Export';
+// ... other button exports
+
+// Usage: Clean imports from index files
+import { Button, DominantHand } from '@/components/ui/buttons';
+import { Form, FormField } from '@/components/ui/forms';
+import { DisplayBeat, MeasuresDisplay } from '@/components/ui/sections';
+```
+
+## Component Patterns
+
+### Layout Components
+
+- **Header** (`@/components/ui/globals/Header`) - Main application header with dominant hand, title, and theme toggle
+- **Footer** (`@/components/ui/globals/Footer`) - Main application footer with import/export and copyright
+- **Main** (`@/components/ui/globals/Main`) - Main content area with GenerateBeat and DisplayBeat sections
+
+### Feature Components
+
+- **GenerateBeat** (`@/components/ui/sections/GenerateBeat`) - Beat generation form and controls
+- **DisplayBeat** (`@/components/ui/sections/DisplayBeat`) - Beat display with measures and hand legend
+- **BeatForm** (`@/components/ui/sections/GenerateBeat/BeatForm`) - Form for beat generation parameters
+- **MeasuresDisplay** (`@/components/ui/sections/DisplayBeat/MeasuresDisplay`) - Display of beat measures
+- **MeasureDisplay** (`@/components/ui/sections/DisplayBeat/MeasureDisplay`) - Individual measure display
+- **NoteDisplay** (`@/components/ui/sections/DisplayBeat/NoteDisplay`) - Individual note display
+- **HandLegend** (`@/components/ui/sections/DisplayBeat/HandLegend`) - Hand color legend
+
+### Provider Components
+
+- **DominantHandProvider** (`@/components/providers/dominant-hand-provider`) - Context for dominant hand preference
+- **ThemeProvider** (`@/components/providers/theme-provider`) - Theme context provider
+- **HydrationBoundary** (`@/components/providers/hydration-boundary`) - Hydration safety wrapper
+- **ErrorBoundary** (`@/components/providers/error-boundary`) - Error boundary for graceful error handling
+- **ClientOnly** (`@/components/providers/hydration-boundary`) - Client-side only rendering wrapper
+
+### Modal Components
+
+- **DifficultyExplanation** (`@/components/ui/modals/DifficultyExplanation`) - Difficulty level explanations
+- **DifficultyChart** (`@/components/ui/modals/DifficultyExplanation/DifficultyChart`) - Visual difficulty chart
+- **TechniqueDefinitions** (`@/components/ui/modals/DifficultyExplanation/TechniqueDefinitions`) - Technique explanations
+- **TechniquesTable** (`@/components/ui/modals/DifficultyExplanation/TechniquesTable`) - Techniques reference table
+- **NoteTypesTable** (`@/components/ui/modals/DifficultyExplanation/NoteTypesTable`) - Note types reference table
+
+## Component Best Practices
+
+### Performance
+
+- **React.memo**: Use for components with stable props
+- **useMemo**: Use for expensive computations
+- **useCallback**: Use for event handlers passed as props
+- **Tree shaking**: Import only necessary components
+
+### Accessibility
+
+- **ARIA labels**: Include appropriate ARIA labels and roles
+- **Keyboard navigation**: Support keyboard navigation
+- **Focus management**: Implement proper focus management
+- **Screen reader compatibility**: Ensure screen reader compatibility
+- **Color contrast**: Maintain proper color contrast ratios
+- **Semantic HTML**: Use semantic HTML structure
+
+### Error Handling
+
+- **Error boundaries**: Implement error boundaries for graceful error handling
+- **Error message association**: Associate error messages with form fields
+- **Loading state announcements**: Announce loading states to screen readers
+- **Defensive programming**: Include validation and fallbacks for data integrity
+
+### Hydration Safety
+
+- **ClientOnly wrapper**: Use for components that require client-side rendering
+- **HydrationBoundary**: Wrap components that may have hydration mismatches
+- **suppressHydrationWarning**: Use sparingly and not on the `<body>` element
+
+## RandoDrum-Specific Patterns
+
+### Beat Display Components
+
+- **MeasuresDisplay**: Renders all measures in a beat
+- **MeasureDisplay**: Renders individual measures with proper spacing
+- **NoteDisplay**: Renders individual notes with hand colors and dynamics
+- **HandLegend**: Shows color coding for left/right hands
+
+### Form Components
+
+- **BeatForm**: Main form for beat generation parameters
+- **DifficultyField**: Difficulty level selection
+- **MeasuresField**: Number of measures input
+- **BeatsField**: Beats per measure input
+
+### State Management
+
+- **useBeatStore**: Zustand store for beat state management
+- **useFormStore**: Zustand store for form state management
+- **useDominantHand**: Context hook for dominant hand preference
+
+### Typography
+
+- **Typographic apostrophe**: Use ' instead of ' in all user-facing text
+
+## Component Testing
+
+### Unit Testing
+
+- **Component rendering**: Test component rendering with different props
+- **User interactions**: Test user interactions and callbacks
+- **Accessibility features**: Test accessibility features
+- **Theme switching**: Test theme switching functionality
+- **Beat generation**: Test beat generation and display components
+
+### Integration Testing
+
+- **Form integration**: Test component integration with forms
+- **Context behavior**: Test component behavior in different contexts
+- **Responsive behavior**: Test responsive behavior across screen sizes
+- **Store integration**: Test integration with Zustand stores
+
+### Testing Commands
+
+- Use `pnpm test:run` for running tests (not `pnpm test` which uses watch mode)
+- Use `pnpm test:ui` for interactive debugging of failing tests
+- Use `pnpm test:coverage` for coverage analysis before committing
