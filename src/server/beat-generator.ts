@@ -1,13 +1,16 @@
+import { getDifficultyConfig } from '@/utils';
 import type {
 	BeatFormData,
 	DifficultyConfig,
 	DifficultyLevel,
+	Duration,
 	Dynamic,
 	Exercise,
 	GeneratedBeat,
 	Measure,
 	Ornament,
 } from '@/types';
+import { isTupletDuration, isTripletDuration, isSixtupletDuration } from '@/types/duration';
 
 const pick = <T>(arr: T[]): T => {
 	if (arr.length === 0) {
@@ -37,8 +40,24 @@ function sampleFromDist(dist: Record<number, number>, cap: number): number {
 	return items[items.length - 1]!.len;
 }
 
+function isTuplet(duration: Duration): boolean {
+	// Use the type-safe helper function
+	return isTupletDuration(duration);
+}
+
+function getTupletGroupSize(duration: Duration): number {
+	// Use type-safe helper functions
+	if (isTripletDuration(duration)) {
+		return 3; // Triplets
+	}
+	if (isSixtupletDuration(duration)) {
+		return 6; // Sixtuplets
+	}
+	return 1; // Non-tuplets don't need grouping
+}
+
 // 1) Rhythm: single pass fill to exactly gridSize units
-export function generateRhythm(allowed: number[], measureLen: number): Measure {
+export function generateRhythm(allowed: Duration[], measureLen: number): Measure {
 	const m: Measure = [];
 	let t = 0;
 
@@ -59,7 +78,73 @@ export function generateRhythm(allowed: number[], measureLen: number): Measure {
 			);
 		}
 
-		const dur = pick(choices);
+		const tupletChoices = choices.filter(isTuplet);
+		const nonTupletChoices = choices.filter(d => !isTuplet(d));
+
+		if (tupletChoices.length > 0) {
+			const tupletDur = pick(tupletChoices);
+			const groupSize = getTupletGroupSize(tupletDur);
+			const totalTupletDuration = tupletDur * groupSize;
+
+			if (remaining >= totalTupletDuration) {
+				// 70% chance to place complete group, 30% chance to place partial group
+				// This encourages mixed tuplet combinations
+				const shouldPlaceComplete = Math.random() < 0.7;
+
+				if (shouldPlaceComplete) {
+					// Place complete tuplet group
+					for (let i = 0; i < groupSize; i++) {
+						m.push({
+							start: t + i * tupletDur,
+							dur: tupletDur,
+							isDominant: true,
+							dynamic: 'normal',
+							ornament: null,
+						});
+					}
+					t += totalTupletDuration;
+					continue;
+				} else {
+					// How many notes can fit in partial tuplet group
+					const maxNotes = Math.floor(remaining / tupletDur);
+					const notesToPlace = Math.min(maxNotes, groupSize);
+
+					// Ensure we place at least 1 note
+					if (notesToPlace > 0) {
+						for (let i = 0; i < notesToPlace; i++) {
+							m.push({
+								start: t + i * tupletDur,
+								dur: tupletDur,
+								isDominant: true,
+								dynamic: 'normal',
+								ornament: null,
+							});
+						}
+						t += tupletDur * notesToPlace;
+						continue;
+					}
+				}
+			} else if (remaining >= tupletDur) {
+				// How many notes can fit into partial tuplet group
+				const maxNotes = Math.floor(remaining / tupletDur);
+				const notesToPlace = Math.min(maxNotes, groupSize);
+
+				for (let i = 0; i < notesToPlace; i++) {
+					m.push({
+						start: t + i * tupletDur,
+						dur: tupletDur,
+						isDominant: true,
+						dynamic: 'normal',
+						ornament: null,
+					});
+				}
+				t += tupletDur * notesToPlace;
+				continue;
+			}
+		}
+
+		const dur = nonTupletChoices.length > 0 ? pick(nonTupletChoices) : pick(choices);
+
 		m.push({
 			start: t,
 			dur,
@@ -74,7 +159,8 @@ export function generateRhythm(allowed: number[], measureLen: number): Measure {
 
 // 2) Sticking via run-lengths + switch probability
 export function generateHandRuns(measure: Measure, cfg: DifficultyConfig): Measure {
-	let currentIsDom = true;
+	// 85% chance of starting with dominant hand
+	let currentIsDom = Math.random() < 0.85;
 	let i = 0;
 	const out = measure.map(note => ({ ...note }));
 	while (i < out.length) {
@@ -115,7 +201,6 @@ export function addOrnaments(measure: Measure, cfg: DifficultyConfig): Measure {
 // 5) Balancing: clamp clumps + hand ratio (skip for Drumline!)
 export function applyBalancing(measure: Measure, cfg: DifficultyConfig): Measure {
 	const out = measure.map(note => ({ ...note }));
-	// clamp consecutive same-hand notes
 	if (cfg.maxClump) {
 		let run = 1;
 		for (let i = 1; i < out.length; i++) {
@@ -130,19 +215,24 @@ export function applyBalancing(measure: Measure, cfg: DifficultyConfig): Measure
 			}
 		}
 	}
-	// nudge hand ratio if bounds provided
+
 	if (cfg.minRatio != null && cfg.maxRatio != null) {
 		const total = out.length;
 		let dom = out.filter(n => n.isDominant).length;
 		let ratio = dom / total;
 		if (ratio > cfg.maxRatio || ratio < cfg.minRatio) {
-			const targetIsDom = ratio < 0.5; // if too few dom, flip non-dom; else flip dom
+			const needMoreDominant = ratio < cfg.minRatio;
 			for (let i = out.length - 1; i >= 0; i--) {
-				if (out[i]!.isDominant !== targetIsDom) {
-					out[i] = { ...out[i]!, isDominant: targetIsDom };
-					dom = targetIsDom ? dom + 1 : dom - 1;
+				if (needMoreDominant && !out[i]!.isDominant) {
+					out[i] = { ...out[i]!, isDominant: true };
+					dom++;
 					ratio = dom / total;
-					if (ratio >= (cfg.minRatio ?? 0) && ratio <= (cfg.maxRatio ?? 1)) break;
+					if (ratio >= cfg.minRatio) break;
+				} else if (!needMoreDominant && out[i]!.isDominant) {
+					out[i] = { ...out[i]!, isDominant: false };
+					dom--;
+					ratio = dom / total;
+					if (ratio <= cfg.maxRatio) break;
 				}
 			}
 		}
@@ -150,97 +240,46 @@ export function applyBalancing(measure: Measure, cfg: DifficultyConfig): Measure
 	return out;
 }
 
-export const difficulties: Record<DifficultyLevel, DifficultyConfig> = {
-	'I’m Too Young to Drum': {
-		durations: [8, 16, 32],
-		runLengths: { 1: 1.0 },
-		switchProb: 1.0,
-		dynamicScale: [2, 7, 9, 10] as [number, number, number, number],
-		flamThreshold: 0,
-		dragThreshold: 0,
-		allowBalancing: true,
-		maxClump: 1,
-		minRatio: 0.45,
-		maxRatio: 0.55,
-	},
-	'Hey, Not Too Rough': {
-		durations: [4, 8, 16],
-		runLengths: { 1: 0.7, 2: 0.3 },
-		switchProb: 0.8,
-		dynamicScale: [2, 7, 9, 10] as [number, number, number, number],
-		flamThreshold: 0.05,
-		dragThreshold: 0,
-		allowBalancing: true,
-		maxClump: 2,
-		minRatio: 0.45,
-		maxRatio: 0.55,
-	},
-	'Hurt Me Plenty': {
-		durations: [2, 4, 8, 16],
-		runLengths: { 1: 0.5, 2: 0.3, 3: 0.2 },
-		switchProb: 0.6,
-		dynamicScale: [2, 7, 9, 10] as [number, number, number, number],
-		flamThreshold: 0.1,
-		dragThreshold: 0.1,
-		allowBalancing: true,
-		maxClump: 3,
-		minRatio: 0.4,
-		maxRatio: 0.6,
-	},
-	'Ultra-Violence': {
-		durations: [1, 2, 4, 8],
-		runLengths: { 1: 0.4, 2: 0.3, 3: 0.2, 4: 0.1 },
-		switchProb: 0.4,
-		dynamicScale: [2, 7, 9, 10] as [number, number, number, number],
-		flamThreshold: 0.15,
-		dragThreshold: 0.15,
-		allowBalancing: true,
-		maxClump: 4,
-		minRatio: 0.35,
-		maxRatio: 0.65,
-	},
-	'Drumline!': {
-		durations: [1, 2, 4, 8],
-		runLengths: { 1: 0.25, 2: 0.25, 3: 0.25, 4: 0.25 },
-		switchProb: 0.5,
-		dynamicScale: [2, 7, 9, 10] as [number, number, number, number],
-		flamThreshold: 0.25,
-		dragThreshold: 0.25,
-		allowBalancing: false,
-	},
-};
-
 export function generateMeasure(
 	cfg: DifficultyConfig,
-	allowedDurations: number[],
-	gridSize: number
+	allowedDurations: Duration[],
+	gridSize: number,
+	_difficulty: DifficultyLevel
 ): Measure {
 	const base = generateRhythm(allowedDurations, gridSize);
 	const withHands = generateHandRuns(base, cfg);
+
 	const withDyn = addDynamics(withHands, cfg);
+
 	const withOrn = addOrnaments(withDyn, cfg);
 	return cfg.allowBalancing ? applyBalancing(withOrn, cfg) : withOrn;
 }
 
 export function generateExerciseBars(
 	cfg: DifficultyConfig,
-	allowedDurations: number[],
+	allowedDurations: Duration[],
 	gridSize: number,
+	_difficulty: DifficultyLevel,
 	bars = 4
 ): Exercise {
-	return Array.from({ length: bars }, () => generateMeasure(cfg, allowedDurations, gridSize));
+	return Array.from({ length: bars }, () =>
+		generateMeasure(cfg, allowedDurations, gridSize, _difficulty)
+	);
 }
 
 export function generateBeat(formData: BeatFormData): GeneratedBeat {
-	const cfg = difficulties[formData.difficulty];
-	if (!cfg) {
-		throw new Error(`Unknown difficulty level: ${formData.difficulty}`);
-	}
+	const cfg = getDifficultyConfig(formData.difficulty);
 
 	const allowedDurations = cfg.durations;
-	const gridSize = formData.beats * 8;
+	const gridSize = formData.beats * 24; // (Quarter Note = 24)
 
-	const exercise = generateExerciseBars(cfg, allowedDurations, gridSize, formData.measures);
+	const exercise = generateExerciseBars(
+		cfg,
+		allowedDurations,
+		gridSize,
+		formData.difficulty,
+		formData.measures
+	);
 
 	return {
 		measures: exercise,
