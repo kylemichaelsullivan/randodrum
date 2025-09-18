@@ -1,54 +1,109 @@
-export type DifficultyLevel =
-	| 'I’m Too Young to Drum'
-	| 'Hey, Not Too Rough'
-	| 'Hurt Me Plenty'
-	| 'Ultra-Violence'
-	| 'Drumline!';
+/**
+ * Central type exports for the RandoDrum application
+ *
+ * This file serves as the main entry point for all type definitions.
+ * Types are organized by domain in separate files for better maintainability.
+ */
 
-export type BeatFormData = {
-	beats: number;
-	measures: number;
-	difficulty: DifficultyLevel;
-};
+// API types
+export type { ApiError, ApiResponse, ApiSuccess, BeatGenerationResponse } from './api';
 
-export type Dynamic = 'ghost' | 'normal' | 'accent' | 'rimshot';
-export type Ornament = 'flam' | 'drag' | null;
+// Beat generation types
+export type {
+	BeatFormData,
+	Exercise,
+	GeneratedBeat,
+	Measure,
+	Note,
+	NoteStart,
+	Samples,
+} from './beat';
 
-export interface Note {
-	start: number;
-	dur: number;
-	isDominant: boolean;
-	dynamic: Dynamic;
-	ornament: Ornament;
-}
+// Form types
+export type { BeatsFieldProps, DifficultyFieldProps, MeasuresFieldProps } from './form';
 
-export type Measure = Note[]; // one bar (sum(dur) = gridSize)
-export type Exercise = Measure[];
-export type Samples = Record<string, Measure[]>;
+// Color types
+export { COLORS, color } from './color';
+export type { Color } from './color';
 
-export interface DifficultyConfig {
-	// Rhythm generation
-	durations: number[];
+// Difficulty types
+export type { DifficultyConfig, DifficultyLevel } from './difficulty';
 
-	// Sticking generation
-	runLengths: Record<number, number>;
-	switchProb: number;
+// Dynamic types
+export type { Dynamic, DynamicConfig, DynamicName, DynamicScale } from './dynamic';
 
-	dynamicScale: [number, number, number, number];
+// Duration types
+export type { Duration, DurationConfig, DurationValue } from './duration';
 
-	// Ornaments
-	flamThreshold: number;
-	dragThreshold: number;
+// Error handling types
+export type {
+	AppError,
+	AsyncErrorHandler,
+	BeatGenerationError,
+	ErrorBoundaryProps,
+	ErrorBoundaryState,
+	ErrorCode,
+	ErrorHandler,
+	ErrorLogger,
+	ErrorRecovery,
+	ErrorResult,
+	NetworkError,
+	Result,
+	StorageError,
+	SuccessResult,
+	ValidationError,
+} from './error';
 
-	// Balancing stage
-	allowBalancing: boolean;
-	maxClump?: number;
-	minRatio?: number;
-	maxRatio?: number;
-}
+export {
+	ERROR_CODES,
+	createBeatGenerationError,
+	createNetworkError,
+	createStorageError,
+	createValidationError,
+} from './error';
 
-export type GeneratedBeat = {
-	measures: Measure[];
-	beatsPerMeasure: number;
-	difficulty: DifficultyLevel;
-};
+// Note type definitions
+export type { NoteType, NoteTypeName } from './noteType';
+
+// Ornament types
+export type { Ornament, OrnamentConfig, OrnamentName } from './ornament';
+
+// Store and state management types
+export type { BeatStore, DominantHandContextType, FormStore } from './store';
+
+// Test types
+export type {
+	BeatTestDataFactory,
+	FormDataTestDataFactory,
+	MeasureTestDataFactory,
+	MockFunction,
+	NoteTestDataFactory,
+	TestBeatFormData,
+	TestConfig,
+	TestCase,
+	TestDataFactory,
+	TestGeneratedBeat,
+	TestMeasure,
+	TestNote,
+	TestResult,
+	TestSuite,
+} from './test';
+
+// UI-specific types
+export type { ChartData, DominantHand, TechniqueTypeName } from './ui';
+
+// Utility types
+export type {
+	ArrayElement,
+	Brand,
+	DeepPartial,
+	DeepReadonly,
+	Email,
+	Id,
+	KeysOfType,
+	PartialBy,
+	RequiredBy,
+	Timestamp,
+	UnionToIntersection,
+	Url,
+} from './utils';
