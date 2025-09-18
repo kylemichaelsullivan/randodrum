@@ -44,8 +44,8 @@ src/__tests__/
 ## Running Tests
 
 ```bash
-# Run all tests
-pnpm test
+# Run all tests once (recommended for development)
+pnpm test:run
 
 # Run tests with UI interface
 pnpm test:ui
@@ -53,9 +53,16 @@ pnpm test:ui
 # Run tests with coverage
 pnpm test:coverage
 
-# Run tests once (CI mode)
-pnpm test:run
+# Run tests in watch mode (use sparingly)
+pnpm test
 ```
+
+### Important Notes
+
+- **Use `pnpm test:run` for most development work** - This runs tests once and exits, which is faster and more reliable
+- **Avoid `pnpm test` (watch mode)** - Watch mode can be resource-intensive and may cause issues in some environments
+- **Use `pnpm test:ui` for interactive debugging** - The UI provides a better experience for debugging failing tests
+- **Use `pnpm test:coverage` for coverage analysis** - Run this before committing to ensure adequate test coverage
 
 ## Test Utilities
 
@@ -88,7 +95,7 @@ Shared mock implementations for:
 
 ```typescript
 import { render, screen, fireEvent } from '@/__tests__/utils';
-import { Button } from '@/components/ui/buttons';
+import { Button } from '@/components';
 
 describe('Button', () => {
   it('renders with correct title', () => {
@@ -102,7 +109,7 @@ describe('Button', () => {
 
 ```typescript
 import { renderHook, act } from '@testing-library/react';
-import { useBeatStore } from '@/stores/beat-store';
+import { useBeatStore } from '@/stores';
 
 describe('BeatStore', () => {
 	it('sets current beat', () => {

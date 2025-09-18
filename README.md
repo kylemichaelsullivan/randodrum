@@ -24,6 +24,23 @@ To learn more about the [T3 Stack](https://create.t3.gg/), take a look at the fo
 
 You can check out the [create-t3-app GitHub repository](https://github.com/t3-oss/create-t3-app) — your feedback and contributions are welcome!
 
+## Testing
+
+This project uses Vitest for testing. **Important**: Use `pnpm test:run` instead of `pnpm test` to avoid watch mode issues.
+
+```bash
+# Run tests once (recommended)
+pnpm test:run
+
+# Interactive test UI for debugging
+pnpm test:ui
+
+# Run tests with coverage
+pnpm test:coverage
+```
+
+See [documentation/TESTING.md](./documentation/TESTING.md) for detailed testing guidelines.
+
 ## How do I deploy this?
 
 Follow our deployment guides for [Vercel](https://create.t3.gg/en/deployment/vercel), [Netlify](https://create.t3.gg/en/deployment/netlify) and [Docker](https://create.t3.gg/en/deployment/docker) for more information.
