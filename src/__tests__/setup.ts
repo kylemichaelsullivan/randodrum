@@ -1,5 +1,6 @@
 import '@testing-library/jest-dom';
 import { vi } from 'vitest';
+import type { IconProp } from '@fortawesome/fontawesome-svg-core';
 
 // Mock Next.js router
 vi.mock('next/navigation', () => ({
@@ -19,18 +20,18 @@ vi.mock('next/navigation', () => ({
 
 // Mock FontAwesome
 vi.mock('@fortawesome/react-fontawesome', () => ({
-	FontAwesomeIcon: ({ icon }: { icon: any }) => {
+	FontAwesomeIcon: ({ icon }: { icon: IconProp }) => {
 		const React = require('react');
-		return React.createElement(
-			'span',
-			{ 'data-testid': 'font-awesome-icon' },
-			icon?.iconName || 'icon'
-		);
+		const iconName =
+			typeof icon === 'string' ? icon
+			: Array.isArray(icon) ? icon[0]
+			: icon?.iconName || 'icon';
+		return React.createElement('span', { 'data-testid': 'font-awesome-icon' }, iconName);
 	},
 }));
 
 // Mock tRPC
-vi.mock('@/trpc/react', () => ({
+vi.mock('@/trpc', () => ({
 	api: {
 		beat: {
 			generate: {

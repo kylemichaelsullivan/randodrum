@@ -1,6 +1,6 @@
 import { describe, it, expect, vi } from 'vitest';
 import { render, screen, fireEvent } from '@/__tests__/utils';
-import { Form } from '@/components/ui/forms';
+import { Form } from '@/components';
 
 describe('Form', () => {
 	it('renders children correctly', () => {

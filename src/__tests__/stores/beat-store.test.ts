@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { act, renderHook } from '@testing-library/react';
-import { useBeatStore } from '@/stores/beat-store';
 import { mockGeneratedBeat, mockUltraViolenceBeat } from '@/__tests__/fixtures';
+import { useBeatStore } from '@/stores';
 
 describe('BeatStore', () => {
 	beforeEach(() => {

@@ -1,10 +1,11 @@
 import { render, type RenderOptions } from '@testing-library/react';
+import { DominantHandProvider } from '@/components';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { ThemeProvider } from '@/components/providers';
-import type { ReactElement } from 'react';
+import { ThemeProvider } from '@/components';
+import type { ReactElement, ReactNode } from 'react';
 
 // Create a custom render function that includes providers
-const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
+const AllTheProviders = ({ children }: { children: ReactNode }) => {
 	const queryClient = new QueryClient({
 		defaultOptions: {
 			queries: {
@@ -15,7 +16,9 @@ const AllTheProviders = ({ children }: { children: React.ReactNode }) => {
 
 	return (
 		<QueryClientProvider client={queryClient}>
-			<ThemeProvider>{children}</ThemeProvider>
+			<ThemeProvider>
+				<DominantHandProvider>{children}</DominantHandProvider>
+			</ThemeProvider>
 		</QueryClientProvider>
 	);
 };

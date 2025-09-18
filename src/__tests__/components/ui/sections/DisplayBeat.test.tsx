@@ -1,17 +1,19 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { render, screen } from '@/__tests__/utils';
-import { DisplayBeat } from '@/components/ui/sections/DisplayBeat';
+import { DisplayBeat } from '@/components';
 import { mockGeneratedBeat } from '@/__tests__/fixtures';
-import { useBeatStore } from '@/stores/beat-store';
+import { render, screen } from '@/__tests__/utils';
+import { useBeatStore } from '@/stores';
+import type { ReactNode } from 'react';
+import type { BeatStore } from '@/types';
 
 // Mock the beat store
-vi.mock('@/stores/beat-store', () => ({
+vi.mock('@/stores', () => ({
 	useBeatStore: vi.fn(),
 }));
 
 // Mock the hydration boundary
 vi.mock('@/components/providers/hydration-boundary', () => ({
-	ClientOnly: ({ children }: { children: React.ReactNode }) => <div>{children}</div>,
+	ClientOnly: ({ children }: { children: ReactNode }) => <div>{children}</div>,
 }));
 
 describe('DisplayBeat', () => {
@@ -24,8 +26,12 @@ describe('DisplayBeat', () => {
 	it('renders empty state when no beat is available', () => {
 		mockUseBeatStore.mockReturnValue({
 			currentBeat: null,
+			isLoading: false,
 			setCurrentBeat: vi.fn(),
-		} as any);
+			setIsLoading: vi.fn(),
+			clearBeat: vi.fn(),
+			clearCorruptedBeat: vi.fn(),
+		} as BeatStore);
 
 		render(<DisplayBeat />);
 
@@ -35,8 +41,12 @@ describe('DisplayBeat', () => {
 	it('renders beat display when beat is available', () => {
 		mockUseBeatStore.mockReturnValue({
 			currentBeat: mockGeneratedBeat,
+			isLoading: false,
 			setCurrentBeat: vi.fn(),
-		} as any);
+			setIsLoading: vi.fn(),
+			clearBeat: vi.fn(),
+			clearCorruptedBeat: vi.fn(),
+		} as BeatStore);
 
 		render(<DisplayBeat />);
 
@@ -52,8 +62,12 @@ describe('DisplayBeat', () => {
 	it('renders correct number of measures', () => {
 		mockUseBeatStore.mockReturnValue({
 			currentBeat: mockGeneratedBeat,
+			isLoading: false,
 			setCurrentBeat: vi.fn(),
-		} as any);
+			setIsLoading: vi.fn(),
+			clearBeat: vi.fn(),
+			clearCorruptedBeat: vi.fn(),
+		} as BeatStore);
 
 		render(<DisplayBeat />);
 
@@ -65,8 +79,12 @@ describe('DisplayBeat', () => {
 	it('applies correct styling classes', () => {
 		mockUseBeatStore.mockReturnValue({
 			currentBeat: mockGeneratedBeat,
+			isLoading: false,
 			setCurrentBeat: vi.fn(),
-		} as any);
+			setIsLoading: vi.fn(),
+			clearBeat: vi.fn(),
+			clearCorruptedBeat: vi.fn(),
+		} as BeatStore);
 
 		render(<DisplayBeat />);
 
@@ -81,8 +99,8 @@ describe('DisplayBeat', () => {
 			'border-light-gray',
 			'rounded-lg',
 			'shadow-sm',
-			'p-6',
-			'font-musisync'
+			'w-full',
+			'p-6'
 		);
 	});
 });

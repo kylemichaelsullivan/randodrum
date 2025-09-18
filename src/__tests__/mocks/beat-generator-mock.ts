@@ -1,5 +1,4 @@
 import { vi } from 'vitest';
-import type { GeneratedBeat, BeatFormData } from '@/types';
 import { mockGeneratedBeat } from '../fixtures';
 
 export const mockBeatGenerator = {

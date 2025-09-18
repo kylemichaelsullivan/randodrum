@@ -6,12 +6,12 @@ import {
 	addDynamics,
 	addOrnaments,
 	applyBalancing,
-} from '@/server/beat-generator';
-import type { BeatFormData, DifficultyLevel } from '@/types';
+} from '@/server';
+import type { BeatFormData, DifficultyLevel, DurationValue, Measure } from '@/types';
+import { TUPLET_DURATIONS, isTripletDuration, isSixtupletDuration } from '@/types/duration';
 
 describe('BeatGenerator', () => {
 	beforeEach(() => {
-		// Mock Math.random for predictable tests
 		vi.spyOn(Math, 'random').mockReturnValue(0.5);
 	});
 
@@ -21,8 +21,8 @@ describe('BeatGenerator', () => {
 
 	describe('generateRhythm', () => {
 		it('generates rhythm that fills exactly the measure length', () => {
-			const allowed = [1, 2, 4, 8];
-			const measureLen = 32;
+			const allowed: DurationValue[] = [3, 6, 12, 24];
+			const measureLen = 96;
 
 			const rhythm = generateRhythm(allowed, measureLen);
 
@@ -31,8 +31,8 @@ describe('BeatGenerator', () => {
 		});
 
 		it('generates notes with correct start positions', () => {
-			const allowed = [8, 16];
-			const measureLen = 32;
+			const allowed: DurationValue[] = [24, 48]; // Quarter Notes, Half Notes
+			const measureLen = 96;
 
 			const rhythm = generateRhythm(allowed, measureLen);
 
@@ -44,8 +44,8 @@ describe('BeatGenerator', () => {
 		});
 
 		it('only uses allowed durations', () => {
-			const allowed = [4, 8, 16];
-			const measureLen = 32;
+			const allowed: DurationValue[] = [12, 24, 48];
+			const measureLen = 96;
 
 			const rhythm = generateRhythm(allowed, measureLen);
 
@@ -56,18 +56,22 @@ describe('BeatGenerator', () => {
 	});
 
 	describe('generateBeat', () => {
+		const beatsPerMeasure = 4;
+		const ticksPerBeat = 24;
+		const measureLen = beatsPerMeasure * ticksPerBeat;
+
 		it('generates beat with correct number of measures', () => {
 			const formData: BeatFormData = {
 				beats: 4,
 				measures: 3,
-				difficulty: 'I’m Too Young to Drum',
+				difficulty: 'Hey, Not Too Rough',
 			};
 
 			const beat = generateBeat(formData);
 
 			expect(beat.measures).toHaveLength(3);
 			expect(beat.beatsPerMeasure).toBe(4);
-			expect(beat.difficulty).toBe('I’m Too Young to Drum');
+			expect(beat.difficulty).toBe('Hey, Not Too Rough');
 		});
 
 		it('generates beat with correct beats per measure', () => {
@@ -110,14 +114,14 @@ describe('BeatGenerator', () => {
 			const formData: BeatFormData = {
 				beats: 4,
 				measures: 2,
-				difficulty: 'I’m Too Young to Drum',
+				difficulty: 'Hey, Not Too Rough',
 			};
 
 			const beat = generateBeat(formData);
 
 			beat.measures.forEach(measure => {
 				const totalDuration = measure.reduce((sum, note) => sum + note.dur, 0);
-				expect(totalDuration).toBe(32); // 32-step grid
+				expect(totalDuration).toBe(measureLen);
 			});
 		});
 
@@ -133,9 +137,9 @@ describe('BeatGenerator', () => {
 			beat.measures.forEach(measure => {
 				measure.forEach(note => {
 					expect(note.start).toBeGreaterThanOrEqual(0);
-					expect(note.start).toBeLessThan(32);
+					expect(note.start).toBeLessThan(measureLen);
 					expect(note.dur).toBeGreaterThan(0);
-					expect(note.dur).toBeLessThanOrEqual(32);
+					expect(note.dur).toBeLessThanOrEqual(measureLen);
 					expect(typeof note.isDominant).toBe('boolean');
 					expect(['ghost', 'normal', 'accent', 'rimshot']).toContain(note.dynamic);
 					expect(['flam', 'drag', null]).toContain(note.ornament);
@@ -146,14 +150,40 @@ describe('BeatGenerator', () => {
 
 	describe('generateHandRuns', () => {
 		it('applies sticking pattern to notes', () => {
-			const measure = [
-				{ start: 0, dur: 8, isDominant: true, dynamic: 'normal' as const, ornament: null },
-				{ start: 8, dur: 8, isDominant: true, dynamic: 'normal' as const, ornament: null },
-				{ start: 16, dur: 8, isDominant: true, dynamic: 'normal' as const, ornament: null },
-				{ start: 24, dur: 8, isDominant: true, dynamic: 'normal' as const, ornament: null },
+			const measure: Measure = [
+				{
+					start: 0,
+					dur: 8 as DurationValue,
+					isDominant: true,
+					dynamic: 'normal' as const,
+					ornament: null,
+				},
+				{
+					start: 8,
+					dur: 8 as DurationValue,
+					isDominant: true,
+					dynamic: 'normal' as const,
+					ornament: null,
+				},
+				{
+					start: 16,
+					dur: 8 as DurationValue,
+					isDominant: true,
+					dynamic: 'normal' as const,
+					ornament: null,
+				},
+				{
+					start: 24,
+					dur: 8 as DurationValue,
+					isDominant: true,
+					dynamic: 'normal' as const,
+					ornament: null,
+				},
 			];
 
 			const result = generateHandRuns(measure, {
+				durations: [4, 8, 16] as DurationValue[],
+				restProbability: 0.1,
 				runLengths: { 1: 0.5, 2: 0.5 },
 				switchProb: 0.5,
 				dynamicScale: [2, 7, 9, 10],
@@ -162,7 +192,6 @@ describe('BeatGenerator', () => {
 				allowBalancing: false,
 			});
 
-			// Should have some variation in isDominant values
 			const dominantCount = result.filter(note => note.isDominant).length;
 			expect(dominantCount).toBeGreaterThan(0);
 			expect(dominantCount).toBeLessThanOrEqual(result.length);
@@ -171,12 +200,26 @@ describe('BeatGenerator', () => {
 
 	describe('addDynamics', () => {
 		it('applies dynamics based on scale', () => {
-			const measure = [
-				{ start: 0, dur: 8, isDominant: true, dynamic: 'normal' as const, ornament: null },
-				{ start: 8, dur: 8, isDominant: false, dynamic: 'normal' as const, ornament: null },
+			const measure: Measure = [
+				{
+					start: 0,
+					dur: 8 as DurationValue,
+					isDominant: true,
+					dynamic: 'normal' as const,
+					ornament: null,
+				},
+				{
+					start: 8,
+					dur: 8 as DurationValue,
+					isDominant: false,
+					dynamic: 'normal' as const,
+					ornament: null,
+				},
 			];
 
 			const result = addDynamics(measure, {
+				durations: [4, 8, 16] as DurationValue[],
+				restProbability: 0.1,
 				runLengths: { 1: 0.5 },
 				switchProb: 0.5,
 				dynamicScale: [2, 7, 9, 10],
@@ -193,12 +236,26 @@ describe('BeatGenerator', () => {
 
 	describe('addOrnaments', () => {
 		it('applies ornaments based on thresholds', () => {
-			const measure = [
-				{ start: 0, dur: 8, isDominant: true, dynamic: 'normal' as const, ornament: null },
-				{ start: 8, dur: 8, isDominant: false, dynamic: 'normal' as const, ornament: null },
+			const measure: Measure = [
+				{
+					start: 0,
+					dur: 8 as DurationValue,
+					isDominant: true,
+					dynamic: 'normal' as const,
+					ornament: null,
+				},
+				{
+					start: 8,
+					dur: 8 as DurationValue,
+					isDominant: false,
+					dynamic: 'normal' as const,
+					ornament: null,
+				},
 			];
 
 			const result = addOrnaments(measure, {
+				durations: [4, 8, 16] as DurationValue[],
+				restProbability: 0.1,
 				runLengths: { 1: 0.5 },
 				switchProb: 0.5,
 				dynamicScale: [2, 7, 9, 10],
@@ -215,14 +272,40 @@ describe('BeatGenerator', () => {
 
 	describe('applyBalancing', () => {
 		it('balances hand distribution when enabled', () => {
-			const measure = [
-				{ start: 0, dur: 8, isDominant: true, dynamic: 'normal' as const, ornament: null },
-				{ start: 8, dur: 8, isDominant: true, dynamic: 'normal' as const, ornament: null },
-				{ start: 16, dur: 8, isDominant: true, dynamic: 'normal' as const, ornament: null },
-				{ start: 24, dur: 8, isDominant: true, dynamic: 'normal' as const, ornament: null },
+			const measure: Measure = [
+				{
+					start: 0,
+					dur: 8 as DurationValue,
+					isDominant: true,
+					dynamic: 'normal' as const,
+					ornament: null,
+				},
+				{
+					start: 8,
+					dur: 8 as DurationValue,
+					isDominant: true,
+					dynamic: 'normal' as const,
+					ornament: null,
+				},
+				{
+					start: 16,
+					dur: 8 as DurationValue,
+					isDominant: true,
+					dynamic: 'normal' as const,
+					ornament: null,
+				},
+				{
+					start: 24,
+					dur: 8 as DurationValue,
+					isDominant: true,
+					dynamic: 'normal' as const,
+					ornament: null,
+				},
 			];
 
 			const result = applyBalancing(measure, {
+				durations: [4, 8, 16] as DurationValue[],
+				restProbability: 0.1,
 				runLengths: { 1: 0.5 },
 				switchProb: 0.5,
 				dynamicScale: [2, 7, 9, 10],
@@ -243,14 +326,40 @@ describe('BeatGenerator', () => {
 		});
 
 		it('does not balance when disabled', () => {
-			const measure = [
-				{ start: 0, dur: 8, isDominant: true, dynamic: 'normal' as const, ornament: null },
-				{ start: 8, dur: 8, isDominant: true, dynamic: 'normal' as const, ornament: null },
-				{ start: 16, dur: 8, isDominant: true, dynamic: 'normal' as const, ornament: null },
-				{ start: 24, dur: 8, isDominant: true, dynamic: 'normal' as const, ornament: null },
+			const measure: Measure = [
+				{
+					start: 0,
+					dur: 8 as DurationValue,
+					isDominant: true,
+					dynamic: 'normal' as const,
+					ornament: null,
+				},
+				{
+					start: 8,
+					dur: 8 as DurationValue,
+					isDominant: true,
+					dynamic: 'normal' as const,
+					ornament: null,
+				},
+				{
+					start: 16,
+					dur: 8 as DurationValue,
+					isDominant: true,
+					dynamic: 'normal' as const,
+					ornament: null,
+				},
+				{
+					start: 24,
+					dur: 8 as DurationValue,
+					isDominant: true,
+					dynamic: 'normal' as const,
+					ornament: null,
+				},
 			];
 
 			const result = applyBalancing(measure, {
+				durations: [4, 8, 16] as DurationValue[],
+				restProbability: 0.1,
 				runLengths: { 1: 0.5 },
 				switchProb: 0.5,
 				dynamicScale: [2, 7, 9, 10],
@@ -261,6 +370,185 @@ describe('BeatGenerator', () => {
 
 			// Should remain unchanged
 			expect(result).toEqual(measure);
+		});
+	});
+
+	describe('tuplet grouping', () => {
+		it('groups eighth sixtuplets in sets of 6', () => {
+			const allowed: DurationValue[] = [4]; // Eighth Sixtuplet (6 hits over 1 beat)
+			const measureLen = 24; // Exactly 6 Eighth Sixtuplets
+
+			const rhythm = generateRhythm(allowed, measureLen);
+
+			expect(rhythm).toHaveLength(6);
+
+			rhythm.forEach(note => {
+				expect(note.dur).toBe(4);
+			});
+
+			const totalDuration = rhythm.reduce((sum, note) => sum + note.dur, 0);
+			expect(totalDuration).toBe(24);
+		});
+
+		it('groups sixteenth sixtuplets in sets of 6', () => {
+			const allowed: DurationValue[] = [2]; // Sixteenth Sixtuplet (6 hits over 1/2 beat)
+			const measureLen = 12; // Exactly 6 Sixteenth Sixtuplets
+
+			const rhythm = generateRhythm(allowed, measureLen);
+
+			expect(rhythm).toHaveLength(6);
+
+			rhythm.forEach(note => {
+				expect(note.dur).toBe(2);
+			});
+
+			const totalDuration = rhythm.reduce((sum, note) => sum + note.dur, 0);
+			expect(totalDuration).toBe(12);
+		});
+
+		it('groups quarter triplets in sets of 3', () => {
+			const allowed: DurationValue[] = [16]; // Quarter Triplet (3 hits over 2 beats)
+			const measureLen = 48; // Exactly 3 Quarter Triplets
+
+			const rhythm = generateRhythm(allowed, measureLen);
+
+			expect(rhythm).toHaveLength(3);
+
+			rhythm.forEach(note => {
+				expect(note.dur).toBe(16);
+			});
+
+			const totalDuration = rhythm.reduce((sum, note) => sum + note.dur, 0);
+			expect(totalDuration).toBe(48);
+		});
+
+		it('groups eighth triplets in sets of 3', () => {
+			const allowed: DurationValue[] = [8]; // Eighth Triplet (3 hits over 1 beat)
+			const measureLen = 24; // Exactly 3 Eighth Triplets
+
+			const rhythm = generateRhythm(allowed, measureLen);
+
+			expect(rhythm).toHaveLength(3);
+
+			rhythm.forEach(note => {
+				expect(note.dur).toBe(8);
+			});
+
+			const totalDuration = rhythm.reduce((sum, note) => sum + note.dur, 0);
+			expect(totalDuration).toBe(24);
+		});
+
+		it('handles mixed tuplet combinations', () => {
+			const allowed: DurationValue[] = [...TUPLET_DURATIONS];
+			const measureLen = 96;
+
+			const rhythm = generateRhythm(allowed, measureLen);
+
+			const totalDuration = rhythm.reduce((sum, note) => sum + note.dur, 0);
+			expect(totalDuration).toBe(96);
+
+			let i = 0;
+			while (i < rhythm.length) {
+				const note = rhythm[i]!;
+				const groupSize = isTripletDuration(note.dur) ? 3 : 6;
+
+				for (let j = 0; j < groupSize && i + j < rhythm.length; j++) {
+					expect(rhythm[i + j]!.dur).toBe(note.dur);
+				}
+				i += groupSize;
+			}
+		});
+
+		it('generates specific tuplet combinations', () => {
+			const allowed: DurationValue[] = [...TUPLET_DURATIONS];
+
+			for (let measureNum = 0; measureNum < 10; measureNum++) {
+				const measureLen = 96; // 4 beats
+				const rhythm = generateRhythm(allowed, measureLen);
+
+				const totalDuration = rhythm.reduce((sum, note) => sum + note.dur, 0);
+				expect(totalDuration).toBe(96);
+
+				let i = 0;
+				while (i < rhythm.length) {
+					const note = rhythm[i]!;
+					const groupSize = isTripletDuration(note.dur) ? 3 : 6; // Triplets or Sixtuplets
+
+					for (let j = 0; j < groupSize && i + j < rhythm.length; j++) {
+						expect(rhythm[i + j]!.dur).toBe(note.dur);
+					}
+					i += groupSize;
+				}
+			}
+		});
+
+		it('allows mixed tuplet combinations with partial groups', () => {
+			const allowed: DurationValue[] = [...TUPLET_DURATIONS];
+			const measureLen = 48;
+
+			for (let measureNum = 0; measureNum < 10; measureNum++) {
+				const rhythm = generateRhythm(allowed, measureLen);
+				const totalDuration = rhythm.reduce((sum, note) => sum + note.dur, 0);
+
+				expect(totalDuration).toBe(48);
+
+				let i = 0;
+				while (i < rhythm.length) {
+					const note = rhythm[i]!;
+					const groupSize = isTripletDuration(note.dur) ? 3 : 6;
+
+					let consecutiveCount = 0;
+					while (
+						i + consecutiveCount < rhythm.length &&
+						rhythm[i + consecutiveCount]!.dur === note.dur
+					) {
+						consecutiveCount++;
+					}
+
+					if (isTripletDuration(note.dur) || isSixtupletDuration(note.dur)) {
+						if (consecutiveCount < groupSize) {
+							expect(i + consecutiveCount).toBe(rhythm.length);
+						} else {
+							expect(consecutiveCount % groupSize).toBe(0);
+						}
+					}
+
+					i += consecutiveCount;
+				}
+			}
+		});
+
+		it('produces mixed tuplet combinations when measure length forces it', () => {
+			// Use a measure length that doesn't divide evenly by common tuplet groups
+			// 20 units = 2 Eighth Triplets (16) + 1 Eighth Sixtuplet (4) = 20
+			const allowed: DurationValue[] = [8, 4]; // Eighth Triplet, Eighth Sixtuplet
+			const measureLen = 20;
+
+			let foundMixedCombination = false;
+
+			for (let measureNum = 0; measureNum < 20; measureNum++) {
+				const rhythm = generateRhythm(allowed, measureLen);
+				const totalDuration = rhythm.reduce((sum, note) => sum + note.dur, 0);
+
+				expect(totalDuration).toBe(20);
+
+				const pattern = rhythm
+					.map(n => {
+						if (n.dur === 8) return 'e3';
+						if (n.dur === 4) return 'e6';
+						return '?';
+					})
+					.join('-');
+
+				const hasE3 = pattern.includes('e3');
+				const hasE6 = pattern.includes('e6');
+
+				if (hasE3 && hasE6) {
+					foundMixedCombination = true;
+				}
+			}
+
+			expect(foundMixedCombination).toBe(true);
 		});
 	});
 });

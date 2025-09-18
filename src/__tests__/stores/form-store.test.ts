@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { act, renderHook } from '@testing-library/react';
-import { useFormStore } from '@/stores/form-store';
+import { useFormStore } from '@/stores';
 import type { BeatFormData } from '@/types';
 
 describe('FormStore', () => {
@@ -106,7 +106,7 @@ describe('FormStore', () => {
 	it('handles all difficulty levels', () => {
 		const { result } = renderHook(() => useFormStore());
 		const difficulties: BeatFormData['difficulty'][] = [
-			"I’m Too Young to Drum",
+			'I’m Too Young to Drum',
 			'Hey, Not Too Rough',
 			'Hurt Me Plenty',
 			'Ultra-Violence',
@@ -129,7 +129,7 @@ describe('FormStore', () => {
 			result.current.setFormValues({
 				beats: 2,
 				measures: 1,
-				difficulty: "I’m Too Young to Drum",
+				difficulty: 'I’m Too Young to Drum',
 			});
 		});
 
