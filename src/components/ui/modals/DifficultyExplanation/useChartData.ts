@@ -1,12 +1,12 @@
 import { useMemo } from 'react';
 
-import { DIFFICULTY_LEVELS, CHART_DATA } from './constants';
+import { CHART_DATA, DIFFICULTY_LEVELS } from '@/utils';
 
 import type { DifficultyLevel } from '@/types';
 
 export function useChartData() {
 	const chartData = useMemo(() => {
-		return DIFFICULTY_LEVELS.map(difficulty => ({
+		return DIFFICULTY_LEVELS.map((difficulty: DifficultyLevel) => ({
 			difficulty,
 			data: CHART_DATA[difficulty],
 		})).filter(({ data }) => data !== undefined);

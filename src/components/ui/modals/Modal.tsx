@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, type MouseEvent } from 'react';
 import { createPortal } from 'react-dom';
 
 import { clsx } from 'clsx';
@@ -45,7 +45,7 @@ export function Modal({ title, isOpen, onClose, children, className = '' }: Moda
 
 	if (!isOpen) return null;
 
-	const handleBackdropClick = (e: React.MouseEvent) => {
+	const handleBackdropClick = (e: MouseEvent) => {
 		if (e.target === e.currentTarget) {
 			onClose();
 		}
@@ -53,7 +53,7 @@ export function Modal({ title, isOpen, onClose, children, className = '' }: Moda
 
 	return createPortal(
 		<div
-			className='fixed flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm inset-0 z-50'
+			className='Modal fixed flex items-center justify-center backdrop-blur-sm inset-0 z-50'
 			role='dialog'
 			aria-modal='true'
 			aria-labelledby='modal-title'

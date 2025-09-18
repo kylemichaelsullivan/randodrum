@@ -1,7 +1,6 @@
 'use client';
 
 import { DifficultyChart } from './DifficultyChart';
-import { Legend } from './Legend';
 import { TechniqueDefinitions } from './TechniqueDefinitions';
 
 export function DifficultyExplanation() {
@@ -19,7 +18,6 @@ export function DifficultyExplanation() {
 
 			<section aria-labelledby='chart-section' className='flex flex-col gap-6'>
 				<DifficultyChart />
-				<Legend />
 			</section>
 
 			<section aria-labelledby='technique-definitions'>
