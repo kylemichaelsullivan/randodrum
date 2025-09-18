@@ -3,8 +3,7 @@
 import { useState } from 'react';
 
 import { Button } from './Button';
-import { DifficultyExplanation } from '../modals/DifficultyExplanation';
-import { Modal } from '../modals';
+import { DifficultyExplanation, Modal } from '@/components';
 
 type HelpButtonProps = {
 	className?: string;

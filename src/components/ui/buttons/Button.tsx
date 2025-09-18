@@ -1,10 +1,10 @@
 'use client';
 
-import { forwardRef } from 'react';
+import { forwardRef, memo } from 'react';
 
 import { clsx } from 'clsx';
 
-import type { ButtonHTMLAttributes, MouseEvent, KeyboardEvent, ReactNode } from 'react';
+import type { ButtonHTMLAttributes, KeyboardEvent, MouseEvent, ReactNode } from 'react';
 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 	title: string;
@@ -14,7 +14,7 @@ interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 	isDisabled?: boolean;
 }
 
-export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
+const ButtonComponent = forwardRef<HTMLButtonElement, ButtonProps>(
 	(
 		{
 			title,
@@ -73,4 +73,6 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 	}
 );
 
-Button.displayName = 'Button';
+ButtonComponent.displayName = 'Button';
+
+export const Button = memo(ButtonComponent);
