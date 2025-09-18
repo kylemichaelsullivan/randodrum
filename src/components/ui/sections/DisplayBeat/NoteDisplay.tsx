@@ -1,62 +1,69 @@
-import type { BeatNote } from '@/types';
+import { memo, useMemo } from 'react';
+import { getDurationSymbol, getDynamicSymbol, getOrnamentSymbol } from '@/utils';
+import { useDominantHand } from '@/components';
+import type { Note } from '@/types';
 
 type NoteDisplayProps = {
-	note: BeatNote;
+	note: Note;
 };
 
-export function NoteDisplay({ note }: NoteDisplayProps) {
-	const getDrumNoteSymbol = (value: number) => {
-		if (value === 8) return '●'; // Quarter note (drum)
-		if (value === 4) return '●'; // Eighth note (drum)
-		if (value === 2) return '●'; // Sixteenth note (drum)
-		if (value === 1) return '●'; // Thirty-second note (drum)
-		if (value === 8 / 3) return '●₃'; // Quarter triplet
-		if (value === 4 / 3) return '●₃'; // Eighth triplet
-		if (value === 2 / 3) return '●₃'; // Sixteenth triplet
-		if (value === 4 / 6) return '●₆'; // Sixtuplet
-		return '●'; // Default drum note
-	};
+function NoteDisplayComponent({ note }: NoteDisplayProps) {
+	const { dominantHand } = useDominantHand();
 
-	const getTechniqueSymbol = (technique?: string) => {
-		switch (technique) {
-			case 'accent':
-				return '>';
-			case 'flam':
-				return 'f';
-			case 'drag':
-				return 'd';
-			case 'ghost':
-				return '(';
-			default:
-				return '';
-		}
-	};
+	// Use optimized symbol lookup functions for O(1) performance
+	const drumNoteSymbol = useMemo(() => {
+		return getDurationSymbol(note.dur);
+	}, [note.dur]);
 
-	const getStickingColor = (sticking: 'R' | 'L') => {
-		return sticking === 'R' ? 'text-green' : 'text-red';
-	};
+	const dynamicSymbol = useMemo(() => {
+		return note.dynamic !== 'normal' ? getDynamicSymbol(note.dynamic) : '';
+	}, [note.dynamic]);
+
+	const ornamentSymbol = useMemo(() => {
+		return note.ornament ? getOrnamentSymbol(note.ornament) : '';
+	}, [note.ornament]);
+
+	const isDisplayedAsDominant = useMemo(() => {
+		return (
+			(note.isDominant && dominantHand === 'right') || (!note.isDominant && dominantHand === 'left')
+		);
+	}, [note.isDominant, dominantHand]);
+
+	const stickingColor = useMemo(() => {
+		return isDisplayedAsDominant ? 'text-green' : 'text-red';
+	}, [isDisplayedAsDominant]);
+
+	const stickingLetter = useMemo(() => {
+		return isDisplayedAsDominant ? 'R' : 'L';
+	}, [isDisplayedAsDominant]);
 
 	return (
-		<div
-			className={`inline-flex flex-col items-center px-1 ${note.isRest ? 'text-gray' : 'text-black'}`}
-		>
-			{note.isRest ?
-				<div className='flex flex-col items-center'>
-					<span className='text-lg'>𝄽</span>
-					<span className='text-xs text-gray'>-</span>
-				</div>
-			:	<div className='flex flex-col items-center'>
-					<span className='text-lg'>{getDrumNoteSymbol(note.value)}</span>
-					<span className={`text-xs font-bold ${getStickingColor(note.sticking)}`}>
-						{note.sticking}
-					</span>
-					{note.technique && (
-						<span className='text-xs text-orange-600 font-medium'>
-							{getTechniqueSymbol(note.technique)}
-						</span>
-					)}
-				</div>
-			}
+		<div className='NoteDisplay flex flex-col items-center justify-center flex-1 text-center text-black h-full min-h-[5rem]'>
+			<div className='flex items-center justify-center h-5'>
+				<span className='text-sm font-medium'>
+					{dynamicSymbol}
+					{ornamentSymbol ? ` ${ornamentSymbol}` : ''}
+				</span>
+			</div>
+			{/* translated to center the note symbol */}
+			<span
+				className='text-5xl font-musisync leading-none'
+				style={{ transform: 'translateX(0.1em)' }}
+			>
+				{drumNoteSymbol}
+			</span>
+			<span className={`text-sm font-bold ${stickingColor}`}>{stickingLetter}</span>
 		</div>
 	);
 }
+
+export const NoteDisplay = memo(NoteDisplayComponent, (prevProps, nextProps) => {
+	return (
+		prevProps.note.dur === nextProps.note.dur &&
+		prevProps.note.dynamic === nextProps.note.dynamic &&
+		prevProps.note.ornament === nextProps.note.ornament &&
+		prevProps.note.isDominant === nextProps.note.isDominant
+	);
+});
+
+NoteDisplay.displayName = 'NoteDisplay';
