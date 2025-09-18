@@ -1,15 +1,7 @@
 'use client';
 
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react';
-
-type DominantHand = 'left' | 'right';
-
-type DominantHandContextType = {
-	dominantHand: DominantHand;
-	setDominantHand: (hand: DominantHand) => void;
-	toggleDominantHand: () => void;
-	isHydrated: boolean;
-};
+import type { DominantHand, DominantHandContextType } from '@/types';
 
 const DominantHandContext = createContext<DominantHandContextType | undefined>(undefined);
 

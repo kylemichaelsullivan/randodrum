@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState, type ReactNode } from 'react';
+import { memo, useEffect, useState, type ReactNode } from 'react';
 
 type HydrationBoundaryProps = {
 	children: ReactNode;
@@ -11,7 +11,7 @@ type HydrationBoundaryProps = {
  * HydrationBoundary prevents hydration mismatches by ensuring
  * client-side rendering matches server-side rendering
  */
-export function HydrationBoundary({ children, fallback = null }: HydrationBoundaryProps) {
+function HydrationBoundaryComponent({ children, fallback = null }: HydrationBoundaryProps) {
 	const [isHydrated, setIsHydrated] = useState(false);
 
 	useEffect(() => {
@@ -25,11 +25,15 @@ export function HydrationBoundary({ children, fallback = null }: HydrationBounda
 	return <>{children}</>;
 }
 
+export const HydrationBoundary = memo(HydrationBoundaryComponent);
+
+HydrationBoundary.displayName = 'HydrationBoundary';
+
 /**
  * ClientOnly ensures a component only renders on the client side
  * Useful for components that depend on browser APIs or localStorage
  */
-export function ClientOnly({ children, fallback = null }: HydrationBoundaryProps) {
+function ClientOnlyComponent({ children, fallback = null }: HydrationBoundaryProps) {
 	const [isClient, setIsClient] = useState(false);
 
 	useEffect(() => {
@@ -42,3 +46,7 @@ export function ClientOnly({ children, fallback = null }: HydrationBoundaryProps
 
 	return <>{children}</>;
 }
+
+export const ClientOnly = memo(ClientOnlyComponent);
+
+ClientOnly.displayName = 'ClientOnly';

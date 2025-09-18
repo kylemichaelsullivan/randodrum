@@ -1,12 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { BeatFormData } from '@/types';
-
-type FormStore = {
-	formValues: BeatFormData;
-	setFormValues: (values: Partial<BeatFormData>) => void;
-	resetFormValues: () => void;
-};
+import type { BeatFormData, FormStore } from '@/types';
 
 const defaultFormValues: BeatFormData = {
 	beats: 4,

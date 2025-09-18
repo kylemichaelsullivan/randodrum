@@ -1,12 +1,12 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 
 /**
  * HydrationManager handles browser extension interference and provides
  * a clean way to manage hydration without suppressHydrationWarning
  */
-export function HydrationManager({ children }: { children: React.ReactNode }) {
+export function HydrationManager({ children }: { children: ReactNode }) {
 	const [isHydrated, setIsHydrated] = useState(false);
 	const [, setHasExtensionInterference] = useState(false);
 
@@ -25,13 +25,8 @@ export function HydrationManager({ children }: { children: React.ReactNode }) {
 
 			const hasExtensions = extensionAttributes.some(attr => body.hasAttribute(attr));
 			setHasExtensionInterference(hasExtensions);
-
-			if (hasExtensions) {
-				console.debug('Browser extension interference detected and handled');
-			}
 		};
 
-		// Mark as hydrated and check for extensions
 		setIsHydrated(true);
 		checkForExtensions();
 
