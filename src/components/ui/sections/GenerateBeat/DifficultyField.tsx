@@ -1,53 +1,54 @@
 'use client';
 
-import { FormField, FormLabel, FormSelect } from '../../forms';
-import { HelpButton } from '../../buttons';
-import { useFormStore } from '@/stores/form-store';
-import type { BeatFormData, DifficultyLevel } from '@/types';
+import { memo, useCallback, useMemo } from 'react';
+import { FormField, FormLabel, FormSelect } from '@/components/ui/forms';
+import { getDifficultyOptions } from '@/utils';
+import { HelpButton } from '@/components/ui/buttons';
+import { useFormStore } from '@/stores';
 
-/* eslint-disable @typescript-eslint/no-explicit-any, @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-unsafe-call, react/no-children-prop */
-type DifficultyFieldProps = {
-	form: any; // Tanstack Form
-};
+import type { ChangeEvent } from 'react';
+import type { BeatFormData, DifficultyFieldProps, DifficultyLevel } from '@/types';
 
-const DIFFICULTY_OPTIONS: DifficultyLevel[] = [
-	'I’m Too Young to Drum',
-	'Hey, Not Too Rough',
-	'Hurt Me Plenty',
-	'Ultra-Violence',
-	'Drumline!',
-];
-
-export function DifficultyField({ form }: DifficultyFieldProps) {
+function DifficultyFieldComponent({ form }: DifficultyFieldProps) {
 	const { setFormValues } = useFormStore();
 
-	return (
-		<form.Field
-			name='difficulty'
-			children={(field: any) => (
-				<FormField className='flex-1 relative'>
-					<div className='flex gap-1 items-center justify-start'>
-						<FormLabel htmlFor='difficulty'>Difficulty</FormLabel>
-						<HelpButton />
-					</div>
-					<FormSelect
-						className='p-1'
-						value={field.state.value}
-						onChange={e => {
-							const newValue = e.target.value as BeatFormData['difficulty'];
-							field.handleChange(newValue);
-							setFormValues({ difficulty: newValue });
-						}}
-						id='difficulty'
-					>
-						{DIFFICULTY_OPTIONS.map(option => (
-							<option value={option} key={option}>
-								{option}
-							</option>
-						))}
-					</FormSelect>
-				</FormField>
-			)}
-		/>
+	const difficultyOptions = useMemo(() => getDifficultyOptions(), []);
+
+	const handleChange = useCallback(
+		(
+			e: ChangeEvent<HTMLSelectElement>,
+			field: { handleChange: (value: DifficultyLevel) => void }
+		) => {
+			const newValue = e.target.value as BeatFormData['difficulty'];
+			field.handleChange(newValue);
+			setFormValues({ difficulty: newValue });
+		},
+		[setFormValues]
 	);
+
+	return form.Field({
+		name: 'difficulty',
+		children: field => (
+			<FormField className='flex-1 relative'>
+				<div className='flex gap-1 items-center justify-start'>
+					<FormLabel htmlFor='difficulty'>Difficulty</FormLabel>
+					<HelpButton />
+				</div>
+				<FormSelect
+					className='p-1'
+					value={field.state.value}
+					onChange={e => handleChange(e, field)}
+					id='difficulty'
+				>
+					{difficultyOptions.map(option => (
+						<option value={option} key={option}>
+							{option}
+						</option>
+					))}
+				</FormSelect>
+			</FormField>
+		),
+	});
 }
+
+export const DifficultyField = memo(DifficultyFieldComponent);

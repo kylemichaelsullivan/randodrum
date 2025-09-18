@@ -1,15 +1,13 @@
 'use client';
 
-import { useForm } from '@tanstack/react-form';
-import { api } from '@/trpc/react';
-
+import { api } from '@/trpc';
 import { BeatsField } from './BeatsField';
-import { Form } from '../../forms';
 import { DifficultyField } from './DifficultyField';
+import { Form } from '@/components/ui/forms';
 import { GenerateBeatButton } from './GenerateBeatButton';
 import { MeasuresField } from './MeasuresField';
-import { useBeatStore } from '@/stores/beat-store';
-import { useFormStore } from '@/stores/form-store';
+import { useBeatStore, useFormStore } from '@/stores';
+import { useForm } from '@tanstack/react-form';
 
 export function GenerateBeat() {
 	const generateBeatMutation = api.beat.generate.useMutation();
@@ -21,8 +19,8 @@ export function GenerateBeat() {
 		onSubmit: async ({ value }) => {
 			try {
 				const result = await generateBeatMutation.mutateAsync(value);
-				if (result.success && result.beat) {
-					setCurrentBeat(result.beat);
+				if (result.success && result.data) {
+					setCurrentBeat(result.data.beat);
 				}
 			} catch (error) {
 				console.error('Failed to generate beat:', error);

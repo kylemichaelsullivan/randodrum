@@ -1,13 +1,12 @@
 'use client';
 
-import { useForm } from '@tanstack/react-form';
-import { api } from '@/trpc/react';
-
-import { Form } from '../../forms';
+import { api } from '@/trpc';
 import { BeatsField } from './BeatsField';
 import { DifficultyField } from './DifficultyField';
+import { Form } from '@/components/ui/forms';
 import { GenerateBeatButton } from './GenerateBeatButton';
 import { MeasuresField } from './MeasuresField';
+import { useForm } from '@tanstack/react-form';
 
 import type { BeatFormData } from '@/types';
 
