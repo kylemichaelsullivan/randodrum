@@ -27,7 +27,7 @@ export { COLORS, color } from './color';
 export type { Color } from './color';
 
 // Difficulty types
-export type { DifficultyConfig, DifficultyLevel } from './difficulty';
+export type { DifficultyConfig, DifficultyLevel, DurationWeightConfig } from './difficulty';
 
 // Dynamic types
 export type { Dynamic, DynamicConfig, DynamicName, DynamicScale } from './dynamic';

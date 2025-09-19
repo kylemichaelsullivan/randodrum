@@ -4,11 +4,4 @@
 
 export { appRouter, createCaller } from './api/root';
 export { createTRPCContext, createTRPCRouter, publicProcedure } from './api/trpc';
-export {
-	generateBeat,
-	generateRhythm,
-	generateHandRuns,
-	addDynamics,
-	addOrnaments,
-	applyBalancing,
-} from './beat-generator';
+export { generateBeat } from './beat-generator';
