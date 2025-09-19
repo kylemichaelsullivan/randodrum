@@ -4,6 +4,7 @@ import { Geist } from 'next/font/google';
 import localFont from 'next/font/local';
 import { TRPCReactProvider } from '@/trpc';
 import {
+	BrowserExtensionHandler,
 	DominantHandProvider,
 	HydrationErrorBoundary,
 	HydrationFix,
@@ -34,6 +35,7 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
 	return (
 		<html lang='en' className={`${geist.variable} ${musisync.variable}`}>
 			<body>
+				<BrowserExtensionHandler />
 				<HydrationFix />
 				<HydrationManager>
 					<HydrationErrorBoundary>

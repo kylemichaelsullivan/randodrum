@@ -22,7 +22,6 @@ export function BeatForm() {
 		onSubmit: async ({ value }) => {
 			try {
 				const result = await generateBeatMutation.mutateAsync(value);
-				console.log('Beat generated:', result);
 			} catch (error) {
 				console.error('Failed to generate beat:', error);
 			}

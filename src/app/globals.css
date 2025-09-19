@@ -132,6 +132,11 @@ a:hover {
 
 /* Utility Classes */
 /* Shadows */
+.text-shadow {
+	font-weight: 500;
+	text-shadow: 0 1px 1px rgba(0, 0, 0, 0.25);
+}
+
 .shadow-xs {
 	box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
 }
@@ -187,6 +192,11 @@ a:hover {
 	box-shadow:
 		0 20px 25px -5px rgba(0, 0, 0, 0.3),
 		0 10px 10px -5px rgba(0, 0, 0, 0.2);
+}
+
+/* Font Utility Classes */
+.font-musisync {
+	font-family: var(--font-musisync), monospace;
 }
 
 /* Background */
@@ -521,16 +531,20 @@ a:hover {
 	--tw-ring-color: var(--color-green);
 }
 
-/* Text Shadow */
-.text-shadow {
-	font-weight: 500;
-	text-shadow: 0 1px 1px rgba(0, 0, 0, 0.25);
+/* Component Styles */
+.NoteSymbol {
+	transform: translateX(0.1em);
+}
+
+.NoteSymbol.hasDot {
+	letter-spacing: -0.25em;
+	transform: translateX(-0.1em);
 }
 
 /* Reserve space for LastPass icon */
 input[data-lpignore='false'] {
-	padding-right: 24px !important;
 	box-sizing: border-box;
+	padding-right: 24px !important;
 }
 
 /* Handle browser extension injections */
@@ -541,9 +555,4 @@ input[data-lpignore='false'] {
 /* Suppress hydration warnings for browser extension elements */
 .FormFieldContainer {
 	suppresshydrationwarning: true;
-}
-
-/* Font Utility Classes */
-.font-musisync {
-	font-family: var(--font-musisync), monospace;
 }

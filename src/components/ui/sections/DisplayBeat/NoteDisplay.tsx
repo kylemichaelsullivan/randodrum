@@ -1,6 +1,10 @@
 import { memo, useMemo } from 'react';
+
+import clsx from 'clsx';
 import { getDurationSymbol, getDynamicSymbol, getOrnamentSymbol } from '@/utils';
+import { isDottedDuration } from '@/types/duration';
 import { useDominantHand } from '@/components';
+
 import type { Note } from '@/types';
 
 type NoteDisplayProps = {
@@ -11,7 +15,11 @@ function NoteDisplayComponent({ note }: NoteDisplayProps) {
 	const { dominantHand } = useDominantHand();
 
 	// Use optimized symbol lookup functions for O(1) performance
-	const drumNoteSymbol = useMemo(() => {
+	const hasDot = useMemo(() => {
+		return isDottedDuration(note.dur);
+	}, [note.dur]);
+
+	const noteSymbol = useMemo(() => {
 		return getDurationSymbol(note.dur);
 	}, [note.dur]);
 
@@ -45,12 +53,12 @@ function NoteDisplayComponent({ note }: NoteDisplayProps) {
 					{ornamentSymbol ? ` ${ornamentSymbol}` : ''}
 				</span>
 			</div>
-			{/* translated to center the note symbol */}
 			<span
-				className='text-5xl font-musisync leading-none'
-				style={{ transform: 'translateX(0.1em)' }}
+				className={clsx('NoteSymbol text-5xl font-musisync leading-none', {
+					hasDot,
+				})}
 			>
-				{drumNoteSymbol}
+				{noteSymbol}
 			</span>
 			<span className={`text-sm font-bold ${stickingColor}`}>{stickingLetter}</span>
 		</div>
