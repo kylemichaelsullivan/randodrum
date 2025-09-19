@@ -2,42 +2,7 @@
  * Difficulty-related utility functions and constants
  */
 
-import { DURATION_CONFIGS } from './constants';
-import type { DifficultyConfig, DifficultyLevel, Duration, DynamicScale } from '@/types';
-
-// Common duration arrays derived from DURATION_CONFIGS
-const BEGINNER_DURATIONS: Duration[] = [
-	DURATION_CONFIGS.find(d => d.name === 'Whole')!.value, // 96
-	DURATION_CONFIGS.find(d => d.name === 'Dotted Half')!.value, // 72
-	DURATION_CONFIGS.find(d => d.name === 'Half')!.value, // 48
-	DURATION_CONFIGS.find(d => d.name === 'Quarter')!.value, // 24
-];
-
-const EASY_DURATIONS: Duration[] = [
-	DURATION_CONFIGS.find(d => d.name === 'Half')!.value, // 48
-	DURATION_CONFIGS.find(d => d.name === 'Dotted Quarter')!.value, // 36
-	DURATION_CONFIGS.find(d => d.name === 'Quarter')!.value, // 24
-	DURATION_CONFIGS.find(d => d.name === 'Eighth')!.value, // 12
-];
-
-const MODERATE_DURATIONS: Duration[] = [
-	DURATION_CONFIGS.find(d => d.name === 'Dotted Quarter')!.value, // 36
-	DURATION_CONFIGS.find(d => d.name === 'Quarter')!.value, // 24
-	DURATION_CONFIGS.find(d => d.name === 'Dotted Eighth')!.value, // 18
-	DURATION_CONFIGS.find(d => d.name === 'Eighth')!.value, // 12
-	DURATION_CONFIGS.find(d => d.name === 'Eighth Triplet')!.value, // 8
-	DURATION_CONFIGS.find(d => d.name === 'Sixteenth')!.value, // 6
-];
-
-const HARD_DURATIONS: Duration[] = [
-	DURATION_CONFIGS.find(d => d.name === 'Dotted Quarter')!.value, // 36
-	DURATION_CONFIGS.find(d => d.name === 'Quarter')!.value, // 24
-	DURATION_CONFIGS.find(d => d.name === 'Dotted Eighth')!.value, // 18
-	DURATION_CONFIGS.find(d => d.name === 'Eighth')!.value, // 12
-	DURATION_CONFIGS.find(d => d.name === 'Eighth Triplet')!.value, // 8
-	DURATION_CONFIGS.find(d => d.name === 'Sixteenth')!.value, // 6
-	DURATION_CONFIGS.find(d => d.name === 'Thirty-Second')!.value, // 3
-];
+import type { DifficultyConfig, DifficultyLevel, DynamicScale } from '@/types';
 
 // Constants
 export const DIFFICULTY_LEVELS: readonly DifficultyLevel[] = [
@@ -51,11 +16,16 @@ export const DIFFICULTY_LEVELS: readonly DifficultyLevel[] = [
 // Centralized difficulty configurations
 export const DIFFICULTY_CONFIGS: Record<DifficultyLevel, DifficultyConfig> = {
 	'I’m Too Young to Drum': {
-		durations: BEGINNER_DURATIONS,
+		durations: [
+			{ duration: 24, weight: 0.5 }, // Quarter
+			{ duration: 48, weight: 0.25 }, // Half
+			{ duration: 72 }, // Dotted Half
+			{ duration: 96 }, // Whole
+		],
 		restProbability: 0.3,
 		runLengths: { 1: 1.0 },
 		switchProb: 1.0,
-		dynamicScale: [0, 10, 10, 10] as DynamicScale,
+		dynamicScale: [0, 10, 10] as DynamicScale,
 		flamThreshold: 0,
 		dragThreshold: 0,
 		allowBalancing: true,
@@ -64,11 +34,16 @@ export const DIFFICULTY_CONFIGS: Record<DifficultyLevel, DifficultyConfig> = {
 		maxRatio: 0.55,
 	},
 	'Hey, Not Too Rough': {
-		durations: EASY_DURATIONS,
+		durations: [
+			{ duration: 12, weight: 0.3 }, // Eighth
+			{ duration: 24, weight: 0.4 }, // Quarter
+			{ duration: 36 }, // Dotted Quarter
+			{ duration: 48 }, // Half
+		],
 		restProbability: 0.25,
 		runLengths: { 1: 0.7, 2: 0.3 },
 		switchProb: 0.8,
-		dynamicScale: [0, 8, 10, 10] as DynamicScale,
+		dynamicScale: [0, 8, 10] as DynamicScale,
 		flamThreshold: 0.05,
 		dragThreshold: 0,
 		allowBalancing: true,
@@ -77,11 +52,18 @@ export const DIFFICULTY_CONFIGS: Record<DifficultyLevel, DifficultyConfig> = {
 		maxRatio: 0.55,
 	},
 	'Hurt Me Plenty': {
-		durations: MODERATE_DURATIONS,
+		durations: [
+			{ duration: 6, weight: 0.2 }, // Sixteenth
+			{ duration: 8, weight: 0.05 }, // Eighth Triplet
+			{ duration: 12, weight: 0.25 }, // Eighth
+			{ duration: 18, weight: 0.1 }, // Dotted Eighth
+			{ duration: 24, weight: 0.3 }, // Quarter
+			{ duration: 36, weight: 0.1 }, // Dotted Quarter
+		],
 		restProbability: 0.2,
 		runLengths: { 1: 0.5, 2: 0.3, 3: 0.2 },
 		switchProb: 0.6,
-		dynamicScale: [0.5, 6, 9, 9.5] as DynamicScale,
+		dynamicScale: [0.5, 6, 9] as DynamicScale,
 		flamThreshold: 0.1,
 		dragThreshold: 0.1,
 		allowBalancing: true,
@@ -90,11 +72,19 @@ export const DIFFICULTY_CONFIGS: Record<DifficultyLevel, DifficultyConfig> = {
 		maxRatio: 0.6,
 	},
 	'Ultra-Violence': {
-		durations: HARD_DURATIONS,
+		durations: [
+			{ duration: 3, weight: 0.05 }, // Thirty-Second
+			{ duration: 6, weight: 0.2 }, // Sixteenth
+			{ duration: 8, weight: 0.15 }, // Eighth Triplet
+			{ duration: 12, weight: 0.25 }, // Eighth
+			{ duration: 18, weight: 0.1 }, // Dotted Eighth
+			{ duration: 24, weight: 0.15 }, // Quarter
+			{ duration: 36, weight: 0.1 }, // Dotted Quarter
+		],
 		restProbability: 0.15,
 		runLengths: { 1: 0.4, 2: 0.3, 3: 0.2, 4: 0.1 },
 		switchProb: 0.4,
-		dynamicScale: [2, 7, 9, 10] as DynamicScale,
+		dynamicScale: [2, 7, 9] as DynamicScale,
 		flamThreshold: 0.15,
 		dragThreshold: 0.15,
 		allowBalancing: true,
@@ -103,11 +93,19 @@ export const DIFFICULTY_CONFIGS: Record<DifficultyLevel, DifficultyConfig> = {
 		maxRatio: 0.65,
 	},
 	'Drumline!': {
-		durations: HARD_DURATIONS,
+		durations: [
+			{ duration: 3, weight: 0.15 }, // Thirty-Second
+			{ duration: 6, weight: 0.3 }, // Sixteenth
+			{ duration: 8, weight: 0.2 }, // Eighth Triplet
+			{ duration: 12, weight: 0.25 }, // Eighth
+			{ duration: 18, weight: 0.03 }, // Dotted Eighth
+			{ duration: 24, weight: 0.05 }, // Quarter
+			{ duration: 36, weight: 0.02 }, // Dotted Quarter
+		],
 		restProbability: 0.1,
 		runLengths: { 1: 0.25, 2: 0.25, 3: 0.25, 4: 0.25 },
 		switchProb: 0.5,
-		dynamicScale: [2, 7, 9, 10] as DynamicScale,
+		dynamicScale: [2, 7, 9] as DynamicScale,
 		flamThreshold: 0.25,
 		dragThreshold: 0.25,
 		allowBalancing: false,

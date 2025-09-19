@@ -9,10 +9,16 @@ export type DifficultyLevel =
 	| 'Ultra-Violence'
 	| 'Drumline!';
 
+// Duration configuration (optional weight)
+export type DurationWeightConfig = {
+	duration: Duration;
+	weight?: number; // 0-1 probability weight
+};
+
 // Difficulty configuration type
 export type DifficultyConfig = {
 	// Rhythm generation
-	durations: Duration[];
+	durations: DurationWeightConfig[];
 	restProbability: number; // 0-1, probability of adding rests
 
 	// Sticking generation

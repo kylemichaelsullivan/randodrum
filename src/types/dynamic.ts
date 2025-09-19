@@ -15,4 +15,4 @@ export type DynamicConfig = {
 };
 
 // Dynamic scale type
-export type DynamicScale = [number, number, number, number];
+export type DynamicScale = [number, number, number];
