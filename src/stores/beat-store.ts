@@ -11,7 +11,6 @@ export const useBeatStore = create<BeatStore>()(
 			setIsLoading: (loading: boolean) => set({ isLoading: loading }),
 			clearBeat: () => set({ currentBeat: null }),
 			clearCorruptedBeat: () => {
-				console.log('Clearing corrupted beat data');
 				localStorage.removeItem('beat-storage');
 				set({ currentBeat: null });
 			},
