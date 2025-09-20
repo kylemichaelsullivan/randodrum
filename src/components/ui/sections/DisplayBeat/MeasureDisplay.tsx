@@ -13,18 +13,22 @@ type MeasureDisplayProps = {
 
 function MeasureDisplayComponent({ difficulty, measure, measureIndex }: MeasureDisplayProps) {
 	const minWidth = useMemo(() => {
-		switch (difficulty) {
-			case 'Hey, Not Too Rough':
-				return 'min-w-[18rem]';
-			case 'Hurt Me Plenty':
-				return 'min-w-[20rem]';
-			case 'Ultra-Violence':
-				return 'min-w-[22rem]';
-			case 'Drumline!':
-				return 'min-w-[24rem]';
-			default:
-				return 'min-w-[16rem]';
-		}
+		const getMinWidth = (() => {
+			const widthMap: Record<DifficultyLevel, number> = {
+				'I’m Too Young to Drum': 10,
+				'Hey, Not Too Rough': 14,
+				'Hurt Me Plenty': 24,
+				'Ultra-Violence': 28,
+				'Drumline!': 32,
+			};
+
+			return (difficulty: DifficultyLevel) => {
+				const width = widthMap[difficulty];
+				return width ? `min-w-[${width}rem]` : 'min-w-0';
+			};
+		})();
+
+		return getMinWidth(difficulty);
 	}, [difficulty]);
 
 	if (!Array.isArray(measure)) {
@@ -34,7 +38,7 @@ function MeasureDisplayComponent({ difficulty, measure, measureIndex }: MeasureD
 
 	return (
 		<div
-			className={`MeasureDisplay flex flex-col flex-1 flex-grow-0 gap-3 bg-black border border-light-gray rounded-lg min-w-0 p-4 ${minWidth} max-w-full`}
+			className={`MeasureDisplay flex flex-col flex-1 flex-grow-0 gap-1 bg-black border border-light-gray rounded-lg ${minWidth} max-w-full p-4 overflow-auto`}
 		>
 			<MeasureHeader measureIndex={measureIndex} />
 			<MeasureContent measure={measure} />

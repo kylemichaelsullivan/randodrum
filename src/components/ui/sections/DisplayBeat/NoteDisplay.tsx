@@ -1,8 +1,7 @@
 import { memo, useMemo } from 'react';
 
 import clsx from 'clsx';
-import { getDurationSymbol, getDynamicSymbol, getOrnamentSymbol } from '@/utils';
-import { isDottedDuration } from '@/types/duration';
+import { getDurationSymbol, getDynamicSymbol } from '@/utils';
 import { useDominantHand } from '@/components';
 
 import type { Note } from '@/types';
@@ -14,11 +13,6 @@ type NoteDisplayProps = {
 function NoteDisplayComponent({ note }: NoteDisplayProps) {
 	const { dominantHand } = useDominantHand();
 
-	// Use optimized symbol lookup functions for O(1) performance
-	const hasDot = useMemo(() => {
-		return isDottedDuration(note.dur);
-	}, [note.dur]);
-
 	const noteSymbol = useMemo(() => {
 		return getDurationSymbol(note.dur);
 	}, [note.dur]);
@@ -27,8 +21,16 @@ function NoteDisplayComponent({ note }: NoteDisplayProps) {
 		return note.dynamic !== 'normal' ? getDynamicSymbol(note.dynamic) : '';
 	}, [note.dynamic]);
 
-	const ornamentSymbol = useMemo(() => {
-		return note.ornament ? getOrnamentSymbol(note.ornament) : '';
+	const hasDrag = useMemo(() => {
+		return note.ornament === 'drag';
+	}, [note.ornament]);
+
+	const hasGhost = useMemo(() => {
+		return note.dynamic === 'ghost';
+	}, [note.dynamic]);
+
+	const hasFlam = useMemo(() => {
+		return note.ornament === 'flam';
 	}, [note.ornament]);
 
 	const isDisplayedAsDominant = useMemo(() => {
@@ -48,14 +50,13 @@ function NoteDisplayComponent({ note }: NoteDisplayProps) {
 	return (
 		<div className='NoteDisplay flex flex-col items-center justify-center flex-1 text-center text-black h-full min-h-[5rem]'>
 			<div className='flex items-center justify-center h-5'>
-				<span className='text-sm font-medium'>
-					{dynamicSymbol}
-					{ornamentSymbol ? ` ${ornamentSymbol}` : ''}
-				</span>
+				<span className='text-sm font-medium'>{dynamicSymbol}</span>
 			</div>
 			<span
-				className={clsx('NoteSymbol text-5xl font-musisync leading-none', {
-					hasDot,
+				className={clsx('NoteSymbol font-musisync text-5xl leading-none', {
+					hasGhost,
+					hasFlam,
+					hasDrag,
 				})}
 			>
 				{noteSymbol}

@@ -9,7 +9,7 @@ type MeasureContentProps = {
 function MeasureContentComponent({ measure }: MeasureContentProps) {
 	return (
 		<div
-			className={`MeasureContent flex flex-row flex-nowrap items-center justify-center gap-2 bg-white rounded p-3 min-h-[6.25rem]`}
+			className={`MeasureContent flex flex-row flex-nowrap items-center justify-center bg-white rounded p-3 min-h-[6.25rem]`}
 		>
 			{measure.map((note, noteIndex) => (
 				<NoteDisplay note={note} key={noteIndex} />

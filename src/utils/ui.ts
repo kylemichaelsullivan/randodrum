@@ -2,60 +2,63 @@
  * UI-related constants and utilities
  */
 
-import { DURATION_CONFIGS } from './constants';
+import { DIFFICULTY_CONFIGS, DIFFICULTY_LEVELS } from './difficulty';
+import { DURATION_CONFIGS, DURATION_DISPLAY_ORDER } from './constants';
+
 import type { ChartData, NoteType, NoteTypeName, TechniqueTypeName } from '@/types';
 
-// UI constants
-export const CHART_DATA: ChartData = {
-	'I’m Too Young to Drum': {
-		notes: ['Whole', 'Dotted Half', 'Half', 'Quarter'],
-		techniques: ['Basic'],
-		restProbability: 30,
-	},
-	'Hey, Not Too Rough': {
-		notes: ['Half', 'Dotted Quarter', 'Quarter', 'Eighth'],
-		techniques: ['Basic', 'Accent', 'Flam'],
-		restProbability: 25,
-	},
-	'Hurt Me Plenty': {
-		notes: ['Dotted Quarter', 'Quarter', 'Dotted Eighth', 'Eighth', 'Quarter Triplet', 'Sixteenth'],
-		techniques: ['Basic', 'Accent', 'Flam', 'Drag'],
-		restProbability: 20,
-	},
-	'Ultra-Violence': {
-		notes: [
-			'Dotted Quarter',
-			'Quarter',
-			'Dotted Eighth',
-			'Eighth',
-			'Quarter Triplet',
-			'Sixteenth',
-			'Eighth Sixtuplet',
-			'Thirty-Second',
-		],
-		techniques: ['Basic', 'Accent', 'Flam', 'Drag', 'Ghost'],
-		restProbability: 15,
-	},
-	'Drumline!': {
-		notes: [
-			'Dotted Quarter',
-			'Quarter',
-			'Dotted Eighth',
-			'Eighth',
-			'Quarter Triplet',
-			'Sixteenth',
-			'Eighth Sixtuplet',
-			'Thirty-Second',
-		],
-		techniques: ['Basic', 'Accent', 'Flam', 'Drag', 'Ghost'],
-		restProbability: 10,
-	},
-} as const satisfies ChartData;
+function generateChartData(): ChartData {
+	const chartData: ChartData = {} as ChartData;
 
-export const NOTE_TYPES: readonly NoteType[] = DURATION_CONFIGS.map(config => ({
-	name: config.name as NoteTypeName,
-	value: config.value,
-}));
+	for (const difficulty of DIFFICULTY_LEVELS) {
+		const config = DIFFICULTY_CONFIGS[difficulty];
+
+		const notes: NoteTypeName[] = [];
+		for (const durationConfig of config.durations) {
+			const durationConfigFound = DURATION_CONFIGS.find(d => d.value === durationConfig.duration);
+			if (durationConfigFound && !notes.includes(durationConfigFound.name)) {
+				notes.push(durationConfigFound.name);
+			}
+		}
+
+		const techniques: TechniqueTypeName[] = ['Basic'];
+
+		if (config.dynamicScale[0] > 0 || config.dynamicScale[2] > 8) {
+			techniques.push('Accent');
+		}
+
+		if (config.flamThreshold > 0) {
+			techniques.push('Flam');
+		}
+
+		if (config.dragThreshold > 0) {
+			techniques.push('Drag');
+		}
+
+		if (config.dynamicScale[0] > 0) {
+			techniques.push('Ghost');
+		}
+
+		chartData[difficulty] = {
+			notes,
+			techniques,
+			restProbability: Math.round(config.restProbability * 100),
+		};
+	}
+
+	return chartData;
+}
+
+export const CHART_DATA: ChartData = generateChartData();
+
+export const NOTE_TYPES: readonly NoteType[] = DURATION_DISPLAY_ORDER.map(name => {
+	const config = DURATION_CONFIGS.find(c => c.name === name);
+	if (!config) throw new Error(`Duration config not found for ${name}`);
+	return {
+		name: config.name,
+		value: config.value,
+	};
+});
 
 export const TECHNIQUE_TYPES: readonly TechniqueTypeName[] = [
 	'Basic',
@@ -64,3 +67,11 @@ export const TECHNIQUE_TYPES: readonly TechniqueTypeName[] = [
 	'Drag',
 	'Ghost',
 ] as const;
+
+export const TECHNIQUE_DEFINITIONS: Record<TechniqueTypeName, string> = {
+	Basic: 'Standard note with normal volume and timing',
+	Accent: 'A note played louder than surrounding notes',
+	Flam: 'Two notes played almost simultaneously, with one slightly before the other',
+	Drag: 'Two grace notes before a main note',
+	Ghost: 'A very quiet note, often played on the snare drum',
+} as const;
