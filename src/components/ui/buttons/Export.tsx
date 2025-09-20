@@ -7,7 +7,7 @@ import { Button } from './Button';
 
 export const Export = () => {
 	return (
-		<Button variant='icon' title='Export Beat' aria-label='Export beat to file'>
+		<Button variant='hidden' title='Export Beat' aria-label='Export beat to file'>
 			<FontAwesomeIcon icon={faDownload} className='w-4 h-4 text-black' />
 		</Button>
 	);

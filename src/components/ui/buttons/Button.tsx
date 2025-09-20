@@ -9,7 +9,7 @@ import type { ButtonHTMLAttributes, KeyboardEvent, MouseEvent, ReactNode } from 
 interface ButtonProps extends ButtonHTMLAttributes<HTMLButtonElement> {
 	title: string;
 	children: ReactNode;
-	variant?: 'default' | 'icon' | 'generate' | 'help';
+	variant?: 'default' | 'icon' | 'generate' | 'help' | 'hidden';
 	'aria-label'?: string;
 	isDisabled?: boolean;
 }
@@ -45,6 +45,7 @@ const ButtonComponent = forwardRef<HTMLButtonElement, ButtonProps>(
 		const iconStyles = 'bg-white border border-black rounded-lg w-10 h-10 hover:bg-light-gray';
 		const helpStyles =
 			'bg-gray-100 border border-gray-300 rounded-full w-6 h-6 hover:bg-gray-200 text-gray-600 hover:text-gray-800';
+		const hiddenStyles = 'invisible';
 
 		return (
 			<button
@@ -54,6 +55,7 @@ const ButtonComponent = forwardRef<HTMLButtonElement, ButtonProps>(
 					variant === 'icon' && iconStyles,
 					variant === 'generate' && generateStyles,
 					variant === 'help' && helpStyles,
+					variant === 'hidden' && hiddenStyles,
 					disabledStyles,
 					className
 				)}
