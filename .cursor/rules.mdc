@@ -64,14 +64,14 @@ src/
 │   │   ├── globals/      # Global UI components
 │   │   ├── modals/       # Modal components
 │   │   └── sections/     # Section components
-│   └── providers/        # Context providers
+│   └── providers/        # Context providers and hydration management
 ├── server/               # Server-side code
 │   ├── api/              # tRPC routers and setup
 │   └── beat-generator.ts # Beat generation logic
 ├── stores/               # Zustand stores
 ├── trpc/                 # tRPC client setup
 ├── types/                # TypeScript type definitions
-├── utils/                # Utility functions
+├── utils/                # Utility functions and validation
 └── __tests__/            # Test files
 ```
 

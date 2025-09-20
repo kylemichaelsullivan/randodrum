@@ -13,8 +13,9 @@ exclude: ['**/__tests__/**', '**/*.test.*', '**/*.spec.*']
 - **Type safety**: Ensure proper TypeScript typing for all forms
 - **State persistence**: Maintain state across form interactions using Zustand stores
 - **Schema-driven validation**: Use Zod schemas as the single source of truth for field requirements
-- **Manual validation**: Implement validation logic as needed for form fields
-- **Schema validation**: Use Zod schemas directly for validation in TanStack Form Field validators
+- **Unified validation system**: Use the comprehensive validation system in `src/utils/validation.ts`
+- **Runtime validation**: Leverage Zod schemas for both runtime validation and TypeScript type inference
+- **Safe validation**: Use safe validation functions for user input and external data
 
 ## Available Schemas
 
@@ -234,14 +235,23 @@ import { useFormStore } from '@/stores';
 
 The project includes comprehensive validation functions in `src/utils/validation.ts`:
 
+#### Strict Validation Functions
+
 - `validateBeatFormData(data: unknown): ValidatedBeatFormData`
 - `validateGeneratedBeat(data: unknown): ValidatedGeneratedBeat`
 - `validateMeasure(data: unknown): ValidatedMeasure`
 - `validateNote(data: unknown): ValidatedNote`
+- `validateDifficultyLevel(value: unknown): DifficultyLevel`
+- `validateDurationValue(value: unknown): DurationValue`
+- `validateDynamicName(value: unknown): DynamicName`
+- `validateOrnamentName(value: unknown): OrnamentName`
+
+#### Safe Validation Functions
+
 - `safeValidateBeatFormData(data: unknown): { success: boolean; data?: ValidatedBeatFormData; error?: string }`
 - `safeValidateGeneratedBeat(data: unknown): { success: boolean; data?: ValidatedGeneratedBeat; error?: string }`
 
-### Type Guards
+#### Type Guards
 
 - `isBeatFormData(data: unknown): data is ValidatedBeatFormData`
 - `isGeneratedBeat(data: unknown): data is ValidatedGeneratedBeat`

@@ -243,8 +243,10 @@ import { DisplayBeat, MeasuresDisplay } from '@/components/ui/sections';
 - **DominantHandProvider** (`@/components/providers/dominant-hand-provider`) - Context for dominant hand preference
 - **ThemeProvider** (`@/components/providers/theme-provider`) - Theme context provider
 - **HydrationBoundary** (`@/components/providers/hydration-boundary`) - Hydration safety wrapper
+- **HydrationManager** (`@/components/providers/hydration-manager`) - Comprehensive hydration management
+- **BrowserExtensionHandler** (`@/components/providers/browser-extension-handler`) - Browser extension detection and handling
 - **ErrorBoundary** (`@/components/providers/error-boundary`) - Error boundary for graceful error handling
-- **ClientOnly** (`@/components/providers/hydration-boundary`) - Client-side only rendering wrapper
+- **HydrationSafe** (`@/components/providers/hydration-safe`) - Extension-aware rendering wrapper
 
 ### Modal Components
 
@@ -283,6 +285,8 @@ import { DisplayBeat, MeasuresDisplay } from '@/components/ui/sections';
 
 - **ClientOnly wrapper**: Use for components that require client-side rendering
 - **HydrationBoundary**: Wrap components that may have hydration mismatches
+- **HydrationManager**: Comprehensive hydration management with extension detection
+- **BrowserExtensionHandler**: Detect and handle browser extension interference
 - **suppressHydrationWarning**: Use sparingly and not on the `<body>` element
 
 ## RandoDrum-Specific Patterns
