@@ -1,5 +1,6 @@
 import { getDifficultyConfig } from '@/utils';
-import { isTupletDuration, isTripletDuration, isSixtupletDuration } from '@/types/duration';
+import { isTupletDuration, isTripletDuration } from '@/types/duration';
+
 import type {
 	BeatFormData,
 	DifficultyConfig,
@@ -13,13 +14,26 @@ import type { OrnamentName } from '@/types/ornament';
 
 function pickWeightedDuration(durationConfigs: DurationWeightConfig[], cap: number): Duration {
 	const validConfigs = durationConfigs.filter(config => config.duration <= cap);
-	if (validConfigs.length === 0) return 2;
+	if (validConfigs.length === 0) return 6;
 
-	const totalWeight = validConfigs.reduce((sum, config) => sum + (config.weight ?? 1), 0);
-	let random = Math.random() * totalWeight;
+	// Normalize weights so they sum to 1.0
+	const explicitWeights = validConfigs.filter(config => config.weight !== undefined);
+	const implicitWeights = validConfigs.filter(config => config.weight === undefined);
 
-	for (const config of validConfigs) {
-		random -= config.weight ?? 1;
+	const explicitTotal = explicitWeights.reduce((sum, config) => sum + config.weight!, 0);
+	const remainingWeight = 1.0 - explicitTotal;
+	const implicitWeightEach =
+		implicitWeights.length > 0 ? remainingWeight / implicitWeights.length : 0;
+
+	const normalizedConfigs = validConfigs.map(config => ({
+		...config,
+		weight: config.weight ?? implicitWeightEach,
+	}));
+
+	let random = Math.random();
+
+	for (const config of normalizedConfigs) {
+		random -= config.weight;
 		if (random <= 0) return config.duration;
 	}
 	return validConfigs[validConfigs.length - 1]!.duration;
@@ -30,7 +44,7 @@ function sampleFromDist(dist: Record<number, number>, cap: number): number {
 		.map(([k, w]) => ({ len: Number(k), w: Number(w) }))
 		.filter(x => x.len <= cap);
 
-	if (items.length === 0) return 2;
+	if (items.length === 0) return 6;
 
 	const total = items.reduce((s, x) => s + x.w, 0);
 	let r = Math.random() * total;
@@ -52,10 +66,7 @@ export function generateRhythm(
 		const dur = pickWeightedDuration(durationConfigs, remaining);
 
 		if (isTupletDuration(dur)) {
-			const groupSize =
-				isTripletDuration(dur) ? 3
-				: isSixtupletDuration(dur) ? 6
-				: 1;
+			const groupSize = isTripletDuration(dur) ? 3 : 1;
 			const totalDuration = dur * groupSize;
 
 			if (remaining >= totalDuration && Math.random() < 0.7) {
@@ -204,18 +215,25 @@ function applyBalancing(measure: Measure, difficultyConfig: DifficultyConfig): M
 	return measure;
 }
 
+function fixRender(measure: Measure): Measure {
+	// TODO: Implement ligature/symbol replacement for grouped notes
+	return measure;
+}
+
 export function generateBeat(formData: BeatFormData): GeneratedBeat {
 	const difficultyConfig = getDifficultyConfig(formData.difficulty);
 	const gridSize = formData.beats * 24;
 
 	const measures = Array.from({ length: formData.measures }, () => {
 		const measure = generateRhythm(difficultyConfig.durations, gridSize);
-		return applyBalancing(
-			addOrnaments(
-				addDynamics(generateHandRuns(measure, difficultyConfig), difficultyConfig),
+		return fixRender(
+			applyBalancing(
+				addOrnaments(
+					addDynamics(generateHandRuns(measure, difficultyConfig), difficultyConfig),
+					difficultyConfig
+				),
 				difficultyConfig
-			),
-			difficultyConfig
+			)
 		);
 	});
 

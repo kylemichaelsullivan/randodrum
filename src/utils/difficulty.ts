@@ -4,7 +4,6 @@
 
 import type { DifficultyConfig, DifficultyLevel, DynamicScale } from '@/types';
 
-// Constants
 export const DIFFICULTY_LEVELS: readonly DifficultyLevel[] = [
 	'I’m Too Young to Drum',
 	'Hey, Not Too Rough',
@@ -13,11 +12,10 @@ export const DIFFICULTY_LEVELS: readonly DifficultyLevel[] = [
 	'Drumline!',
 ] as const;
 
-// Centralized difficulty configurations
 export const DIFFICULTY_CONFIGS: Record<DifficultyLevel, DifficultyConfig> = {
 	'I’m Too Young to Drum': {
 		durations: [
-			{ duration: 24, weight: 0.5 }, // Quarter
+			{ duration: 24, weight: 0.6 }, // Quarter
 			{ duration: 48, weight: 0.25 }, // Half
 			{ duration: 72 }, // Dotted Half
 			{ duration: 96 }, // Whole
@@ -36,7 +34,7 @@ export const DIFFICULTY_CONFIGS: Record<DifficultyLevel, DifficultyConfig> = {
 	'Hey, Not Too Rough': {
 		durations: [
 			{ duration: 12, weight: 0.3 }, // Eighth
-			{ duration: 24, weight: 0.4 }, // Quarter
+			{ duration: 24, weight: 0.5 }, // Quarter
 			{ duration: 36 }, // Dotted Quarter
 			{ duration: 48 }, // Half
 		],
@@ -73,13 +71,13 @@ export const DIFFICULTY_CONFIGS: Record<DifficultyLevel, DifficultyConfig> = {
 	},
 	'Ultra-Violence': {
 		durations: [
-			{ duration: 3, weight: 0.05 }, // Thirty-Second
 			{ duration: 6, weight: 0.2 }, // Sixteenth
 			{ duration: 8, weight: 0.15 }, // Eighth Triplet
 			{ duration: 12, weight: 0.25 }, // Eighth
+			{ duration: 16, weight: 0.1 }, // Quarter Triplet
 			{ duration: 18, weight: 0.1 }, // Dotted Eighth
 			{ duration: 24, weight: 0.15 }, // Quarter
-			{ duration: 36, weight: 0.1 }, // Dotted Quarter
+			{ duration: 36, weight: 0.15 }, // Dotted Quarter
 		],
 		restProbability: 0.15,
 		runLengths: { 1: 0.4, 2: 0.3, 3: 0.2, 4: 0.1 },
@@ -94,12 +92,12 @@ export const DIFFICULTY_CONFIGS: Record<DifficultyLevel, DifficultyConfig> = {
 	},
 	'Drumline!': {
 		durations: [
-			{ duration: 3, weight: 0.15 }, // Thirty-Second
 			{ duration: 6, weight: 0.3 }, // Sixteenth
 			{ duration: 8, weight: 0.2 }, // Eighth Triplet
 			{ duration: 12, weight: 0.25 }, // Eighth
-			{ duration: 18, weight: 0.03 }, // Dotted Eighth
-			{ duration: 24, weight: 0.05 }, // Quarter
+			{ duration: 16, weight: 0.05 }, // Quarter Triplet
+			{ duration: 18, weight: 0.08 }, // Dotted Eighth
+			{ duration: 24, weight: 0.1 }, // Quarter
 			{ duration: 36, weight: 0.02 }, // Dotted Quarter
 		],
 		restProbability: 0.1,
@@ -130,6 +128,5 @@ export const isValidDifficultyLevel = (value: string): value is DifficultyLevel 
 };
 
 export const getDifficultyDisplayName = (difficulty: DifficultyLevel): string => {
-	// Add display formatting logic here if needed
 	return difficulty;
 };

@@ -11,13 +11,9 @@ export type NoteTypeName =
 	| 'Quarter'
 	| 'Dotted Eighth'
 	| 'Eighth'
-	| 'Dotted Sixteenth'
 	| 'Sixteenth'
-	| 'Thirty-Second'
 	| 'Quarter Triplet'
-	| 'Eighth Triplet'
-	| 'Eighth Sixtuplet'
-	| 'Sixteenth Sixtuplet';
+	| 'Eighth Triplet';
 
 // Note type configuration
 export type NoteType = {
