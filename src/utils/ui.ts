@@ -7,6 +7,30 @@ import { DURATION_CONFIGS, DURATION_DISPLAY_ORDER } from './constants';
 
 import type { ChartData, NoteType, NoteTypeName, TechniqueTypeName } from '@/types';
 
+function getAvailableTechniques(
+	config: (typeof DIFFICULTY_CONFIGS)[keyof typeof DIFFICULTY_CONFIGS]
+): TechniqueTypeName[] {
+	const techniques: TechniqueTypeName[] = ['Basic'];
+
+	if (config.dynamicScale[0] < 1.0) {
+		techniques.push('Accent');
+	}
+
+	if (config.dynamicScale[1] < 1.0) {
+		techniques.push('Rimshot');
+	}
+
+	if (config.flamThreshold > 0) {
+		techniques.push('Flam');
+	}
+
+	if (config.dragThreshold > 0) {
+		techniques.push('Drag');
+	}
+
+	return techniques;
+}
+
 function generateChartData(): ChartData {
 	const chartData: ChartData = {} as ChartData;
 
@@ -21,27 +45,7 @@ function generateChartData(): ChartData {
 			}
 		}
 
-		const techniques: TechniqueTypeName[] = ['Basic'];
-
-		if (config.dynamicScale[0] > 0 || config.dynamicScale[2] > 8) {
-			techniques.push('Accent');
-		}
-
-		if (config.flamThreshold > 0) {
-			techniques.push('Flam');
-		}
-
-		if (config.dragThreshold > 0) {
-			techniques.push('Drag');
-		}
-
-		if (config.dynamicScale[0] > 0) {
-			techniques.push('Ghost');
-		}
-
-		if (config.dynamicScale[2] > 8) {
-			techniques.push('Rimshot');
-		}
+		const techniques = getAvailableTechniques(config);
 
 		chartData[difficulty] = {
 			notes,
@@ -69,7 +73,6 @@ export const TECHNIQUE_TYPES: readonly TechniqueTypeName[] = [
 	'Accent',
 	'Flam',
 	'Drag',
-	'Ghost',
 	'Rimshot',
 ] as const;
 
@@ -78,6 +81,5 @@ export const TECHNIQUE_DEFINITIONS: Record<TechniqueTypeName, string> = {
 	Accent: 'A note played louder than surrounding notes',
 	Flam: 'Two notes played almost simultaneously, with one slightly before the other',
 	Drag: 'Two grace notes before a main note',
-	Ghost: 'A very quiet note, often played on the snare drum',
 	Rimshot: 'A note played by hitting both the drumhead and rim simultaneously',
 } as const;

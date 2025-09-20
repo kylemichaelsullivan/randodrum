@@ -321,6 +321,53 @@ describe('safeValidateBeatFormData', () => {
 - Error message generation adds some overhead
 - Consider error handling strategy based on performance requirements
 
+## Configuration Validation
+
+The system includes built-in validation for difficulty configurations to ensure logical consistency:
+
+### Dynamic Scale Validation
+
+```typescript
+export const getDifficultyConfig = (difficulty: DifficultyLevel): DifficultyConfig => {
+	const config = DIFFICULTY_CONFIGS[difficulty];
+	if (!config) {
+		throw new Error(`Unknown difficulty level: ${difficulty}`);
+	}
+
+	// Validate dynamicScale consistency
+	const [normalThreshold, accentThreshold] = config.dynamicScale;
+	if (normalThreshold > accentThreshold) {
+		throw new Error(
+			`Invalid dynamicScale for ${difficulty}: normalThreshold (${normalThreshold}) must be <= accentThreshold (${accentThreshold})`
+		);
+	}
+
+	return config;
+};
+```
+
+### Configuration Validation Function
+
+```typescript
+export const validateDifficultyConfigs = (): void => {
+	for (const difficulty of DIFFICULTY_LEVELS) {
+		try {
+			getDifficultyConfig(difficulty);
+		} catch (error) {
+			throw new Error(
+				`Configuration validation failed for ${difficulty}: ${error instanceof Error ? error.message : 'Unknown error'}`
+			);
+		}
+	}
+};
+```
+
+This validation ensures that:
+
+- `normalThreshold <= accentThreshold` for logical dynamic selection
+- All difficulty configurations are valid and consistent
+- Errors are caught at module load time for immediate feedback
+
 ## Future Enhancements
 
 ### Custom Validators

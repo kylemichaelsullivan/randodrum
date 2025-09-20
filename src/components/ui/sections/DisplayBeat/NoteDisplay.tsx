@@ -25,10 +25,6 @@ function NoteDisplayComponent({ note }: NoteDisplayProps) {
 		return note.ornament === 'drag';
 	}, [note.ornament]);
 
-	const hasGhost = useMemo(() => {
-		return note.dynamic === 'ghost';
-	}, [note.dynamic]);
-
 	const hasFlam = useMemo(() => {
 		return note.ornament === 'flam';
 	}, [note.ornament]);
@@ -54,7 +50,6 @@ function NoteDisplayComponent({ note }: NoteDisplayProps) {
 			</div>
 			<span
 				className={clsx('NoteSymbol font-musisync text-5xl leading-none', {
-					hasGhost,
 					hasFlam,
 					hasDrag,
 				})}

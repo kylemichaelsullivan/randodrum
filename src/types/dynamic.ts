@@ -2,7 +2,7 @@
  * Drum dynamic type definitions
  */
 
-export const DYNAMICS = ['ghost', 'normal', 'accent', 'rimshot'] as const;
+export const DYNAMICS = ['normal', 'accent', 'rimshot'] as const;
 
 export type DynamicArray = typeof DYNAMICS;
 export type DynamicName = DynamicArray[number];
@@ -14,4 +14,4 @@ export type DynamicConfig = {
 	symbol: string;
 };
 
-export type DynamicScale = [number, number, number];
+export type DynamicScale = [number, number];

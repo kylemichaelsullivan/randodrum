@@ -37,7 +37,7 @@ src/types/
 export type Note = {
 	start: NoteStart; // Start time in grid ticks
 	dur: Duration; // Duration in grid ticks
-	dynamic: Dynamic; // Dynamic level (ghost, normal, accent, rimshot)
+	dynamic: Dynamic; // Dynamic level (normal, accent, rimshot)
 	isDominant: boolean; // Whether played with dominant hand
 	ornament: Ornament; // Ornament type (flam, drag, null)
 };
@@ -104,7 +104,7 @@ export type DurationConfig = {
 #### Dynamic Levels
 
 ```typescript
-export const DYNAMICS = ['ghost', 'normal', 'accent', 'rimshot'] as const;
+export const DYNAMICS = ['normal', 'accent', 'rimshot'] as const;
 export type DynamicName = (typeof DYNAMICS)[number];
 export type Dynamic = DynamicName;
 ```
@@ -117,7 +117,7 @@ export type DynamicConfig = {
 	symbol: string; // Display symbol
 };
 
-export type DynamicScale = [number, number, number]; // [ghost, normal, accent/rimshot]
+export type DynamicScale = [number, number]; // [normalThreshold, accentThreshold] where normalThreshold <= accentThreshold
 ```
 
 ### Ornament Types
@@ -200,7 +200,7 @@ export type DominantHand = 'left' | 'right';
 #### Technique Types
 
 ```typescript
-export type TechniqueTypeName = 'Accent' | 'Basic' | 'Drag' | 'Flam' | 'Ghost' | 'Rimshot';
+export type TechniqueTypeName = 'Basic' | 'Accent' | 'Flam' | 'Drag' | 'Rimshot';
 ```
 
 #### Chart Data
@@ -268,7 +268,6 @@ export const DURATION_CONFIGS: readonly DurationConfig[] = [
 
 ```typescript
 export const DYNAMIC_CONFIGS: readonly DynamicConfig[] = [
-	{ name: 'ghost', symbol: 'g' },
 	{ name: 'normal', symbol: 'n' },
 	{ name: 'accent', symbol: 'a' },
 	{ name: 'rimshot', symbol: 'r' },
@@ -322,7 +321,6 @@ export const TECHNIQUE_TYPES: readonly TechniqueTypeName[] = [
 	'Accent',
 	'Flam',
 	'Drag',
-	'Ghost',
 	'Rimshot',
 ] as const;
 ```
@@ -335,7 +333,6 @@ export const TECHNIQUE_DEFINITIONS: Record<TechniqueTypeName, string> = {
 	Accent: 'A note played louder than surrounding notes',
 	Flam: 'Two notes played almost simultaneously, with one slightly before the other',
 	Drag: 'Two grace notes before a main note',
-	Ghost: 'A very quiet note, often played on the snare drum',
 	Rimshot: 'A note played by hitting both the drumhead and rim simultaneously',
 } as const;
 ```

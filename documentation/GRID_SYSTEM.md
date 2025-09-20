@@ -158,11 +158,11 @@ The 96-grid system is used throughout the application for:
 
 - **Beat Generation**: Creating rhythmically accurate drum patterns with weighted duration selection
 - **Hand Balancing**: Ensuring proper distribution between dominant and non-dominant hands
-- **Dynamics**: Adding ghost notes, normal hits, accents, and rimshots
+- **Dynamics**: Adding normal hits, accents, and rimshots using 0-1 probability thresholds
 - **Ornaments**: Incorporating flams and drags based on difficulty level
 - **Display**: Rendering notes at precise positions with proper timing
 - **Import/Export**: Generating MIDI-compatible timing data
-- **Validation**: Ensuring measures have correct total duration
+- **Validation**: Ensuring measures have correct total duration and dynamic scale consistency
 - **Difficulty Scaling**: Controlling which rhythmic subdivisions are available
 
 ## Testing

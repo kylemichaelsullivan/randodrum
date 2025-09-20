@@ -37,7 +37,6 @@ export const DURATION_CONFIGS: readonly DurationConfig[] = [
 
 // Dynamic constants with symbols
 export const DYNAMIC_CONFIGS: readonly DynamicConfig[] = [
-	{ name: 'ghost', symbol: '' },
 	{ name: 'normal', symbol: '' },
 	{ name: 'accent', symbol: '>' },
 	{ name: 'rimshot', symbol: '>' },

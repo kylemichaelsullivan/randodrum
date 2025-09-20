@@ -8,7 +8,7 @@ RandoDrum uses five difficulty levels inspired by classic video game difficulty 
 
 1. **Rhythm complexity** - Available note durations
 2. **Sticking patterns** - Hand switching frequency and run lengths
-3. **Dynamics** - Volume variations and ghost notes
+3. **Dynamics** - Volume variations
 4. **Ornaments** - Flams and drags
 5. **Balancing** - Hand distribution and clump prevention
 
@@ -20,7 +20,7 @@ _The easiest level, perfect for beginners_
 
 - **Durations**: Quarter notes (60%), half notes (25%), dotted half notes, and whole notes
 - **Sticking**: Always single notes (no runs), 100% hand switching
-- **Dynamics**: Only normal volume (no ghost notes, accents, or rimshots)
+- **Dynamics**: Only normal volume (no accents or rimshots)
 - **Ornaments**: None
 - **Balancing**: Strict 45-55% dominant hand ratio, maximum 1 note per hand
 - **Rest Probability**: 30%
@@ -31,7 +31,7 @@ _Gentle introduction to more complex patterns_
 
 - **Durations**: Eighth notes (30%), quarter notes (50%), dotted quarter notes, and half notes
 - **Sticking**: 70% single notes, 30% two-note runs, 80% hand switching
-- **Dynamics**: 80% normal, 20% accent/rimshot (no ghost notes)
+- **Dynamics**: 80% normal, 20% accent/rimshot
 - **Ornaments**: 5% chance of flams, no drags
 - **Balancing**: 45-55% dominant hand ratio, maximum 2 notes per hand
 - **Rest Probability**: 25%
@@ -42,7 +42,7 @@ _Moderate challenge with more variety_
 
 - **Durations**: Sixteenth notes (20%), eighth triplets (5%), eighth notes (25%), dotted eighth notes (10%), quarter notes (30%), dotted quarter notes (10%)
 - **Sticking**: 50% single, 30% two-note, 20% three-note runs, 60% hand switching
-- **Dynamics**: 50% ghost, 50% normal, 30% accent, 5% rimshot
+- **Dynamics**: 60% normal, 30% accent, 10% rimshot
 - **Ornaments**: 10% flams, 10% drags
 - **Balancing**: 40-60% dominant hand ratio, maximum 3 notes per hand
 - **Rest Probability**: 20%
@@ -53,7 +53,7 @@ _High difficulty with complex patterns_
 
 - **Durations**: Sixteenth notes (20%), eighth triplets (15%), eighth notes (25%), quarter triplets (10%), dotted eighth notes (10%), quarter notes (15%), dotted quarter notes (15%)
 - **Sticking**: 40% single, 30% two-note, 20% three-note, 10% four-note runs, 40% hand switching
-- **Dynamics**: 20% ghost, 50% normal, 20% accent, 10% rimshot
+- **Dynamics**: 50% normal, 30% accent, 20% rimshot
 - **Ornaments**: 15% flams, 15% drags
 - **Balancing**: 35-65% dominant hand ratio, maximum 4 notes per hand
 - **Rest Probability**: 15%
@@ -64,7 +64,7 @@ _Maximum difficulty with no balancing_
 
 - **Durations**: Sixteenth notes (30%), eighth triplets (20%), eighth notes (25%), quarter triplets (5%), dotted eighth notes (8%), quarter notes (10%), dotted quarter notes (2%)
 - **Sticking**: Equal distribution of 1-4 note runs, 50% hand switching
-- **Dynamics**: 20% ghost, 50% normal, 20% accent, 10% rimshot
+- **Dynamics**: 50% normal, 30% accent, 20% rimshot
 - **Ornaments**: 25% flams, 25% drags
 - **Balancing**: Disabled - allows natural hand distribution and longer runs
 - **Rest Probability**: 10%
@@ -97,9 +97,10 @@ The system uses run-length distributions to determine how many consecutive notes
 
 ### Dynamic Scale
 
-Dynamics are determined by weighted thresholds on a 0-10 scale:
+Dynamics are determined by weighted thresholds on a 0-1 scale:
 
-- `[ghostThreshold, normalThreshold, accentThreshold, rimshotThreshold]`
+- `[normalThreshold, accentThreshold]` - values below normalThreshold are normal, below accentThreshold are accent, above are rimshot
+- **Constraint**: normalThreshold must be <= accentThreshold for logical consistency
 - Random values below each threshold determine the dynamic level
 
 ### Ornament Probabilities

@@ -122,10 +122,9 @@ function generateHandRuns(measure: Measure, difficultyConfig: DifficultyConfig):
 	return measure;
 }
 
-function selectDynamic(randomValue: number, dynamicScale: [number, number, number]): DynamicName {
-	const [ghostThreshold, normalThreshold, accentThreshold] = dynamicScale;
+function selectDynamic(randomValue: number, dynamicScale: [number, number]): DynamicName {
+	const [normalThreshold, accentThreshold] = dynamicScale;
 
-	if (randomValue < ghostThreshold) return 'ghost';
 	if (randomValue < normalThreshold) return 'normal';
 	if (randomValue < accentThreshold) return 'accent';
 	return 'rimshot';
@@ -133,7 +132,7 @@ function selectDynamic(randomValue: number, dynamicScale: [number, number, numbe
 
 function addDynamics(measure: Measure, difficultyConfig: DifficultyConfig): Measure {
 	measure.forEach(note => {
-		const randomValue = Math.random() * 10; // 0-10 scale
+		const randomValue = Math.random(); // 0-1 scale
 		note.dynamic = selectDynamic(randomValue, difficultyConfig.dynamicScale);
 	});
 	return measure;

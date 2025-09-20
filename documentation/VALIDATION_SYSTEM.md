@@ -63,7 +63,14 @@ export const dynamicNameSchema = z.enum(DYNAMICS.map(dynamic => dynamic) as [str
 
 **Purpose**: Validates dynamic level names.
 
-**Valid Values**: `"normal", "accent", "ghost" "rimshot"`
+**Valid Values**: `"normal", "accent", "rimshot"`
+
+**Logic**: Dynamic selection uses a 0-1 probability scale:
+
+- Values below `normalThreshold` become 'normal'
+- Values below `accentThreshold` become 'accent'
+- Values above `accentThreshold` become 'rimshot'
+- **Constraint**: `normalThreshold <= accentThreshold` for logical consistency
 
 #### Note Type Name Schema
 
@@ -105,7 +112,7 @@ export const techniqueTypeNameSchema = z.enum(
 
 **Purpose**: Validates technique type names.
 
-**Valid Values**: `"Accent", "Basic", "Drag", "Flam", "Ghost", "Rimshot"`
+**Valid Values**: `"Accent", "Basic", "Drag", "Flam", "Rimshot"`
 
 ### Complex Object Schemas
 
@@ -322,6 +329,19 @@ export const isMeasure = (data: unknown): data is ValidatedMeasure => {
 
 export const isNote = (data: unknown): data is ValidatedNote => {
 	return noteSchema.safeParse(data).success;
+};
+
+// Configuration validation
+export const validateDifficultyConfigs = (): void => {
+	for (const difficulty of DIFFICULTY_LEVELS) {
+		try {
+			getDifficultyConfig(difficulty);
+		} catch (error) {
+			throw new Error(
+				`Configuration validation failed for ${difficulty}: ${error instanceof Error ? error.message : 'Unknown error'}`
+			);
+		}
+	}
 };
 ```
 

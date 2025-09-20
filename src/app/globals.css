@@ -571,22 +571,6 @@ a:hover {
 	position: absolute;
 }
 
-.NoteSymbol.hasGhost::before,
-.NoteSymbol.hasGhost::after {
-	font-family: var(--font-main);
-	font-weight: 100;
-}
-
-.NoteSymbol.hasGhost::before {
-	content: '(';
-	left: -0.2em;
-}
-
-.NoteSymbol.hasGhost::after {
-	content: ')';
-	right: -0.2em;
-}
-
 .NoteSymbol.hasDrag::before,
 .NoteSymbol.hasFlam::before {
 	font-size: 0.5em;
