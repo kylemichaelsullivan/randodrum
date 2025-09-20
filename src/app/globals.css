@@ -5,6 +5,7 @@
 }
 
 @layer utilities {
+	/* Min-width utilities (rem units) */
 	.min-w-\[6\.25rem\] {
 		min-width: 6.25rem;
 	}
@@ -27,6 +28,33 @@
 
 	.min-w-\[32rem\] {
 		min-width: 32rem;
+	}
+
+	/* Min-width utilities (px units) */
+	.min-w-\[300px\] {
+		min-width: 300px;
+	}
+
+	.min-w-\[350px\] {
+		min-width: 350px;
+	}
+
+	/* Min-height utilities */
+	.min-h-\[5rem\] {
+		min-height: 5rem;
+	}
+
+	.min-h-\[6\.25rem\] {
+		min-height: 6.25rem;
+	}
+
+	.min-h-\[80px\] {
+		min-height: 80px;
+	}
+
+	/* Max-height utilities */
+	.max-h-\[90vh\] {
+		max-height: 90vh;
 	}
 }
 
