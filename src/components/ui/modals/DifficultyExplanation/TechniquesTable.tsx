@@ -9,7 +9,7 @@ type TechniquesTableProps = {
 function TechniquesTableComponent({ difficulties }: TechniquesTableProps) {
 	return (
 		<div
-			className='border border-black rounded-lg p-3 sm:p-4 flex flex-col gap-4'
+			className='flex flex-col gap-4 border border-black rounded-lg p-3 sm:p-4'
 			role='region'
 			aria-labelledby='techniques-title'
 		>
@@ -29,16 +29,16 @@ function TechniquesTableComponent({ difficulties }: TechniquesTableProps) {
 								Difficulty
 							</th>
 							<th
-								className='flex-1 text-black text-xs font-medium text-center pb-2'
+								className='flex-1 text-black text-xs font-medium text-center pb-2 sm:text-sm'
 								colSpan={TECHNIQUE_TYPES.length}
 							>
 								Techniques
 							</th>
 						</tr>
 						<tr>
-							<th className='px-1 sm:px-2'></th>
+							<th></th>
 							{TECHNIQUE_TYPES.map(technique => (
-								<th key={technique} className='text-xs text-center px-0.5 sm:px-1'>
+								<th className='text-sm text-center px-1' key={technique}>
 									{technique}
 								</th>
 							))}
@@ -51,16 +51,16 @@ function TechniquesTableComponent({ difficulties }: TechniquesTableProps) {
 
 							return (
 								<tr
-									key={difficulty}
 									className='border-b border-light-gray hover:bg-light-gray transition-colors'
+									key={difficulty}
 								>
-									<td className='flex-shrink-0 text-black text-xs font-medium px-1 py-2 w-32 sm:text-sm sm:w-36 sm:px-2 sm:py-3'>
+									<td className='flex-shrink-0 text-black text-xs font-medium w-32 py-2 sm:text-sm sm:w-36 sm:py-3'>
 										{difficulty.replace("'", '')}
 									</td>
 									{TECHNIQUE_TYPES.map(technique => {
 										const isAvailable = data.techniques.includes(technique);
 										return (
-											<td key={technique} className='text-center py-2 sm:py-3 px-1 sm:px-2'>
+											<td className='text-center py-2 sm:py-3' key={technique}>
 												{isAvailable && (
 													<span
 														className='text-green text-lg sm:text-xl'

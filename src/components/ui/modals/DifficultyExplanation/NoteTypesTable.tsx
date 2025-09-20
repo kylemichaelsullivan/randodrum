@@ -1,6 +1,11 @@
 import { memo } from 'react';
-import { CHART_DATA, NOTE_TYPES } from '@/utils';
-import type { DifficultyLevel } from '@/types';
+import { CHART_DATA, NOTE_TYPES, DURATION_CONFIGS } from '@/utils';
+import type { DifficultyLevel, NoteTypeName } from '@/types';
+
+const getNoteTypeSymbol = (noteTypeName: NoteTypeName): string => {
+	const config = DURATION_CONFIGS.find(config => config.name === noteTypeName);
+	return config?.symbol ?? noteTypeName.charAt(0).toLowerCase();
+};
 
 type NoteTypesTableProps = {
 	difficulties: DifficultyLevel[];
@@ -19,7 +24,7 @@ function NoteTypesTableComponent({ difficulties }: NoteTypesTableProps) {
 
 			<div className='overflow-x-auto'>
 				<table
-					className='w-full min-w-[400px] sm:min-w-[450px]'
+					className='w-full'
 					role='table'
 					aria-label='Difficulty chart showing available note types and rest probabilities'
 				>
@@ -29,23 +34,25 @@ function NoteTypesTableComponent({ difficulties }: NoteTypesTableProps) {
 								Difficulty
 							</th>
 							<th
-								className='flex-1 text-black text-xs font-medium text-center pb-2'
+								className='flex-1 text-black text-xs font-medium text-center pb-2 sm:text-sm'
 								colSpan={NOTE_TYPES.length}
 							>
 								Note Types
 							</th>
-							<th className='flex-shrink-0 text-black text-xs font-medium text-center w-20 px-1 pb-2 sm:w-24 sm:px-2'>
+							<th className='flex-shrink-0 text-black text-xs font-medium text-center w-20 px-1 pb-2 sm:text-sm sm:w-24 sm:px-2'>
 								Rest %
 							</th>
 						</tr>
 						<tr>
-							<th className='px-1 sm:px-2'></th>
+							<th></th>
 							{NOTE_TYPES.map(note => (
-								<th key={note.name} className='text-xs text-center px-0.5 sm:px-1'>
-									{note.name}
+								<th className='cursor-pointer text-center px-1' key={note.name}>
+									<span className='font-musisync text-4xl font-extralight' title={note.name}>
+										{getNoteTypeSymbol(note.name)}
+									</span>
 								</th>
 							))}
-							<th className='px-1 sm:px-2'></th>
+							<th></th>
 						</tr>
 					</thead>
 					<tbody>
