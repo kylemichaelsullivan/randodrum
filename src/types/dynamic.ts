@@ -2,17 +2,16 @@
  * Drum dynamic type definitions
  */
 
-// Dynamic name constants (precise type)
-export type DynamicName = 'ghost' | 'normal' | 'accent' | 'rimshot';
+export const DYNAMICS = ['ghost', 'normal', 'accent', 'rimshot'] as const;
 
-// Dynamic type alias
+export type DynamicArray = typeof DYNAMICS;
+export type DynamicName = DynamicArray[number];
+
 export type Dynamic = DynamicName;
 
-// Dynamic configuration type
 export type DynamicConfig = {
 	name: DynamicName;
 	symbol: string;
 };
 
-// Dynamic scale type
 export type DynamicScale = [number, number, number];

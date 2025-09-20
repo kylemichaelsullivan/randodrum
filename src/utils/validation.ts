@@ -2,50 +2,41 @@
  * Unified validation system using Zod
  */
 
-import { z } from 'zod';
-
-import { DYNAMICS } from './beat';
+import { z, type ZodLiteral } from 'zod';
 import { DIFFICULTY_LEVELS } from './difficulty';
+import { DURATIONS, DYNAMICS, ORNAMENTS } from './beat';
+import { DURATION_CONFIGS } from './constants';
+import { TECHNIQUE_TYPES } from './ui';
 
 // ============================================================================
 // BASIC TYPE SCHEMAS
 // ============================================================================
 
-export const difficultyLevelSchema = z.enum(DIFFICULTY_LEVELS as [string, ...string[]]);
+export const difficultyLevelSchema = z.enum(
+	DIFFICULTY_LEVELS.map(level => level) as [string, ...string[]]
+);
 
-export const durationValueSchema = z.union([
-	z.literal(6), // Sixteenth Note (1/4 beat)
-	z.literal(8), // Eighth Triplet (1/3 beat)
-	z.literal(12), // Eighth Note (1/2 beat)
-	z.literal(16), // Quarter Triplet (2/3 beat)
-	z.literal(18), // Dotted Eighth Note (3/4 beat)
-	z.literal(24), // Quarter Note (1 beat)
-	z.literal(36), // Dotted Quarter Note (3/2 beats)
-	z.literal(48), // Half Note (2 beats)
-	z.literal(72), // Dotted Half Note (3 beats)
-	z.literal(96), // Whole Note (4 beats)
+export const durationValueSchema = z.union([...DURATIONS.map(duration => z.literal(duration))] as [
+	ZodLiteral<number>,
+	ZodLiteral<number>,
+	...ZodLiteral<number>[],
 ]);
 
-export const dynamicNameSchema = z.enum(DYNAMICS as [string, ...string[]]);
+export const dynamicNameSchema = z.enum(DYNAMICS.map(dynamic => dynamic) as [string, ...string[]]);
 
-export const noteTypeNameSchema = z.enum([
-	// Straight notes
-	'Sixteenth',
-	'Eighth',
-	'Dotted Eighth',
-	'Quarter',
-	'Dotted Quarter',
-	'Half',
-	'Dotted Half',
-	'Whole',
-	// Triplets
-	'Eighth Triplet',
-	'Quarter Triplet',
+export const noteTypeNameSchema = z.enum(
+	DURATION_CONFIGS.map(config => config.name).map(name => name) as [string, ...string[]]
+);
+
+export const ornamentNameSchema = z.union([...ORNAMENTS.map(ornament => z.literal(ornament))] as [
+	ZodLiteral<string | null>,
+	ZodLiteral<string | null>,
+	...ZodLiteral<string | null>[],
 ]);
 
-export const ornamentNameSchema = z.union([z.literal('flam'), z.literal('drag'), z.null()]);
-
-export const techniqueTypeNameSchema = z.enum(['Basic', 'Accent', 'Flam', 'Drag', 'Ghost']);
+export const techniqueTypeNameSchema = z.enum(
+	TECHNIQUE_TYPES.map(type => type) as [string, ...string[]]
+);
 
 // ============================================================================
 // COMPLEX OBJECT SCHEMAS

@@ -2,13 +2,13 @@
  * Drum ornament type definitions
  */
 
-// Ornament name constants (precise type)
-export type OrnamentName = 'flam' | 'drag' | null;
+export const ORNAMENTS = ['flam', 'drag', null] as const;
 
-// Ornament type alias
+export type OrnamentArray = typeof ORNAMENTS;
+export type OrnamentName = OrnamentArray[number];
+
 export type Ornament = OrnamentName;
 
-// Ornament configuration type
 export type OrnamentConfig = {
 	name: OrnamentName;
 	symbol: string;

@@ -9,7 +9,7 @@ import type { NoteTypeName } from './noteType';
 export type DominantHand = 'left' | 'right';
 
 // Technique type name constants
-export type TechniqueTypeName = 'Accent' | 'Basic' | 'Drag' | 'Flam' | 'Ghost';
+export type TechniqueTypeName = 'Accent' | 'Basic' | 'Drag' | 'Flam' | 'Ghost' | 'Rimshot';
 
 // Chart data configuration
 export type ChartData = Record<

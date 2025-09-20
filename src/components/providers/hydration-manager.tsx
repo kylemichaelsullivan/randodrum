@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, type ReactNode } from 'react';
+import { BROWSER_EXTENSION_ATTRIBUTES } from '@/utils/browser-extensions';
 
 /**
  * HydrationManager handles browser extension interference and provides
@@ -11,19 +12,9 @@ export function HydrationManager({ children }: { children: ReactNode }) {
 	const [, setHasExtensionInterference] = useState(false);
 
 	useEffect(() => {
-		// Check for browser extension interference
 		const checkForExtensions = () => {
 			const body = document.body;
-			const extensionAttributes = [
-				'cz-shortcut-listen',
-				'data-1password-root',
-				'data-bitwarden-watching',
-				'data-dashlane-id',
-				'data-grammarly-shadow-root',
-				'data-lastpass-icon-root',
-			];
-
-			const hasExtensions = extensionAttributes.some(attr => body.hasAttribute(attr));
+			const hasExtensions = BROWSER_EXTENSION_ATTRIBUTES.some(attr => body.hasAttribute(attr));
 			setHasExtensionInterference(hasExtensions);
 		};
 
@@ -37,13 +28,12 @@ export function HydrationManager({ children }: { children: ReactNode }) {
 
 		observer.observe(document.body, {
 			attributes: true,
-			attributeFilter: ['cz-shortcut-listen', 'data-lastpass-icon-root', 'data-1password-root'],
+			attributeFilter: [...BROWSER_EXTENSION_ATTRIBUTES],
 		});
 
 		return () => observer.disconnect();
 	}, []);
 
-	// Show loading state until hydrated
 	if (!isHydrated) {
 		return (
 			<div className='flex items-center justify-center min-h-screen'>

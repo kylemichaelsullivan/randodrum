@@ -2,6 +2,11 @@
 
 import { useEffect } from 'react';
 
+import {
+	BROWSER_EXTENSION_ATTRIBUTES,
+	isBrowserExtensionAttribute,
+} from '@/utils/browser-extensions';
+
 /**
  * BrowserExtensionHandler manages browser extension interference with hydration
  * by handling common extension attributes that get injected into the DOM
@@ -11,19 +16,8 @@ export function BrowserExtensionHandler() {
 		const handleBrowserExtensions = () => {
 			const body = document.body;
 
-			// List of known browser extension attributes that cause hydration issues
-			const extensionAttributes = [
-				'cz-shortcut-listen', // Common password manager extension
-				'data-1password-root', // 1Password
-				'data-bitwarden-watching', // Bitwarden
-				'data-dashlane-id', // Dashlane
-				'data-grammarly-ignore', // Grammarly
-				'data-grammarly-shadow-root', // Grammarly
-				'data-lastpass-icon-root', // LastPass
-			];
-
 			// Remove extension attributes that might cause hydration mismatches
-			extensionAttributes.forEach(attr => {
+			BROWSER_EXTENSION_ATTRIBUTES.forEach(attr => {
 				if (body.hasAttribute(attr)) {
 					body.removeAttribute(attr);
 				}
@@ -34,7 +28,7 @@ export function BrowserExtensionHandler() {
 				mutations.forEach(mutation => {
 					if (mutation.type === 'attributes' && mutation.target === body) {
 						const attributeName = mutation.attributeName;
-						if (attributeName && extensionAttributes.some(attr => attributeName.includes(attr))) {
+						if (attributeName && isBrowserExtensionAttribute(attributeName)) {
 							// Log for debugging but don't remove - extensions might need these
 							console.debug('Browser extension attribute detected:', attributeName);
 						}
@@ -44,7 +38,7 @@ export function BrowserExtensionHandler() {
 
 			observer.observe(body, {
 				attributes: true,
-				attributeFilter: extensionAttributes,
+				attributeFilter: [...BROWSER_EXTENSION_ATTRIBUTES],
 			});
 
 			return () => observer.disconnect();

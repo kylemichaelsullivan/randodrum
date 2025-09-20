@@ -2,6 +2,8 @@
 
 import { Component, type ReactNode } from 'react';
 
+import { BROWSER_EXTENSION_ATTRIBUTES } from '@/utils/browser-extensions';
+
 type ErrorBoundaryState = {
 	hasError: boolean;
 	error?: Error;
@@ -64,9 +66,8 @@ export function HydrationErrorBoundary({ children }: { children: ReactNode }) {
 		<ErrorBoundary
 			onError={error => {
 				if (error.message.includes('hydration') || error.message.includes('Hydration')) {
-					// Check if it's a browser extension issue
 					if (
-						error.message.includes('cz-shortcut-listen') ||
+						BROWSER_EXTENSION_ATTRIBUTES.some(attr => error.message.includes(attr)) ||
 						error.message.includes('browser extension') ||
 						error.stack?.includes('body')
 					) {

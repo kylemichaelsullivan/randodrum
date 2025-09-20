@@ -23,8 +23,8 @@ export type {
 export type { BeatsFieldProps, DifficultyFieldProps, MeasuresFieldProps } from './form';
 
 // Color types
-export { COLORS, color } from './color';
-export type { Color } from './color';
+export { COLORS } from './color';
+export type { ColorName } from './color';
 
 // Difficulty types
 export type { DifficultyConfig, DifficultyLevel, DurationWeightConfig } from './difficulty';

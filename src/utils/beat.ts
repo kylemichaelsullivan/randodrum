@@ -2,17 +2,20 @@
  * Beat-related utility functions and constants
  */
 
+import { DYNAMICS } from '@/types/dynamic';
 import { isValidDifficultyLevel } from './difficulty';
+import { ORNAMENTS } from '@/types/ornament';
+import { STRAIGHT_DURATIONS, DOTTED_DURATIONS, TRIPLET_DURATIONS } from '@/types/duration';
 import type { Duration, Dynamic, GeneratedBeat, Measure, Note, NoteStart, Ornament } from '@/types';
 
-// Constants
-export const DURATIONS: readonly Duration[] = [6, 8, 12, 16, 18, 24, 36, 48, 72, 96] as Duration[];
+export const DURATIONS: readonly Duration[] = [
+	...STRAIGHT_DURATIONS,
+	...TRIPLET_DURATIONS,
+	...DOTTED_DURATIONS,
+] as Duration[];
 
-export const DYNAMICS: readonly Dynamic[] = ['ghost', 'normal', 'accent', 'rimshot'] as const;
+export { DYNAMICS, ORNAMENTS };
 
-export const ORNAMENTS: readonly Ornament[] = ['flam', 'drag', null] as const;
-
-// Helper functions
 export const createNoteStart = (value: number): NoteStart => {
 	if (value < 0) {
 		throw new Error('Note start time must be non-negative');
@@ -20,7 +23,6 @@ export const createNoteStart = (value: number): NoteStart => {
 	return value as NoteStart;
 };
 
-// Type guards
 export const isValidDynamic = (value: string): value is Dynamic =>
 	DYNAMICS.includes(value as Dynamic);
 

@@ -39,6 +39,10 @@ function generateChartData(): ChartData {
 			techniques.push('Ghost');
 		}
 
+		if (config.dynamicScale[2] > 8) {
+			techniques.push('Rimshot');
+		}
+
 		chartData[difficulty] = {
 			notes,
 			techniques,
@@ -66,6 +70,7 @@ export const TECHNIQUE_TYPES: readonly TechniqueTypeName[] = [
 	'Flam',
 	'Drag',
 	'Ghost',
+	'Rimshot',
 ] as const;
 
 export const TECHNIQUE_DEFINITIONS: Record<TechniqueTypeName, string> = {
@@ -74,4 +79,5 @@ export const TECHNIQUE_DEFINITIONS: Record<TechniqueTypeName, string> = {
 	Flam: 'Two notes played almost simultaneously, with one slightly before the other',
 	Drag: 'Two grace notes before a main note',
 	Ghost: 'A very quiet note, often played on the snare drum',
+	Rimshot: 'A note played by hitting both the drumhead and rim simultaneously',
 } as const;
