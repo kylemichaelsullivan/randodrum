@@ -117,11 +117,11 @@ The `generateRhythm` function fills the grid by:
 
 Only durations from the allowed list (based on difficulty level) can be used:
 
-- **I'm Too Young to Drum**: Quarter (24), Half (48), Dotted Half (72), Whole (96)
+- **I’m Too Young to Drum**: Quarter (24), Half (48), Dotted Half (72), Whole (96)
 - **Hey, Not Too Rough**: Eighth (12), Quarter (24), Dotted Quarter (36), Half (48)
 - **Hurt Me Plenty**: Sixteenth (6), Eighth Triplet (8), Eighth (12), Dotted Eighth (18), Quarter (24), Dotted Quarter (36)
-- **Ultra-Violence**: Sixteenth (6), Eighth Triplet (8), Eighth (12), Dotted Eighth (18), Quarter (24), Dotted Quarter (36)
-- **Drumline!**: Sixteenth (6), Eighth Triplet (8), Eighth (12), Dotted Eighth (18), Quarter (24), Dotted Quarter (36) - _No balancing safeguards_
+- **Ultra-Violence**: Sixteenth (6), Eighth Triplet (8), Eighth (12), Quarter Triplet (16), Dotted Eighth (18), Quarter (24), Dotted Quarter (36)
+- **Drumline!**: Sixteenth (6), Eighth Triplet (8), Eighth (12), Quarter Triplet (16), Dotted Eighth (18), Quarter (24), Dotted Quarter (36) - _No balancing safeguards_
 
 Each difficulty level uses weighted probability distributions to determine which durations are more likely to appear in generated rhythms.
 

@@ -18,51 +18,56 @@ RandoDrum uses five difficulty levels inspired by classic video game difficulty 
 
 _The easiest level, perfect for beginners_
 
-- **Durations**: Quarter notes, half notes, and whole notes only
+- **Durations**: Quarter notes (60%), half notes (25%), dotted half notes, and whole notes
 - **Sticking**: Always single notes (no runs), 100% hand switching
 - **Dynamics**: Only normal volume (no ghost notes, accents, or rimshots)
 - **Ornaments**: None
 - **Balancing**: Strict 45-55% dominant hand ratio, maximum 1 note per hand
+- **Rest Probability**: 30%
 
 ### Hey, Not Too Rough
 
 _Gentle introduction to more complex patterns_
 
-- **Durations**: Quarter notes, half notes, and whole notes
+- **Durations**: Eighth notes (30%), quarter notes (50%), dotted quarter notes, and half notes
 - **Sticking**: 70% single notes, 30% two-note runs, 80% hand switching
 - **Dynamics**: 80% normal, 20% accent/rimshot (no ghost notes)
 - **Ornaments**: 5% chance of flams, no drags
 - **Balancing**: 45-55% dominant hand ratio, maximum 2 notes per hand
+- **Rest Probability**: 25%
 
 ### Hurt Me Plenty
 
 _Moderate challenge with more variety_
 
-- **Durations**: Quarter notes, half notes, and whole notes
+- **Durations**: Sixteenth notes (20%), eighth triplets (5%), eighth notes (25%), dotted eighth notes (10%), quarter notes (30%), dotted quarter notes (10%)
 - **Sticking**: 50% single, 30% two-note, 20% three-note runs, 60% hand switching
 - **Dynamics**: 50% ghost, 50% normal, 30% accent, 5% rimshot
 - **Ornaments**: 10% flams, 10% drags
 - **Balancing**: 40-60% dominant hand ratio, maximum 3 notes per hand
+- **Rest Probability**: 20%
 
 ### Ultra-Violence
 
 _High difficulty with complex patterns_
 
-- **Durations**: Quarter notes, half notes, and whole notes
+- **Durations**: Sixteenth notes (20%), eighth triplets (15%), eighth notes (25%), quarter triplets (10%), dotted eighth notes (10%), quarter notes (15%), dotted quarter notes (15%)
 - **Sticking**: 40% single, 30% two-note, 20% three-note, 10% four-note runs, 40% hand switching
 - **Dynamics**: 20% ghost, 50% normal, 20% accent, 10% rimshot
 - **Ornaments**: 15% flams, 15% drags
 - **Balancing**: 35-65% dominant hand ratio, maximum 4 notes per hand
+- **Rest Probability**: 15%
 
 ### Drumline!
 
 _Maximum difficulty with no balancing_
 
-- **Durations**: Quarter notes, half notes, and whole notes
+- **Durations**: Sixteenth notes (30%), eighth triplets (20%), eighth notes (25%), quarter triplets (5%), dotted eighth notes (8%), quarter notes (10%), dotted quarter notes (2%)
 - **Sticking**: Equal distribution of 1-4 note runs, 50% hand switching
 - **Dynamics**: 20% ghost, 50% normal, 20% accent, 10% rimshot
 - **Ornaments**: 25% flams, 25% drags
 - **Balancing**: Disabled - allows natural hand distribution and longer runs
+- **Rest Probability**: 10%
 
 ## Technical Details
 
