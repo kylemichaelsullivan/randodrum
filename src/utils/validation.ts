@@ -14,12 +14,8 @@ import { DIFFICULTY_LEVELS } from './difficulty';
 export const difficultyLevelSchema = z.enum(DIFFICULTY_LEVELS as [string, ...string[]]);
 
 export const durationValueSchema = z.union([
-	z.literal(2), // Sixteenth Sixtuplet (1/12 beat)
-	z.literal(3), // Thirty-Second Note (1/8 beat)
-	z.literal(4), // Eighth Sixtuplet (1/6 beat)
 	z.literal(6), // Sixteenth Note (1/4 beat)
 	z.literal(8), // Eighth Triplet (1/3 beat)
-	z.literal(9), // Dotted Sixteenth Note (3/8 beat)
 	z.literal(12), // Eighth Note (1/2 beat)
 	z.literal(16), // Quarter Triplet (2/3 beat)
 	z.literal(18), // Dotted Eighth Note (3/4 beat)
@@ -34,22 +30,17 @@ export const dynamicNameSchema = z.enum(DYNAMICS as [string, ...string[]]);
 
 export const noteTypeNameSchema = z.enum([
 	// Straight notes
-	'Whole',
-	'Dotted Half',
-	'Half',
-	'Dotted Quarter',
-	'Quarter',
-	'Dotted Eighth',
-	'Eighth',
-	'Dotted Sixteenth',
 	'Sixteenth',
-	'Thirty-Second',
+	'Eighth',
+	'Dotted Eighth',
+	'Quarter',
+	'Dotted Quarter',
+	'Half',
+	'Dotted Half',
+	'Whole',
 	// Triplets
-	'Quarter Triplet',
 	'Eighth Triplet',
-	// Sixtuplets
-	'Eighth Sixtuplet',
-	'Sixteenth Sixtuplet',
+	'Quarter Triplet',
 ]);
 
 export const ornamentNameSchema = z.union([z.literal('flam'), z.literal('drag'), z.null()]);

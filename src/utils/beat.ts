@@ -6,9 +6,7 @@ import { isValidDifficultyLevel } from './difficulty';
 import type { Duration, Dynamic, GeneratedBeat, Measure, Note, NoteStart, Ornament } from '@/types';
 
 // Constants
-export const DURATIONS: readonly Duration[] = [
-	2, 3, 4, 6, 8, 9, 12, 16, 18, 24, 32, 36, 48, 72, 96,
-] as Duration[];
+export const DURATIONS: readonly Duration[] = [6, 8, 12, 16, 18, 24, 36, 48, 72, 96] as Duration[];
 
 export const DYNAMICS: readonly Dynamic[] = ['ghost', 'normal', 'accent', 'rimshot'] as const;
 
