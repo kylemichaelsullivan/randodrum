@@ -21,44 +21,34 @@ Where:
 - `beatsPerMeasure` is the number of beats in the measure (typically 4, 6, or 8)
 - `24` represents the number of ticks per quarter note in the 96-grid system
 
-### Examples:
-
-- **4/4 time**: `4 × 24 = 96 ticks` (whole note)
-- **6/8 time**: `6 × 24 = 144 ticks` (dotted whole note)
-- **3/4 time**: `3 × 24 = 72 ticks` (dotted half note)
-
 ## Duration Values
 
-The system supports 15 distinct duration values, each representing a specific note type:
+The system supports 10 distinct duration values, each representing a specific note type:
 
 ### Straight Notes (Power-of-Two Divisions)
 
-| Duration | Note Type        | Symbol | Beats | Fraction of Whole Note |
-| -------- | ---------------- | ------ | ----- | ---------------------- |
-| 96       | Whole            | w      | 4.0   | 1.0                    |
-| 72       | Dotted Half      | h.     | 3.0   | 0.75                   |
-| 48       | Half             | h      | 2.0   | 0.5                    |
-| 36       | Dotted Quarter   | q.     | 1.5   | 0.375                  |
-| 24       | Quarter          | q      | 1.0   | 0.25                   |
-| 18       | Dotted Eighth    | e.     | 0.75  | 0.1875                 |
-| 12       | Eighth           | e      | 0.5   | 0.125                  |
-| 9        | Dotted Sixteenth | s.     | 0.375 | 0.09375                |
-| 6        | Sixteenth        | s      | 0.25  | 0.0625                 |
-| 3        | Thirty-Second    | t      | 0.125 | 0.03125                |
+| Duration | Note Type | Symbol | Beats | Fraction of Whole Note |
+| -------- | --------- | ------ | ----- | ---------------------- |
+| 6        | Sixteenth | s      | 0.25  | 0.0625                 |
+| 12       | Eighth    | e      | 0.5   | 0.125                  |
+| 24       | Quarter   | q      | 1.0   | 0.25                   |
+| 48       | Half      | h      | 2.0   | 0.5                    |
+| 96       | Whole     | w      | 4.0   | 1.0                    |
+
+### Dotted Notes (1.5x Base Duration)
+
+| Duration | Note Type      | Symbol | Beats | Fraction of Whole Note |
+| -------- | -------------- | ------ | ----- | ---------------------- |
+| 18       | Dotted Eighth  | i      | 0.75  | 0.1875                 |
+| 36       | Dotted Quarter | j      | 1.5   | 0.375                  |
+| 72       | Dotted Half    | d      | 3.0   | 0.75                   |
 
 ### Triplets (Divide by 3)
 
 | Duration | Note Type       | Symbol | Beats | Fraction of Whole Note |
 | -------- | --------------- | ------ | ----- | ---------------------- |
-| 16       | Quarter Triplet | q3     | 2/3   | 0.166...               |
-| 8        | Eighth Triplet  | e3     | 1/3   | 0.083...               |
-
-### Sixtuplets (Divide by 6)
-
-| Duration | Note Type           | Symbol | Beats | Fraction of Whole Note |
-| -------- | ------------------- | ------ | ----- | ---------------------- |
-| 4        | Eighth Sixtuplet    | e6     | 1/6   | 0.041...               |
-| 2        | Sixteenth Sixtuplet | s6     | 1/12  | 0.020...               |
+| 8        | Eighth Triplet  | T      | 1/3   | 0.083...               |
+| 16       | Quarter Triplet | t      | 2/3   | 0.166...               |
 
 ## Implementation Details
 
@@ -67,19 +57,41 @@ The system supports 15 distinct duration values, each representing a specific no
 The system uses TypeScript union types to ensure only valid duration values are used:
 
 ```typescript
-export type DurationValue = 2 | 3 | 4 | 6 | 8 | 9 | 12 | 16 | 18 | 24 | 32 | 36 | 48 | 72 | 96;
+// Straight note durations (power-of-two divisions)
+export type StraightDuration = 6 | 12 | 24 | 48 | 96;
+
+// Triplet durations (divide by 3)
+export type TripletDuration = 8 | 16;
+
+// Dotted note durations (1.5x the base duration)
+export type DottedDuration = 18 | 36 | 72;
+
+// Duration value type
+export type DurationValue = StraightDuration | DottedDuration | TripletDuration;
 ```
 
 ### Duration Configuration
 
-Each duration is associated with metadata including name, symbol, and color:
+Each duration is associated with metadata including name, symbol, and value:
 
 ```typescript
 export const DURATION_CONFIGS: readonly DurationConfig[] = [
+	// Straight notes (power-of-two divisions)
+	{ name: 'Sixteenth', symbol: 's', value: 6 },
+	{ name: 'Eighth', symbol: 'e', value: 12 },
+	{ name: 'Quarter', symbol: 'q', value: 24 },
+	{ name: 'Half', symbol: 'h', value: 48 },
 	{ name: 'Whole', symbol: 'w', value: 96 },
-	{ name: 'Dotted Half', symbol: 'h.', value: 72 },
-	// ... etc
-];
+
+	// Dotted notes (1.5x base duration)
+	{ name: 'Dotted Eighth', symbol: 'i', value: 18 },
+	{ name: 'Dotted Quarter', symbol: 'j', value: 36 },
+	{ name: 'Dotted Half', symbol: 'd', value: 72 },
+
+	// Triplets (divide by 3)
+	{ name: 'Eighth Triplet', symbol: 'T', value: 8 },
+	{ name: 'Quarter Triplet', symbol: 't', value: 16 },
+] as const;
 ```
 
 ## Rhythm Generation Process
@@ -105,11 +117,13 @@ The `generateRhythm` function fills the grid by:
 
 Only durations from the allowed list (based on difficulty level) can be used:
 
-- **I'm Too Young to Drum**: Whole, Dotted Half, Half, Quarter (96, 72, 48, 24)
-- **Hey, Not Too Rough**: Half, Dotted Quarter, Quarter, Eighth (48, 36, 24, 12)
-- **Hurt Me Plenty**: Dotted Quarter, Quarter, Dotted Eighth, Eighth, Eighth Triplet, Sixteenth (36, 24, 18, 12, 8, 6)
-- **Ultra-Violence**: Dotted Quarter, Quarter, Dotted Eighth, Eighth, Eighth Triplet, Sixteenth, Thirty-Second (36, 24, 18, 12, 8, 6, 3)
-- **Drumline!**: Same durations as Ultra-Violence without balancing and other safeguards
+- **I'm Too Young to Drum**: Quarter (24), Half (48), Dotted Half (72), Whole (96)
+- **Hey, Not Too Rough**: Eighth (12), Quarter (24), Dotted Quarter (36), Half (48)
+- **Hurt Me Plenty**: Sixteenth (6), Eighth Triplet (8), Eighth (12), Dotted Eighth (18), Quarter (24), Dotted Quarter (36)
+- **Ultra-Violence**: Sixteenth (6), Eighth Triplet (8), Eighth (12), Dotted Eighth (18), Quarter (24), Dotted Quarter (36)
+- **Drumline!**: Sixteenth (6), Eighth Triplet (8), Eighth (12), Dotted Eighth (18), Quarter (24), Dotted Quarter (36) - _No balancing safeguards_
+
+Each difficulty level uses weighted probability distributions to determine which durations are more likely to appear in generated rhythms.
 
 ## Mathematical Properties
 
@@ -124,9 +138,12 @@ Only durations from the allowed list (based on difficulty level) can be used:
 
 All common rhythmic patterns result in clean integer values:
 
-- Quarter note triplet: 96 ÷ 3 = 32 ticks
-- Eighth note triplet: 96 ÷ 6 = 16 ticks
-- Sixteenth note triplet: 96 ÷ 12 = 8 ticks
+- Quarter note triplet: 96 ÷ 3 = 32 ticks (not used in current system)
+- Eighth note triplet: 96 ÷ 6 = 16 ticks (Quarter Triplet = 16)
+- Sixteenth note triplet: 96 ÷ 12 = 8 ticks (Eighth Triplet = 8)
+- Dotted eighth note: 12 × 1.5 = 18 ticks
+- Dotted quarter note: 24 × 1.5 = 36 ticks
+- Dotted half note: 48 × 1.5 = 72 ticks
 
 ## Advantages
 
@@ -134,15 +151,17 @@ All common rhythmic patterns result in clean integer values:
 2. **Flexibility**: Supports all standard rhythmic subdivisions
 3. **Simplicity**: Integer-based calculations are fast and reliable
 4. **Compatibility**: Works well with MIDI timing and sequencer applications
-5. **Extensibility**: Easy to add new subdivisions (e.g., quintuplets, septuplets)
 
 ## Usage in RandoDrum
 
 The 96-grid system is used throughout the application for:
 
-- **Beat Generation**: Creating rhythmically accurate drum patterns
-- **Display**: Rendering notes at precise positions
-- **Export**: Generating MIDI-compatible timing data
+- **Beat Generation**: Creating rhythmically accurate drum patterns with weighted duration selection
+- **Hand Balancing**: Ensuring proper distribution between dominant and non-dominant hands
+- **Dynamics**: Adding ghost notes, normal hits, accents, and rimshots
+- **Ornaments**: Incorporating flams and drags based on difficulty level
+- **Display**: Rendering notes at precise positions with proper timing
+- **Import/Export**: Generating MIDI-compatible timing data
 - **Validation**: Ensuring measures have correct total duration
 - **Difficulty Scaling**: Controlling which rhythmic subdivisions are available
 
@@ -155,16 +174,31 @@ The system is thoroughly tested to ensure:
 - Rhythm generation terminates correctly
 - All difficulty levels produce valid patterns
 
-Example test case:
+Example test cases:
 
 ```typescript
-it('generates measures with correct total duration', () => {
-	const beat = generateBeat({ beats: 4, measures: 2, difficulty: 'Hey, Not Too Rough' });
+it('generates rhythm that fills exactly the measure length', () => {
+	const durationConfigs: DurationWeightConfig[] = [{ duration: 24 as DurationValue, weight: 1 }];
+	const measureLen = 96;
 
-	beat.measures.forEach(measure => {
-		const totalDuration = measure.reduce((sum, note) => sum + note.dur, 0);
-		expect(totalDuration).toBe(96); // 4 beats * 24 ticks per beat
-	});
+	const rhythm = generateRhythm(durationConfigs, measureLen);
+
+	const totalDuration = rhythm.reduce((sum, note) => sum + note.dur, 0);
+	expect(totalDuration).toBe(measureLen);
+});
+
+it('handles tuplets correctly', () => {
+	const durationConfigs: DurationWeightConfig[] = [
+		{ duration: 8 as DurationValue, weight: 1 }, // Triplet eighth
+	];
+	const measureLen = 24;
+
+	const rhythm = generateRhythm(durationConfigs, measureLen);
+
+	expect(rhythm).toHaveLength(3);
+	expect(rhythm[0]?.start).toBe(0);
+	expect(rhythm[1]?.start).toBe(8);
+	expect(rhythm[2]?.start).toBe(16);
 });
 ```
 

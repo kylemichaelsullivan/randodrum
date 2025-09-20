@@ -79,19 +79,12 @@ Notes are measured in grid units based on a 96-tick system where 96 ticks = whol
 - 24 = quarter note (1 beat)
 - 18 = dotted eighth note (3/4 beat)
 - 12 = eighth note (1/2 beat)
-- 9 = dotted sixteenth note (3/8 beat)
 - 6 = sixteenth note (1/4 beat)
-- 3 = thirty-second note (1/8 beat)
 
 **Triplets (Divide by 3):**
 
 - 16 = quarter triplet (3 hits over 2 beats)
 - 8 = eighth triplet (3 hits over 1 beat)
-
-**Sixtuplets (Divide by 6):**
-
-- 4 = eighth sixtuplet (6 hits over 1 beat)
-- 2 = sixteenth sixtuplet (6 hits over 1/2 beat)
 
 ### Sticking Generation
 
@@ -126,6 +119,6 @@ The beat generation process follows this sequence:
 2. **Sticking Assignment**: Apply hand runs and switching patterns
 3. **Dynamic Assignment**: Add volume variations
 4. **Ornament Addition**: Apply flams and drags
-5. **Balancing** (if enabled): Adjust hand distribution and clumps
+5. **Balancing**: Adjust hand distribution and clumps (skipped for Drumline!)
 
 Each difficulty level provides a different configuration object that controls these generation parameters, allowing for progressive complexity increases while maintaining musical coherence.
