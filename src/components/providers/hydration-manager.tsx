@@ -1,7 +1,8 @@
 'use client';
 
 import { useEffect, useState, type ReactNode } from 'react';
-import { BROWSER_EXTENSION_ATTRIBUTES } from '@/utils/browser-extensions';
+
+import { BROWSER_EXTENSION_ATTRIBUTES } from '@/utils';
 
 /**
  * HydrationManager handles browser extension interference and provides

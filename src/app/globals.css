@@ -599,18 +599,35 @@ a:hover {
 	position: absolute;
 }
 
-.NoteSymbol.hasDrag::before,
-.NoteSymbol.hasFlam::before {
+/* .NoteSymbol.hasDrag,
+.NoteSymbol.hasFlam {
+	padding-left: 0.125em;
+} */
+
+.NoteSymbol.hasAccent::before,
+.NoteSymbol.hasRimshot::before {
+	content: '>';
+	font-family: var(--font-geist-sans);
+	font-size: 0.5em;
+	top: -0.5em;
+}
+
+.NoteSymbol.hasDrag::after,
+.NoteSymbol.hasFlam::after {
 	font-size: 0.5em;
 	left: -0.5em;
 	bottom: 0;
 }
 
-.NoteSymbol.hasFlam::before {
+.NoteSymbol.hasRimshot::before {
+	transform: rotate(-90deg);
+}
+
+.NoteSymbol.hasFlam::after {
 	content: '♪';
 }
 
-.NoteSymbol.hasDrag::before {
+.NoteSymbol.hasDrag::after {
 	content: 'N';
 	font-family: var(--font-musisync);
 }
