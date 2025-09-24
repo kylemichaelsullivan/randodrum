@@ -1,9 +1,8 @@
 'use client';
 
 import { memo, useCallback, useMemo } from 'react';
-import { FormField, FormLabel, FormSelect } from '@/components/ui/forms';
+import { FormField, FormLabel, FormSelect, HelpButton } from '@/components';
 import { getDifficultyOptions } from '@/utils';
-import { HelpButton } from '@/components/ui/buttons';
 import { useFormStore } from '@/stores';
 
 import type { ChangeEvent } from 'react';

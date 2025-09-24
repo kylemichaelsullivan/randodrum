@@ -3,7 +3,7 @@
 import { api } from '@/trpc';
 import { BeatsField } from './BeatsField';
 import { DifficultyField } from './DifficultyField';
-import { Form } from '@/components/ui/forms';
+import { Form } from '@/components';
 import { GenerateBeatButton } from './GenerateBeatButton';
 import { MeasuresField } from './MeasuresField';
 import { useBeatStore, useFormStore } from '@/stores';

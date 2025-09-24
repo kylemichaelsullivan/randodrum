@@ -1,4 +1,4 @@
-import { DisplayBeat, GenerateBeat } from '@/components/ui/sections';
+import { DisplayBeat, GenerateBeat } from '@/components';
 
 export function Main() {
 	return (

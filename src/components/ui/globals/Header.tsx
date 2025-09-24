@@ -1,6 +1,6 @@
 'use client';
 
-import { DominantHand, ThemeToggle } from '@/components/ui/buttons';
+import { DominantHand, ThemeToggle } from '@/components';
 
 export function Header() {
 	return (

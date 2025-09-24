@@ -1,7 +1,7 @@
 import { memo, useMemo } from 'react';
 
 import clsx from 'clsx';
-import { getDurationSymbol, getDynamicSymbol } from '@/utils';
+import { getNoteSymbol, getRestSymbol } from '@/types';
 import { useDominantHand } from '@/components';
 
 import type { Note } from '@/types';
@@ -14,26 +14,32 @@ function NoteDisplayComponent({ note }: NoteDisplayProps) {
 	const { dominantHand } = useDominantHand();
 
 	const noteSymbol = useMemo(() => {
-		return getDurationSymbol(note.dur);
-	}, [note.dur]);
+		return note.isRest ? getRestSymbol(note.dur) : getNoteSymbol(note.dur);
+	}, [note.dur, note.isRest]);
 
-	const dynamicSymbol = useMemo(() => {
-		return note.dynamic !== 'normal' ? getDynamicSymbol(note.dynamic) : '';
-	}, [note.dynamic]);
+	const hasAccent = useMemo(() => {
+		return !note.isRest && note.dynamic === 'Accent';
+	}, [note.dynamic, note.isRest]);
+
+	const hasRimshot = useMemo(() => {
+		return !note.isRest && note.dynamic === 'Rimshot';
+	}, [note.dynamic, note.isRest]);
 
 	const hasDrag = useMemo(() => {
-		return note.ornament === 'drag';
-	}, [note.ornament]);
+		return !note.isRest && note.ornament === 'Drag';
+	}, [note.ornament, note.isRest]);
 
 	const hasFlam = useMemo(() => {
-		return note.ornament === 'flam';
-	}, [note.ornament]);
+		return !note.isRest && note.ornament === 'Flam';
+	}, [note.ornament, note.isRest]);
 
 	const isDisplayedAsDominant = useMemo(() => {
 		return (
-			(note.isDominant && dominantHand === 'right') || (!note.isDominant && dominantHand === 'left')
+			!note.isRest &&
+			((note.isDominant && dominantHand === 'right') ||
+				(!note.isDominant && dominantHand === 'left'))
 		);
-	}, [note.isDominant, dominantHand]);
+	}, [note.isDominant, dominantHand, note.isRest]);
 
 	const stickingColor = useMemo(() => {
 		return isDisplayedAsDominant ? 'text-green' : 'text-red';
@@ -45,18 +51,19 @@ function NoteDisplayComponent({ note }: NoteDisplayProps) {
 
 	return (
 		<div className='NoteDisplay flex flex-col items-center justify-center flex-1 text-center text-black h-full min-h-[5rem]'>
-			<div className='flex items-center justify-center h-5'>
-				<span className='text-sm font-medium'>{dynamicSymbol}</span>
-			</div>
 			<span
 				className={clsx('NoteSymbol font-musisync text-5xl leading-none', {
-					hasFlam,
+					hasAccent,
+					hasRimshot,
 					hasDrag,
+					hasFlam,
 				})}
 			>
 				{noteSymbol}
 			</span>
-			<span className={`text-sm font-bold ${stickingColor}`}>{stickingLetter}</span>
+			{!note.isRest && (
+				<span className={`text-sm font-bold ${stickingColor}`}>{stickingLetter}</span>
+			)}
 		</div>
 	);
 }
@@ -64,6 +71,7 @@ function NoteDisplayComponent({ note }: NoteDisplayProps) {
 export const NoteDisplay = memo(NoteDisplayComponent, (prevProps, nextProps) => {
 	return (
 		prevProps.note.dur === nextProps.note.dur &&
+		prevProps.note.isRest === nextProps.note.isRest &&
 		prevProps.note.dynamic === nextProps.note.dynamic &&
 		prevProps.note.ornament === nextProps.note.ornament &&
 		prevProps.note.isDominant === nextProps.note.isDominant

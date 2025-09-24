@@ -1,8 +1,10 @@
 'use client';
 
 import { memo, useCallback } from 'react';
-import { FormField, FormLabel } from '@/components/ui/forms';
+
+import { FormField, FormLabel } from '@/components';
 import { useFormStore } from '@/stores';
+
 import type { ChangeEvent } from 'react';
 import type { BeatsFieldProps } from '@/types';
 

@@ -3,7 +3,7 @@
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faRefresh } from '@fortawesome/free-solid-svg-icons';
 
-import { Button } from '@/components/ui/buttons';
+import { Button } from '@/components';
 import { clsx } from 'clsx';
 
 type GenerateBeatButtonProps = {

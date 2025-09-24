@@ -2,8 +2,7 @@
 
 import { memo } from 'react';
 
-import { ClientOnly } from '@/components/providers';
-import { EmptyState } from '@/components/ui/globals';
+import { ClientOnly, EmptyState } from '@/components';
 import { HandLegend } from './HandLegend';
 import { MeasuresDisplay } from './MeasuresDisplay';
 import { useBeatStore } from '@/stores';
