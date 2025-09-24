@@ -1,6 +1,7 @@
 import { beatFormDataSchema } from '@/utils';
-import { createTRPCRouter, publicProcedure } from '@/server/api/trpc';
+import { createTRPCRouter, publicProcedure } from '@/server';
 import { generateBeat } from '@/server';
+
 import type { BeatFormData, BeatGenerationResponse } from '@/types';
 
 export const beatRouter = createTRPCRouter({
