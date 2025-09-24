@@ -5,7 +5,7 @@
 import { z, type ZodLiteral } from 'zod';
 import { DIFFICULTY_LEVELS } from './difficulty';
 import { DURATIONS, DYNAMICS, ORNAMENTS } from './beat';
-import { DURATION_CONFIGS } from './constants';
+import { DURATION_DISPLAY_ORDER } from '@/types';
 import { TECHNIQUE_TYPES } from './ui';
 
 // ============================================================================
@@ -24,9 +24,7 @@ export const durationValueSchema = z.union([...DURATIONS.map(duration => z.liter
 
 export const dynamicNameSchema = z.enum(DYNAMICS.map(dynamic => dynamic) as [string, ...string[]]);
 
-export const noteTypeNameSchema = z.enum(
-	DURATION_CONFIGS.map(config => config.name).map(name => name) as [string, ...string[]]
-);
+export const noteTypeNameSchema = z.enum(DURATION_DISPLAY_ORDER as [string, ...string[]]);
 
 export const ornamentNameSchema = z.union([...ORNAMENTS.map(ornament => z.literal(ornament))] as [
 	ZodLiteral<string | null>,

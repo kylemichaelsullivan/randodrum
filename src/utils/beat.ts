@@ -2,10 +2,14 @@
  * Beat-related utility functions and constants
  */
 
-import { DYNAMICS } from '@/types/dynamic';
+import {
+	DYNAMICS,
+	ORNAMENTS,
+	STRAIGHT_DURATIONS,
+	TRIPLET_DURATIONS,
+	DOTTED_DURATIONS,
+} from '@/types';
 import { isValidDifficultyLevel } from './difficulty';
-import { ORNAMENTS } from '@/types/ornament';
-import { STRAIGHT_DURATIONS, DOTTED_DURATIONS, TRIPLET_DURATIONS } from '@/types/duration';
 import type { Duration, Dynamic, GeneratedBeat, Measure, Note, NoteStart, Ornament } from '@/types';
 
 export const DURATIONS: readonly Duration[] = [
