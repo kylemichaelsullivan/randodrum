@@ -1,5 +1,5 @@
 import { getDifficultyConfig } from '@/utils';
-import { isTupletDuration, isTripletDuration } from '@/types/duration';
+import { isTripletDuration } from '@/types';
 
 import type {
 	BeatFormData,
@@ -9,8 +9,7 @@ import type {
 	GeneratedBeat,
 	Measure,
 } from '@/types';
-import type { DynamicName } from '@/types/dynamic';
-import type { OrnamentName } from '@/types/ornament';
+import type { OrnamentName } from '@/types';
 
 function pickWeightedDuration(durationConfigs: DurationWeightConfig[], cap: number): Duration {
 	const validConfigs = durationConfigs.filter(config => config.duration <= cap);
@@ -56,7 +55,8 @@ function sampleFromDist(dist: Record<number, number>, cap: number): number {
 
 export function generateRhythm(
 	durationConfigs: DurationWeightConfig[],
-	measureLen: number
+	measureLen: number,
+	restProbability = 0
 ): Measure {
 	const m: Measure = [];
 	let t = 0;
@@ -65,7 +65,19 @@ export function generateRhythm(
 		const remaining = measureLen - t;
 		const dur = pickWeightedDuration(durationConfigs, remaining);
 
-		if (isTupletDuration(dur)) {
+		// Apply rest probability - create a rest object if random value is below threshold
+		if (Math.random() < restProbability) {
+			m.push({
+				start: t,
+				dur,
+				isRest: true,
+				// No dynamic, isDominant, or ornament for rests
+			});
+			t += dur;
+			continue;
+		}
+
+		if (isTripletDuration(dur)) {
 			const groupSize = isTripletDuration(dur) ? 3 : 1;
 			const totalDuration = dur * groupSize;
 
@@ -74,9 +86,10 @@ export function generateRhythm(
 					m.push({
 						start: t + i * dur,
 						dur,
+						dynamic: 'Normal',
 						isDominant: true,
-						dynamic: 'normal',
 						ornament: null,
+						isRest: false,
 					});
 				}
 				t += totalDuration;
@@ -87,9 +100,10 @@ export function generateRhythm(
 		m.push({
 			start: t,
 			dur,
+			dynamic: 'Normal',
 			isDominant: true,
-			dynamic: 'normal',
 			ornament: null,
+			isRest: false,
 		});
 		t += dur;
 	}
@@ -112,7 +126,9 @@ function generateHandRuns(measure: Measure, difficultyConfig: DifficultyConfig):
 		const runLength = sampleFromDist(difficultyConfig.runLengths, measure.length - noteIndex);
 
 		for (let j = 0; j < runLength && noteIndex < measure.length; j++, noteIndex++) {
-			measure[noteIndex] = { ...measure[noteIndex]!, isDominant: currentIsDominant };
+			if (!measure[noteIndex]!.isRest) {
+				measure[noteIndex] = { ...measure[noteIndex]!, isDominant: currentIsDominant };
+			}
 		}
 
 		if (shouldSwitchHands(difficultyConfig.switchProb)) {
@@ -122,18 +138,32 @@ function generateHandRuns(measure: Measure, difficultyConfig: DifficultyConfig):
 	return measure;
 }
 
-function selectDynamic(randomValue: number, dynamicScale: [number, number]): DynamicName {
+function selectDynamicFlags(
+	randomValue: number,
+	dynamicScale: [number, number]
+): { isAccent: boolean; isRimshot: boolean } {
 	const [normalThreshold, accentThreshold] = dynamicScale;
 
-	if (randomValue < normalThreshold) return 'normal';
-	if (randomValue < accentThreshold) return 'accent';
-	return 'rimshot';
+	if (randomValue < normalThreshold) return { isAccent: false, isRimshot: false };
+	if (randomValue < accentThreshold) return { isAccent: true, isRimshot: false };
+	return { isAccent: false, isRimshot: true };
 }
 
 function addDynamics(measure: Measure, difficultyConfig: DifficultyConfig): Measure {
 	measure.forEach(note => {
-		const randomValue = Math.random(); // 0-1 scale
-		note.dynamic = selectDynamic(randomValue, difficultyConfig.dynamicScale);
+		// Rests don't need dynamic assignment
+		if (!note.isRest) {
+			const randomValue = Math.random(); // 0-1 scale
+			const dynamicFlags = selectDynamicFlags(randomValue, difficultyConfig.dynamicScale);
+
+			if (dynamicFlags.isAccent) {
+				note.dynamic = 'Accent';
+			} else if (dynamicFlags.isRimshot) {
+				note.dynamic = 'Rimshot';
+			} else {
+				note.dynamic = 'Normal';
+			}
+		}
 	});
 	return measure;
 }
@@ -143,19 +173,22 @@ function selectOrnament(
 	flamThreshold: number,
 	dragThreshold: number
 ): OrnamentName {
-	if (randomValue < flamThreshold) return 'flam';
-	if (randomValue < flamThreshold + dragThreshold) return 'drag';
+	if (randomValue < flamThreshold) return 'Flam';
+	if (randomValue < flamThreshold + dragThreshold) return 'Drag';
 	return null;
 }
 
 function addOrnaments(measure: Measure, difficultyConfig: DifficultyConfig): Measure {
 	measure.forEach(note => {
-		const randomValue = Math.random();
-		note.ornament = selectOrnament(
-			randomValue,
-			difficultyConfig.flamThreshold,
-			difficultyConfig.dragThreshold
-		);
+		// Rests don't need ornament assignment
+		if (!note.isRest) {
+			const randomValue = Math.random();
+			note.ornament = selectOrnament(
+				randomValue,
+				difficultyConfig.flamThreshold,
+				difficultyConfig.dragThreshold
+			);
+		}
 	});
 	return measure;
 }
@@ -163,6 +196,12 @@ function addOrnaments(measure: Measure, difficultyConfig: DifficultyConfig): Mea
 function preventConsecutiveHandClumps(measure: Measure, maxClump: number): Measure {
 	let consecutiveCount = 1;
 	for (let i = 1; i < measure.length; i++) {
+		// Rests don't need hand balancing
+		if (measure[i]!.isRest || measure[i - 1]!.isRest) {
+			consecutiveCount = 1;
+			continue;
+		}
+
 		if (measure[i]!.isDominant === measure[i - 1]!.isDominant) {
 			consecutiveCount++;
 			if (consecutiveCount > maxClump) {
@@ -177,13 +216,17 @@ function preventConsecutiveHandClumps(measure: Measure, maxClump: number): Measu
 }
 
 function balanceHandRatio(measure: Measure, minRatio: number, maxRatio: number): Measure {
-	const total = measure.length;
-	let dominantCount = measure.filter(n => n.isDominant).length;
+	const playableNotes = measure.filter(n => !n.isRest);
+	const total = playableNotes.length;
+	let dominantCount = playableNotes.filter(n => n.isDominant).length;
 	let ratio = dominantCount / total;
 
 	if (ratio > maxRatio || ratio < minRatio) {
 		const needMoreDominant = ratio < minRatio;
 		for (let i = measure.length - 1; i >= 0; i--) {
+			// Rests don't need hand balancing
+			if (measure[i]!.isRest) continue;
+
 			if (needMoreDominant && !measure[i]!.isDominant) {
 				measure[i] = { ...measure[i]!, isDominant: true };
 				dominantCount++;
@@ -224,7 +267,12 @@ export function generateBeat(formData: BeatFormData): GeneratedBeat {
 	const gridSize = formData.beats * 24;
 
 	const measures = Array.from({ length: formData.measures }, () => {
-		const measure = generateRhythm(difficultyConfig.durations, gridSize);
+		const measure = generateRhythm(
+			difficultyConfig.durations,
+			gridSize,
+			difficultyConfig.restProbability
+		);
+
 		return fixRender(
 			applyBalancing(
 				addOrnaments(
