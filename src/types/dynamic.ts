@@ -1,17 +1,14 @@
 /**
- * Drum dynamic type definitions
+ * Dynamic scale type for probability thresholds
+ * Used to determine accent and rimshot probabilities
  */
 
-export const DYNAMICS = ['normal', 'accent', 'rimshot'] as const;
+import { createConstArray, type NamedConfig } from './type-utils';
 
-export type DynamicArray = typeof DYNAMICS;
-export type DynamicName = DynamicArray[number];
+export const DYNAMICS = createConstArray(['Normal', 'Accent', 'Rimshot'] as const);
 
+export type DynamicName = (typeof DYNAMICS)[number];
 export type Dynamic = DynamicName;
-
-export type DynamicConfig = {
-	name: DynamicName;
-	symbol: string;
-};
+export type DynamicConfig = NamedConfig<DynamicName>;
 
 export type DynamicScale = [number, number];

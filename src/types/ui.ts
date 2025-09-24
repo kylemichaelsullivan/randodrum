@@ -3,16 +3,20 @@
  */
 
 import type { DifficultyLevel } from './difficulty';
-import type { NoteTypeName } from './noteType';
+import type { DurationName } from './durations';
+import type { DynamicName } from './dynamic';
+import type { OrnamentName } from './ornament';
 
 export type DominantHand = 'left' | 'right';
 
-export type TechniqueTypeName = 'Accent' | 'Basic' | 'Drag' | 'Flam' | 'Rimshot';
+// Filter out null from ornaments to get only actual techniques
+export type TechniqueTypeName = Exclude<OrnamentName, null>;
 
 export type ChartData = Record<
 	DifficultyLevel,
 	{
-		notes: NoteTypeName[];
+		notes: DurationName[];
+		dynamics: DynamicName[];
 		techniques: TechniqueTypeName[];
 		restProbability: number;
 	}

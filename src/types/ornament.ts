@@ -2,14 +2,10 @@
  * Drum ornament type definitions
  */
 
-export const ORNAMENTS = ['flam', 'drag', null] as const;
+export const ORNAMENTS = ['Flam', 'Drag', null] as const;
 
-export type OrnamentArray = typeof ORNAMENTS;
-export type OrnamentName = OrnamentArray[number];
-
+export type OrnamentName = (typeof ORNAMENTS)[number];
 export type Ornament = OrnamentName;
-
 export type OrnamentConfig = {
-	name: OrnamentName;
-	symbol: string;
+	name: Exclude<OrnamentName, null>;
 };

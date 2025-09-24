@@ -3,7 +3,7 @@
  */
 
 import type { DifficultyLevel } from './difficulty';
-import type { Duration } from './duration';
+import type { Duration } from './durations';
 import type { Dynamic } from './dynamic';
 import type { Ornament } from './ornament';
 
@@ -29,11 +29,12 @@ export type Measure = Note[];
 
 // Note type definition
 export type Note = {
-	dynamic: Dynamic;
 	dur: Duration;
-	isDominant: boolean;
-	ornament: Ornament;
+	isRest: boolean;
 	start: number;
+	dynamic?: Dynamic; // Not needed for rests
+	isDominant?: boolean; // Not needed for rests
+	ornament?: Ornament; // Not needed for rests
 };
 
 // Stricter type for note start times (must be non-negative)

@@ -30,10 +30,24 @@ export type { ColorName } from './color';
 export type { DifficultyConfig, DifficultyLevel, DurationWeightConfig } from './difficulty';
 
 // Dynamic types
+export { DYNAMICS } from './dynamic';
 export type { Dynamic, DynamicConfig, DynamicName, DynamicScale } from './dynamic';
 
 // Duration types
-export type { Duration, DurationConfig, DurationValue } from './duration';
+export {
+	DOTTED_DURATIONS,
+	DURATION_DISPLAY_ORDER,
+	DURATION_TO_NAME_MAP,
+	NAME_TO_DURATION_MAP,
+	STRAIGHT_DURATIONS,
+	TRIPLET_DURATIONS,
+	getDurationFromName,
+	getNameFromDuration,
+	isDottedDuration,
+	isStraightDuration,
+	isTripletDuration,
+} from './durations';
+export type { Duration, DurationValue, DurationType, DurationName } from './durations';
 
 // Error handling types
 export type {
@@ -62,11 +76,17 @@ export {
 	createValidationError,
 } from './error';
 
-// Note type definitions
-export type { NoteType, NoteTypeName } from './noteType';
+// Symbol system
+export { NOTE_SYMBOL_MAP, REST_SYMBOL_MAP, getNoteSymbol, getRestSymbol } from './symbols';
+export type { NoteSymbol, RestSymbol } from './symbols';
 
 // Ornament types
+export { ORNAMENTS } from './ornament';
 export type { Ornament, OrnamentConfig, OrnamentName } from './ornament';
+
+// Type utilities
+export { createConstArray, createConfigArray } from './type-utils';
+export type { ConstArray, NamedConfig } from './type-utils';
 
 // Store and state management types
 export type { BeatStore, DominantHandContextType, FormStore } from './store';

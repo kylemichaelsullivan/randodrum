@@ -1,4 +1,4 @@
-import type { Duration } from './duration';
+import type { Duration } from './durations';
 import type { DynamicScale } from './dynamic';
 
 // Difficulty level constants
