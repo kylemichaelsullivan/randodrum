@@ -7,21 +7,105 @@ export const mockBeatFormData = {
 };
 
 export const mockMeasure: Measure = [
-	{ dynamic: 'normal', dur: 24, isDominant: true, ornament: null, start: 0 }, // Quarter Note
-	{ dynamic: 'normal', dur: 24, isDominant: false, ornament: null, start: 24 }, // Quarter Note
-	{ dynamic: 'normal', dur: 24, isDominant: true, ornament: null, start: 48 }, // Quarter Note
-	{ dynamic: 'normal', dur: 24, isDominant: false, ornament: null, start: 72 }, // Quarter Note
+	{
+		dur: 24,
+		dynamic: 'Normal',
+		isDominant: true,
+		ornament: null,
+		start: 0,
+		isRest: false,
+	}, // Quarter Note
+	{
+		dur: 24,
+		dynamic: 'Normal',
+		isDominant: false,
+		ornament: null,
+		start: 24,
+		isRest: false,
+	}, // Quarter Note
+	{
+		dur: 24,
+		dynamic: 'Normal',
+		isDominant: true,
+		ornament: null,
+		start: 48,
+		isRest: false,
+	}, // Quarter Note
+	{
+		dur: 24,
+		dynamic: 'Normal',
+		isDominant: false,
+		ornament: null,
+		start: 72,
+		isRest: false,
+	}, // Quarter Note
 ];
 
 export const mockComplexMeasure: Measure = [
-	{ dynamic: 'accent', dur: 12, isDominant: true, ornament: 'flam', start: 0 }, // Eighth Note
-	{ dynamic: 'normal', dur: 12, isDominant: false, ornament: null, start: 12 }, // Eighth Note
-	{ dynamic: 'normal', dur: 12, isDominant: true, ornament: 'flam', start: 24 }, // Eighth Note
-	{ dynamic: 'accent', dur: 12, isDominant: false, ornament: null, start: 36 }, // Eighth Note
-	{ dynamic: 'normal', dur: 12, isDominant: true, ornament: null, start: 48 }, // Eighth Note
-	{ dynamic: 'accent', dur: 12, isDominant: false, ornament: 'flam', start: 60 }, // Eighth Note
-	{ dynamic: 'normal', dur: 12, isDominant: true, ornament: null, start: 72 }, // Eighth Note
-	{ dynamic: 'normal', dur: 12, isDominant: false, ornament: 'flam', start: 84 }, // Eighth Note
+	{
+		dur: 12,
+		dynamic: 'Accent',
+		isDominant: true,
+		ornament: 'Flam',
+		start: 0,
+		isRest: false,
+	}, // Eighth Note
+	{
+		dur: 12,
+		dynamic: 'Normal',
+		isDominant: false,
+		ornament: null,
+		start: 12,
+		isRest: false,
+	}, // Eighth Note
+	{
+		dur: 12,
+		dynamic: 'Normal',
+		isDominant: true,
+		ornament: 'Flam',
+		start: 24,
+		isRest: false,
+	}, // Eighth Note
+	{
+		dur: 12,
+		dynamic: 'Accent',
+		isDominant: false,
+		ornament: null,
+		start: 36,
+		isRest: false,
+	}, // Eighth Note
+	{
+		dur: 12,
+		dynamic: 'Normal',
+		isDominant: true,
+		ornament: null,
+		start: 48,
+		isRest: false,
+	}, // Eighth Note
+	{
+		dur: 12,
+		dynamic: 'Accent',
+		isDominant: false,
+		ornament: 'Flam',
+		start: 60,
+		isRest: false,
+	}, // Eighth Note
+	{
+		dur: 12,
+		dynamic: 'Normal',
+		isDominant: true,
+		ornament: null,
+		start: 72,
+		isRest: false,
+	}, // Eighth Note
+	{
+		dur: 12,
+		dynamic: 'Normal',
+		isDominant: false,
+		ornament: 'Flam',
+		start: 84,
+		isRest: false,
+	}, // Eighth Note
 ];
 
 export const mockGeneratedBeat: GeneratedBeat = {
@@ -31,11 +115,12 @@ export const mockGeneratedBeat: GeneratedBeat = {
 };
 
 export const mockNote: Note = {
-	dynamic: 'normal',
 	dur: 24, // Quarter Note
+	dynamic: 'Normal',
 	isDominant: true,
 	ornament: null,
 	start: 0,
+	isRest: false,
 };
 
 export const mockUltraViolenceBeat: GeneratedBeat = {

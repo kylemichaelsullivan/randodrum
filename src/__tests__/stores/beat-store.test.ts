@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { act, renderHook } from '@testing-library/react';
-import { mockGeneratedBeat, mockUltraViolenceBeat } from '@/__tests__/fixtures';
+import { mockGeneratedBeat, mockUltraViolenceBeat } from '@/__tests__';
 import { useBeatStore } from '@/stores';
 
 describe('BeatStore', () => {
@@ -91,6 +91,6 @@ describe('BeatStore', () => {
 		// Check that measures contain notes with ornaments
 		const firstMeasure = storedBeat?.measures[0];
 		expect(firstMeasure).toBeDefined();
-		expect(firstMeasure?.some(note => note.ornament === 'flam')).toBe(true);
+		expect(firstMeasure?.some(note => note.ornament === 'Flam')).toBe(true);
 	});
 });

@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { DisplayBeat } from '@/components';
-import { mockGeneratedBeat } from '@/__tests__/fixtures';
-import { render, screen } from '@/__tests__/utils';
+import { mockGeneratedBeat, render, screen } from '@/__tests__';
 import { useBeatStore } from '@/stores';
+
 import type { ReactNode } from 'react';
 import type { BeatStore } from '@/types';
 
