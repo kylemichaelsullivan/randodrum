@@ -125,7 +125,7 @@ export type DynamicScale = [number, number]; // [normalThreshold, accentThreshol
 #### Ornament Definitions
 
 ```typescript
-export const ORNAMENTS = ['flam', 'drag', null] as const;
+export const ORNAMENTS = ['Flam', 'Drag', null] as const;
 export type OrnamentName = (typeof ORNAMENTS)[number];
 export type Ornament = OrnamentName;
 ```
@@ -135,7 +135,6 @@ export type Ornament = OrnamentName;
 ```typescript
 export type OrnamentConfig = {
 	name: OrnamentName; // Ornament name
-	symbol: string; // Display symbol
 };
 ```
 
@@ -271,18 +270,6 @@ export const DYNAMIC_CONFIGS: readonly DynamicConfig[] = [
 	{ name: 'normal', symbol: 'n' },
 	{ name: 'accent', symbol: 'a' },
 	{ name: 'rimshot', symbol: 'r' },
-] as const;
-```
-
-### Ornament Constants
-
-#### Ornament Configuration
-
-```typescript
-export const ORNAMENT_CONFIGS: readonly OrnamentConfig[] = [
-	{ name: 'flam', symbol: 'f' },
-	{ name: 'drag', symbol: 'd' },
-	{ name: null, symbol: '' },
 ] as const;
 ```
 
