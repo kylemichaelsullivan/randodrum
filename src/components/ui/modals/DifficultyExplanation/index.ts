@@ -1,7 +1,12 @@
+export { BorderedSection } from './BorderedSection';
+export { Definition } from './Definition';
+export { DefinitionList } from './DefinitionList';
+export { Definitions } from './Definitions';
 export { DifficultyChart } from './DifficultyChart';
 export { DifficultyExplanation } from './DifficultyExplanation';
+export { DifficultyTable } from './DifficultyTable';
 export { NoteTypesTable } from './NoteTypesTable';
-export { TechniqueDefinition } from './TechniqueDefinition';
-export { TechniqueDefinitions } from './TechniqueDefinitions';
+export { PlayingStylesTable } from './PlayingStylesTable';
+export { SectionWrapper } from './SectionWrapper';
 export { TechniquesTable } from './TechniquesTable';
 export { useChartData, useDifficultyData } from './useChartData';

@@ -1,10 +1,13 @@
 import { memo } from 'react';
-import { CHART_DATA, NOTE_TYPES, DURATION_CONFIGS } from '@/utils';
-import type { DifficultyLevel, NoteTypeName } from '@/types';
 
-const getNoteTypeSymbol = (noteTypeName: NoteTypeName): string => {
-	const config = DURATION_CONFIGS.find(config => config.name === noteTypeName);
-	return config?.symbol ?? noteTypeName.charAt(0).toLowerCase();
+import { CHART_DATA, NOTE_TYPES, NOTE_SYMBOL_MAP, NAME_TO_DURATION_MAP } from '@/utils';
+
+import type { DifficultyLevel, DurationName } from '@/types';
+
+const getNoteTypeSymbol = (noteTypeName: DurationName): string => {
+	const duration = NAME_TO_DURATION_MAP.get(noteTypeName);
+	if (!duration) return noteTypeName.charAt(0).toLowerCase();
+	return NOTE_SYMBOL_MAP[duration] ?? noteTypeName.charAt(0).toLowerCase();
 };
 
 type NoteTypesTableProps = {
@@ -14,7 +17,7 @@ type NoteTypesTableProps = {
 function NoteTypesTableComponent({ difficulties }: NoteTypesTableProps) {
 	return (
 		<div
-			className='flex flex-col gap-4 border border-black rounded-lg p-3 sm:p-4'
+			className='NoteTypesTable flex flex-col gap-4 border border-black rounded-lg p-3 sm:p-4'
 			role='region'
 			aria-labelledby='note-types-title'
 		>

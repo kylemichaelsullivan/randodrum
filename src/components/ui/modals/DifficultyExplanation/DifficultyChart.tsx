@@ -1,5 +1,6 @@
 import { NoteTypesTable } from './NoteTypesTable';
-import { TechniquesTable } from './TechniquesTable';
+import { PlayingStylesTable } from './PlayingStylesTable';
+import { SectionWrapper } from './SectionWrapper';
 import { useChartData } from './useChartData';
 
 export function DifficultyChart() {
@@ -7,9 +8,9 @@ export function DifficultyChart() {
 	const difficulties = chartData.map(({ difficulty }) => difficulty);
 
 	return (
-		<div className='flex flex-col gap-6' role='region' aria-label='Difficulty charts'>
+		<SectionWrapper ariaLabel='Difficulty charts'>
 			<NoteTypesTable difficulties={difficulties} />
-			<TechniquesTable difficulties={difficulties} />
-		</div>
+			<PlayingStylesTable difficulties={difficulties} />
+		</SectionWrapper>
 	);
 }
