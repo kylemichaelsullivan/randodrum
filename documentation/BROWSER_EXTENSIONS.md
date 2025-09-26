@@ -68,128 +68,173 @@ export const isBrowserExtensionAttribute = (attributeName: string): boolean => {
 
 ## Hydration Management Components
 
-### Browser Extension Handler
+### Hydration Fix
 
-The `BrowserExtensionHandler` component provides comprehensive extension detection and handling:
+The `HydrationFix` component uses Next.js's `Script` component to load an external script that runs immediately before React hydration to remove browser extension attributes:
 
 ```typescript
-// src/components/providers/browser-extension-handler.tsx
-export function BrowserExtensionHandler({ children }: { children: ReactNode }) {
-	const [hasExtensions, setHasExtensions] = useState(false);
-	const [extensionAttributes, setExtensionAttributes] = useState<string[]>([]);
+// src/components/providers/hydration-fix.tsx
+import Script from 'next/script';
 
-	useEffect(() => {
-		// Detect extension attributes in the DOM
-		const detectExtensions = () => {
-			const allElements = document.querySelectorAll('*');
-			const foundAttributes: string[] = [];
+export function HydrationFix() {
+	return <Script id='hydration-fix' src='/scripts/hydration-fix.js' strategy='beforeInteractive' />;
+}
+```
 
-			allElements.forEach(element => {
-				Array.from(element.attributes).forEach(attr => {
-					if (isBrowserExtensionAttribute(attr.name)) {
-						foundAttributes.push(attr.name);
-					}
-				});
-			});
+**External Script**: `/public/scripts/hydration-fix.js`
 
-			if (foundAttributes.length > 0) {
-				setHasExtensions(true);
-				setExtensionAttributes(foundAttributes);
+```javascript
+(function () {
+	// Remove browser extension attributes before React hydration
+	const body = document.body;
+	if (body) {
+		const attributesToRemove = [
+			'cz-shortcut-listen', // Common password manager extension
+			'data-1password-root', // 1Password
+			'data-bitwarden-watching', // Bitwarden
+			'data-dashlane-id', // Dashlane
+			'data-grammarly-ignore', // Grammarly
+			'data-grammarly-shadow-root', // Grammarly
+			'data-lastpass-icon-root', // LastPass
+		];
+		// Use JSDoc type annotation to ensure TypeScript compatibility
+		const removedAttributes = /** @type {string[]} */ ([]);
+
+		attributesToRemove.forEach(attr => {
+			if (body.hasAttribute(attr)) {
+				body.removeAttribute(attr);
+				removedAttributes.push(attr);
 			}
-		};
+		});
 
-		// Run detection after hydration
-		const timer = setTimeout(detectExtensions, 100);
-		return () => clearTimeout(timer);
-	}, []);
-
-	return (
-		<ExtensionContext.Provider value={{ hasExtensions, extensionAttributes }}>
-			{children}
-		</ExtensionContext.Provider>
-	);
-}
-```
-
-### Hydration Manager
-
-The `HydrationManager` component provides comprehensive hydration safety:
-
-```typescript
-// src/components/providers/hydration-manager.tsx
-export function HydrationManager({ children }: { children: ReactNode }) {
-	const [isHydrated, setIsHydrated] = useState(false);
-	const [hasExtensions, setHasExtensions] = useState(false);
-
-	useEffect(() => {
-		// Mark as hydrated
-		setIsHydrated(true);
-
-		// Detect browser extensions
-		const detectExtensions = () => {
-			const hasExtensionAttributes = document.querySelectorAll('*').length > 0 &&
-				Array.from(document.querySelectorAll('*')).some(element =>
-					Array.from(element.attributes).some(attr =>
-						isBrowserExtensionAttribute(attr.name)
-					)
-				);
-			setHasExtensions(hasExtensionAttributes);
-		};
-
-		// Run detection after a short delay
-		const timer = setTimeout(detectExtensions, 50);
-		return () => clearTimeout(timer);
-	}, []);
-
-	if (!isHydrated) {
-		return <HydrationBoundary>{children}</HydrationBoundary>;
+		// Store which attributes we removed for potential restoration
+		if (removedAttributes.length > 0) {
+			// Use JSDoc intersection type for type-safe window property access
+			/** @type {Window & { __removedExtensionAttributes?: string[] }} */ (
+				window
+			).__removedExtensionAttributes = removedAttributes;
+		}
 	}
-
-	return (
-		<HydrationSafe hasExtensions={hasExtensions}>
-			{children}
-		</HydrationSafe>
-	);
-}
+})();
 ```
 
-### Hydration Boundary
+**Benefits of This Approach**:
 
-The `HydrationBoundary` component provides a safe wrapper for components that may have hydration issues:
+- **Security**: Uses external script loading instead of inline script injection
+- **Performance**: External script can be cached by the browser
+- **Maintainability**: JavaScript logic is in a separate, debuggable file
+- **Best Practices**: Uses Next.js's recommended `Script` component with `beforeInteractive` strategy
+
+### TypeScript Compatibility with JSDoc
+
+The hydration fix script uses JSDoc type annotations to ensure TypeScript compatibility while maintaining pure JavaScript:
+
+```javascript
+// Explicitly type the removed attributes array
+const removedAttributes = /** @type {string[]} */ ([]);
+
+// Store removed attributes on window object for potential restoration
+// Use intersection type for type-safe window property access
+/** @type {Window & { __removedExtensionAttributes?: string[] }} */ (
+	window
+).__removedExtensionAttributes = removedAttributes;
+```
+
+**JSDoc Benefits**:
+
+- **Type Safety**: Provides TypeScript type checking without requiring `.ts` extension
+- **Linting Compliance**: Eliminates TypeScript linting errors for implicit `any` types
+- **Intersection Types**: Uses `Window & { __removedExtensionAttributes?: string[] }` for precise type definitions
+- **Runtime Compatibility**: Maintains pure JavaScript execution without compilation
+- **IDE Support**: Enables IntelliSense and type checking in development environments
+- **Documentation**: Serves as inline documentation for type expectations
+- **Self-Documenting**: Type annotations clearly show what properties are being added to the window object
+
+**Why JSDoc Instead of TypeScript**:
+
+- **Performance**: No compilation step required for the hydration script
+- **Simplicity**: Keeps the script as pure JavaScript for maximum compatibility
+- **Timing**: Ensures the script can run immediately without build processes
+- **Reliability**: Reduces potential build-time issues that could affect hydration timing
+
+````
+
+### Hydration Error Boundary
+
+The `HydrationErrorBoundary` specifically handles hydration-related errors and provides graceful fallbacks for browser extension interference:
 
 ```typescript
-// src/components/providers/hydration-boundary.tsx
-export function HydrationBoundary({ children }: { children: ReactNode }) {
+// src/components/providers/error-boundary.tsx
+export function HydrationErrorBoundary({ children }: { children: ReactNode }) {
 	return (
-		<div suppressHydrationWarning={true}>
+		<ErrorBoundary
+			onError={error => {
+				if (error.message.includes('hydration') || error.message.includes('Hydration')) {
+					if (
+						BROWSER_EXTENSION_ATTRIBUTES.some(attr => error.message.includes(attr)) ||
+						error.message.includes('browser extension') ||
+						error.stack?.includes('body')
+					) {
+						console.warn(
+							'Browser extension hydration interference detected and handled:',
+							error.message
+						);
+					} else {
+						console.warn('Hydration error caught and handled:', error.message);
+					}
+				}
+			}}
+			fallback={
+				<div className='flex items-center justify-center p-8 border border-gray rounded-lg bg-light-gray'>
+					<div className='text-center'>
+						<h3 className='text-lg font-semibold text-black pb-2'>Loading…</h3>
+						<p className='text-gray'>The page is loading. Please wait a moment.</p>
+					</div>
+				</div>
+			}
+		>
 			{children}
-		</div>
+		</ErrorBoundary>
 	);
 }
-```
-
-**Note**: `suppressHydrationWarning` is used sparingly and never on the `<body>` element, following project guidelines.
+````
 
 ### Hydration Safe
 
-The `HydrationSafe` component provides conditional rendering based on extension detection:
+The `HydrationSafe` component ensures that content only renders after hydration is complete:
 
 ```typescript
 // src/components/providers/hydration-safe.tsx
-export function HydrationSafe({
-	children,
-	hasExtensions
-}: {
-	children: ReactNode;
-	hasExtensions: boolean;
-}) {
-	if (hasExtensions) {
-		// Render with extension-aware handling
-		return (
-			<div className="extension-aware">
-				{children}
-			</div>
-		);
+export function HydrationSafe({ children, fallback = null, className }: HydrationSafeProps) {
+	const [isHydrated, setIsHydrated] = useState(false);
+
+	useEffect(() => {
+		setIsHydrated(true);
+	}, []);
+
+	if (!isHydrated) {
+		return fallback ? <div className={className}>{fallback}</div> : null;
+	}
+
+	return <div className={className}>{children}</div>;
+}
+```
+
+### Client Only
+
+The `ClientOnly` component ensures a component only renders on the client side:
+
+```typescript
+// src/components/providers/hydration-boundary.tsx
+export function ClientOnly({ children, fallback = null }: ClientOnlyProps) {
+	const [isClient, setIsClient] = useState(false);
+
+	useEffect(() => {
+		setIsClient(true);
+	}, []);
+
+	if (!isClient) {
+		return <>{fallback}</>;
 	}
 
 	return <>{children}</>;
@@ -200,23 +245,22 @@ export function HydrationSafe({
 
 ### Root Layout Integration
 
-The browser extension handling is integrated into the root layout:
+The browser extension handling is integrated into the root layout through the `HydrationFix` component:
 
 ```typescript
 // src/app/layout.tsx
 export default function RootLayout({ children }: { children: ReactNode }) {
 	return (
-		<html lang="en" suppressHydrationWarning>
+		<html lang='en' className={`${geist.variable} ${musisync.variable}`}>
 			<body>
-				<HydrationManager>
-					<BrowserExtensionHandler>
-						<ThemeProvider>
-							<DominantHandProvider>
-								{children}
-							</DominantHandProvider>
-						</ThemeProvider>
-					</BrowserExtensionHandler>
-				</HydrationManager>
+				<HydrationFix />
+				<HydrationErrorBoundary>
+					<ThemeProvider>
+						<DominantHandProvider>
+							<TRPCReactProvider>{children}</TRPCReactProvider>
+						</DominantHandProvider>
+					</ThemeProvider>
+				</HydrationErrorBoundary>
 			</body>
 		</html>
 	);
@@ -225,20 +269,19 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 
 ### Component Integration
 
-Components can use the extension context to adapt their behavior:
+Components can use the hydration-safe components to prevent extension-related issues:
 
 ```typescript
-import { useExtensionContext } from '@/components/providers/browser-extension-handler';
+import { HydrationSafe, ClientOnly } from '@/components/providers';
 
 export function MyComponent() {
-	const { hasExtensions, extensionAttributes } = useExtensionContext();
-
-	if (hasExtensions) {
-		// Adapt behavior for extension presence
-		return <ExtensionAwareComponent />;
-	}
-
-	return <StandardComponent />;
+	return (
+		<HydrationSafe fallback={<div>Loading...</div>}>
+			<ClientOnly fallback={<div>Client-side only content</div>}>
+				<ExtensionSensitiveComponent />
+			</ClientOnly>
+		</HydrationSafe>
+	);
 }
 ```
 
@@ -286,9 +329,9 @@ export function cleanupExtensionAttributes() {
 
 ```typescript
 import { render, screen } from '@testing-library/react';
-import { BrowserExtensionHandler } from '@/components/providers/browser-extension-handler';
+import { HydrationErrorBoundary } from '@/components/providers/error-boundary';
 
-describe('BrowserExtensionHandler', () => {
+describe('HydrationErrorBoundary', () => {
 	beforeEach(() => {
 		simulateExtensionAttributes();
 	});
@@ -297,14 +340,14 @@ describe('BrowserExtensionHandler', () => {
 		cleanupExtensionAttributes();
 	});
 
-	it('detects browser extensions', () => {
+	it('handles hydration errors gracefully', () => {
 		render(
-			<BrowserExtensionHandler>
+			<HydrationErrorBoundary>
 				<div>Test content</div>
-			</BrowserExtensionHandler>
+			</HydrationErrorBoundary>
 		);
 
-		// Test extension detection
+		// Test error boundary functionality
 		expect(screen.getByText('Test content')).toBeInTheDocument();
 	});
 });

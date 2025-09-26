@@ -1,6 +1,8 @@
 'use client';
 
-import { memo, useEffect, useState, type ReactNode } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
+
+import { createMemoizedComponentWithDisplayName } from '@/utils';
 
 type HydrationSafeProps = {
 	children: ReactNode;
@@ -26,6 +28,7 @@ function HydrationSafeComponent({ children, fallback = null, className }: Hydrat
 	return <div className={className}>{children}</div>;
 }
 
-export const HydrationSafe = memo(HydrationSafeComponent);
-
-HydrationSafe.displayName = 'HydrationSafe';
+export const HydrationSafe = createMemoizedComponentWithDisplayName(
+	HydrationSafeComponent,
+	'HydrationSafe'
+);
