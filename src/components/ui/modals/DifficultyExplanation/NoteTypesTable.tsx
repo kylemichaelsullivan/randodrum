@@ -1,11 +1,12 @@
 import { memo } from 'react';
 
-import { CHART_DATA, NOTE_TYPES, NOTE_SYMBOL_MAP, NAME_TO_DURATION_MAP } from '@/utils';
+import { CHART_DATA, NOTE_TYPES } from '@/utils';
+import { DURATION_NAME_TO_VALUE_MAP, NOTE_SYMBOL_MAP } from '@/types';
 
 import type { DifficultyLevel, DurationName } from '@/types';
 
 const getNoteTypeSymbol = (noteTypeName: DurationName): string => {
-	const duration = NAME_TO_DURATION_MAP.get(noteTypeName);
+	const duration = DURATION_NAME_TO_VALUE_MAP[noteTypeName];
 	if (!duration) return noteTypeName.charAt(0).toLowerCase();
 	return NOTE_SYMBOL_MAP[duration] ?? noteTypeName.charAt(0).toLowerCase();
 };

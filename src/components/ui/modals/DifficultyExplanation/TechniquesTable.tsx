@@ -1,5 +1,6 @@
-import { CHART_DATA, TECHNIQUE_TYPES } from '@/utils';
+import { CHART_DATA } from '@/utils';
 import { DifficultyTable } from './DifficultyTable';
+import { TECHNIQUE_TYPES } from '@/types';
 
 import type { DifficultyLevel } from '@/types';
 
