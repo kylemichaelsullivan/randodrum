@@ -30,16 +30,64 @@ src/utils/validation.ts
 └── Type Guards                 # Runtime type checking
 ```
 
+## Available Functions
+
+### Safe Validation Functions
+
+The validation system provides comprehensive safe validation functions that return result objects instead of throwing errors:
+
+```typescript
+// Individual type safe validation
+export const safeValidateDifficultyLevel = (value: unknown): SafeValidationResult<DifficultyLevel>
+export const safeValidateDurationValue = (value: unknown): SafeValidationResult<DurationValue>
+export const safeValidateDynamicName = (value: unknown): SafeValidationResult<DynamicName>
+export const safeValidateOrnamentName = (value: unknown): SafeValidationResult<OrnamentName>
+
+// Complex object safe validation
+export const safeValidateNote = (data: unknown): SafeValidationResult<ValidatedNote>
+export const safeValidateMeasure = (data: unknown): SafeValidationResult<ValidatedMeasure>
+export const safeValidateBeatFormData = (data: unknown): SafeValidationResult<ValidatedBeatFormData>
+export const safeValidateGeneratedBeat = (data: unknown): SafeValidationResult<ValidatedGeneratedBeat>
+```
+
+### Type Guards
+
+Runtime type checking functions that don't throw errors:
+
+```typescript
+// Individual type guards
+export const isDifficultyLevel = (value: unknown): value is DifficultyLevel
+export const isDurationValue = (value: unknown): value is DurationValue
+export const isDynamicName = (value: unknown): value is DynamicName
+export const isOrnamentName = (value: unknown): value is OrnamentName
+
+// Complex object type guards
+export const isNote = (data: unknown): data is ValidatedNote
+export const isMeasure = (data: unknown): data is ValidatedMeasure
+export const isBeatFormData = (data: unknown): data is ValidatedBeatFormData
+export const isGeneratedBeat = (data: unknown): data is ValidatedGeneratedBeat
+```
+
 ## Available Schemas
+
+### Helper Functions
+
+```typescript
+/**
+ * Creates a Zod enum schema from a readonly array
+ * This is cleaner than using type assertions
+ */
+function createEnumSchema<T extends readonly string[]>(values: T) {
+	return z.enum(values as unknown as [string, ...string[]]);
+}
+```
 
 ### Basic Type Schemas
 
 #### Difficulty Level Schema
 
 ```typescript
-export const difficultyLevelSchema = z.enum(
-	DIFFICULTY_LEVELS.map(level => level) as [string, ...string[]]
-);
+export const difficultyLevelSchema = createEnumSchema(DIFFICULTY_LEVELS);
 ```
 
 #### Duration Value Schema
@@ -51,7 +99,7 @@ export const durationValueSchema = z.union([...DURATIONS.map(duration => z.liter
 #### Dynamic Name Schema
 
 ```typescript
-export const dynamicNameSchema = z.enum(DYNAMICS.map(dynamic => dynamic) as [string, ...string[]]);
+export const dynamicNameSchema = createEnumSchema(DYNAMICS);
 ```
 
 #### Ornament Name Schema
@@ -106,11 +154,27 @@ export const validateDifficultyLevel = (value: unknown): DifficultyLevel => {
 	return difficultyLevelSchema.parse(value);
 };
 
-export const validateDurationValue = (value: unknown): DurationValue => {
+export const validateDurationValue = (value: unknown): z.infer<typeof durationValueSchema> => {
 	return durationValueSchema.parse(value);
 };
 
+export const validateDynamicName = (value: unknown): z.infer<typeof dynamicNameSchema> => {
+	return dynamicNameSchema.parse(value);
+};
+
+export const validateOrnamentName = (value: unknown): z.infer<typeof ornamentNameSchema> => {
+	return ornamentNameSchema.parse(value);
+};
+
 // Complex object validation
+export const validateNote = (data: unknown): ValidatedNote => {
+	return noteSchema.parse(data);
+};
+
+export const validateMeasure = (data: unknown): ValidatedMeasure => {
+	return measureSchema.parse(data);
+};
+
 export const validateBeatFormData = (data: unknown): ValidatedBeatFormData => {
 	return beatFormDataSchema.parse(data);
 };
@@ -125,9 +189,22 @@ export const validateGeneratedBeat = (data: unknown): ValidatedGeneratedBeat => 
 Use these functions for user input and external data where graceful error handling is preferred:
 
 ```typescript
+// Individual type safe validation
+export const safeValidateDifficultyLevel = (value: unknown): SafeValidationResult<DifficultyLevel>
+export const safeValidateDurationValue = (value: unknown): SafeValidationResult<DurationValue>
+export const safeValidateDynamicName = (value: unknown): SafeValidationResult<DynamicName>
+export const safeValidateOrnamentName = (value: unknown): SafeValidationResult<OrnamentName>
+
+// Complex object safe validation
+export const safeValidateNote = (data: unknown): SafeValidationResult<ValidatedNote>
+export const safeValidateMeasure = (data: unknown): SafeValidationResult<ValidatedMeasure>
+export const safeValidateBeatFormData = (data: unknown): SafeValidationResult<ValidatedBeatFormData>
+export const safeValidateGeneratedBeat = (data: unknown): SafeValidationResult<ValidatedGeneratedBeat>
+
+// Example implementation
 export const safeValidateBeatFormData = (
 	data: unknown
-): { success: true; data: ValidatedBeatFormData } | { success: false; error: string } => {
+): SafeValidationResult<ValidatedBeatFormData> => {
 	try {
 		const validated = beatFormDataSchema.parse(data);
 		return { success: true, data: validated };
@@ -148,12 +225,21 @@ export const safeValidateBeatFormData = (
 Use these functions for runtime type checking without throwing errors:
 
 ```typescript
+// Individual type guards
+export const isDifficultyLevel = (value: unknown): value is DifficultyLevel
+export const isDurationValue = (value: unknown): value is DurationValue
+export const isDynamicName = (value: unknown): value is DynamicName
+export const isOrnamentName = (value: unknown): value is OrnamentName
+
+// Complex object type guards
+export const isNote = (data: unknown): data is ValidatedNote
+export const isMeasure = (data: unknown): data is ValidatedMeasure
+export const isBeatFormData = (data: unknown): data is ValidatedBeatFormData
+export const isGeneratedBeat = (data: unknown): data is ValidatedGeneratedBeat
+
+// Example implementation
 export const isBeatFormData = (data: unknown): data is ValidatedBeatFormData => {
 	return beatFormDataSchema.safeParse(data).success;
-};
-
-export const isGeneratedBeat = (data: unknown): data is ValidatedGeneratedBeat => {
-	return generatedBeatSchema.safeParse(data).success;
 };
 ```
 
@@ -167,6 +253,11 @@ export type ValidatedBeatFormData = z.infer<typeof beatFormDataSchema>;
 export type ValidatedGeneratedBeat = z.infer<typeof generatedBeatSchema>;
 export type ValidatedMeasure = z.infer<typeof measureSchema>;
 export type ValidatedNote = z.infer<typeof noteSchema>;
+
+// Safe validation result type
+export type SafeValidationResult<T> =
+	| { success: true; data: T }
+	| { success: false; error: string };
 ```
 
 ## Integration Patterns
@@ -181,7 +272,7 @@ const form = useForm<ValidatedBeatFormData>({
 	defaultValues: {
 		beats: 4,
 		measures: 4,
-		difficulty: 'Hey, Not Too Rough',
+		difficulty: 'Hey, Not Too Ruff',
 	},
 	onSubmit: async ({ value }) => {
 		// value is automatically typed as ValidatedBeatFormData
@@ -263,12 +354,12 @@ import { beatFormDataSchema } from '@/utils/validation';
 
 describe('beatFormDataSchema', () => {
 	it('validates correct form data', () => {
-		const validData = { beats: 4, measures: 4, difficulty: 'Hey, Not Too Rough' };
+		const validData = { beats: 4, measures: 4, difficulty: 'Hey, Not Too Ruff' };
 		expect(() => beatFormDataSchema.parse(validData)).not.toThrow();
 	});
 
 	it('rejects invalid form data', () => {
-		const invalidData = { beats: 0, measures: 4, difficulty: 'Hey, Not Too Rough' };
+		const invalidData = { beats: 0, measures: 4, difficulty: 'Hey, Not Too Ruff' };
 		expect(() => beatFormDataSchema.parse(invalidData)).toThrow();
 	});
 });
@@ -282,7 +373,7 @@ import { safeValidateBeatFormData } from '@/utils/validation';
 
 describe('safeValidateBeatFormData', () => {
 	it('returns success for valid data', () => {
-		const validData = { beats: 4, measures: 4, difficulty: 'Hey, Not Too Rough' };
+		const validData = { beats: 4, measures: 4, difficulty: 'Hey, Not Too Ruff' };
 		const result = safeValidateBeatFormData(validData);
 		expect(result.success).toBe(true);
 		if (result.success) {
@@ -291,7 +382,7 @@ describe('safeValidateBeatFormData', () => {
 	});
 
 	it('returns error for invalid data', () => {
-		const invalidData = { beats: 0, measures: 4, difficulty: 'Hey, Not Too Rough' };
+		const invalidData = { beats: 0, measures: 4, difficulty: 'Hey, Not Too Ruff' };
 		const result = safeValidateBeatFormData(invalidData);
 		expect(result.success).toBe(false);
 		if (!result.success) {
@@ -328,38 +419,14 @@ The system includes built-in validation for difficulty configurations to ensure 
 ### Dynamic Scale Validation
 
 ```typescript
-export const getDifficultyConfig = (difficulty: DifficultyLevel): DifficultyConfig => {
-	const config = DIFFICULTY_CONFIGS[difficulty];
-	if (!config) {
-		throw new Error(`Unknown difficulty level: ${difficulty}`);
-	}
-
-	// Validate dynamicScale consistency
-	const [normalThreshold, accentThreshold] = config.dynamicScale;
-	if (normalThreshold > accentThreshold) {
-		throw new Error(
-			`Invalid dynamicScale for ${difficulty}: normalThreshold (${normalThreshold}) must be <= accentThreshold (${accentThreshold})`
-		);
-	}
-
-	return config;
-};
+// Note: This function is implemented in src/utils/difficulty.ts
+// The validation logic shown here is conceptual - actual implementation may differ
 ```
 
 ### Configuration Validation Function
 
 ```typescript
-export const validateDifficultyConfigs = (): void => {
-	for (const difficulty of DIFFICULTY_LEVELS) {
-		try {
-			getDifficultyConfig(difficulty);
-		} catch (error) {
-			throw new Error(
-				`Configuration validation failed for ${difficulty}: ${error instanceof Error ? error.message : 'Unknown error'}`
-			);
-		}
-	}
-};
+// Note: This function is implemented in src/utils/difficulty.ts
 ```
 
 This validation ensures that:

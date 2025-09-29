@@ -72,26 +72,27 @@ export type DurationValue = StraightDuration | DottedDuration | TripletDuration;
 
 ### Duration Configuration
 
-Each duration is associated with metadata including name, symbol, and value:
+Each duration is associated with metadata including name, symbol, and value. The system uses separate mappings for different purposes:
 
 ```typescript
-export const DURATION_CONFIGS: readonly DurationConfig[] = [
-	// Straight notes (power-of-two divisions)
-	{ name: 'Sixteenth', symbol: 's', value: 6 },
-	{ name: 'Eighth', symbol: 'e', value: 12 },
-	{ name: 'Quarter', symbol: 'q', value: 24 },
-	{ name: 'Half', symbol: 'h', value: 48 },
-	{ name: 'Whole', symbol: 'w', value: 96 },
+// Name to value mapping (used for configuration)
+export const DURATION_NAME_TO_VALUE_MAP: Record<DurationName, DurationValue> = {
+	Sixteenth: 6,
+	'Eighth Triplet': 8,
+	Eighth: 12,
+	'Quarter Triplet': 16,
+	'Dotted Eighth': 18,
+	Quarter: 24,
+	'Dotted Quarter': 36,
+	Half: 48,
+	'Dotted Half': 72,
+	Whole: 96,
+} as const;
 
-	// Dotted notes (1.5x base duration)
-	{ name: 'Dotted Eighth', symbol: 'i', value: 18 },
-	{ name: 'Dotted Quarter', symbol: 'j', value: 36 },
-	{ name: 'Dotted Half', symbol: 'd', value: 72 },
-
-	// Triplets (divide by 3)
-	{ name: 'Eighth Triplet', symbol: 'T', value: 8 },
-	{ name: 'Quarter Triplet', symbol: 't', value: 16 },
-] as const;
+// Value to name mapping (used for display)
+export const DURATION_TO_NAME_MAP = new Map<DurationValue, DurationName>(
+	Object.entries(DURATION_NAME_TO_VALUE_MAP).map(([name, value]) => [value, name as DurationName])
+);
 ```
 
 ## Rhythm Generation Process
@@ -158,7 +159,7 @@ The 96-grid system is used throughout the application for:
 
 - **Beat Generation**: Creating rhythmically accurate drum patterns with weighted duration selection
 - **Hand Balancing**: Ensuring proper distribution between dominant and non-dominant hands
-- **Dynamics**: Adding normal hits, accents, and rimshots using 0-1 probability thresholds
+- **Dynamics**: Adding normal, accents, and rimshots using 0-1 probability thresholds
 - **Ornaments**: Incorporating flams and drags based on difficulty level
 - **Display**: Rendering notes at precise positions with proper timing
 - **Import/Export**: Generating MIDI-compatible timing data

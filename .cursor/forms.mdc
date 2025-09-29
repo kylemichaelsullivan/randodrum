@@ -33,7 +33,7 @@ export const beatFormDataSchema = z.object({
 ### Difficulty Level Schema
 
 ```typescript
-export const difficultyLevelSchema = z.enum(DIFFICULTY_LEVELS as [string, ...string[]]);
+export const difficultyLevelSchema = createEnumSchema(DIFFICULTY_LEVELS);
 ```
 
 ### Note Schema

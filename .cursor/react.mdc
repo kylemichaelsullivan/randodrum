@@ -43,24 +43,60 @@ exclude:
 #### Memoization Guidelines (Current Implementation)
 
 ```typescript
-// ✅ Current memoization pattern
-import { memo } from 'react';
+// ✅ Current memoization pattern using createMemoizedComponent utility
+import { createMemoizedComponent } from '@/utils';
 
 function ComponentNameComponent({ prop1, prop2 }: ComponentProps) {
   return <div>{/* component content */}</div>;
 }
 
-// Memoized component for performance optimization
-export const ComponentName = memo(ComponentNameComponent);
-
-ComponentName.displayName = 'ComponentName';
+// Memoized component with automatic displayName setting
+export const ComponentName = createMemoizedComponent(
+  ComponentNameComponent,
+  'ComponentName'
+);
 ```
+
+**Benefits of createMemoizedComponent:**
+
+- **Type Safety**: Uses `ComponentProps<T>` to infer props type automatically
+- **Automatic displayName**: Sets displayName automatically for better debugging
+- **Consistent Pattern**: Ensures all memoized components follow the same pattern
+- **No ESLint Disable**: Avoids `any` types with proper TypeScript inference
+
+#### createMemoizedComponent Utility
+
+The `createMemoizedComponent` utility function provides a type-safe way to create memoized components with automatic displayName setting:
+
+```typescript
+// Utility function definition
+export const createMemoizedComponent = <T extends ComponentType<P>, P = ComponentProps<T>>(
+	Component: T,
+	displayName: string
+): MemoExoticComponent<T> => {
+	const MemoizedComponent = memo(Component);
+	MemoizedComponent.displayName = displayName;
+	return MemoizedComponent;
+};
+```
+
+**When to use createMemoizedComponent:**
+
+- **Standard memoization**: For most components that need memoization
+- **Type safety**: When you want automatic props type inference
+- **Consistency**: To ensure all memoized components follow the same pattern
+
+**When to use memo directly:**
+
+- **Custom comparison functions**: When you need custom prop comparison logic
+- **Special cases**: When the utility function doesn't meet specific requirements
 
 #### Performance Optimization Patterns
 
 ```typescript
-// ✅ useCallback for event handlers
-import { memo, useCallback } from 'react';
+// ✅ useCallback for event handlers with createMemoizedComponent
+import { useCallback } from 'react';
+import { createMemoizedComponent } from '@/utils';
 
 function FormFieldComponent({ form }: FormFieldProps) {
   const { setFormValues } = useFormStore();
@@ -79,12 +115,13 @@ function FormFieldComponent({ form }: FormFieldProps) {
   });
 }
 
-export const FormField = memo(FormFieldComponent);
+export const FormField = createMemoizedComponent(FormFieldComponent, 'FormField');
 ```
 
 ```typescript
-// ✅ useMemo for expensive computations
-import { memo, useMemo } from 'react';
+// ✅ useMemo for expensive computations with createMemoizedComponent
+import { useMemo } from 'react';
+import { createMemoizedComponent } from '@/utils';
 
 function DisplayComponent({ data }: DisplayProps) {
   // Memoize expensive calculations
@@ -95,7 +132,7 @@ function DisplayComponent({ data }: DisplayProps) {
   return <div>{/* render processed data */}</div>;
 }
 
-export const DisplayComponent = memo(DisplayComponent);
+export const DisplayComponent = createMemoizedComponent(DisplayComponent, 'DisplayComponent');
 ```
 
 ```typescript
@@ -106,13 +143,16 @@ function ComplexComponent({ complexData }: ComplexProps) {
   return <div>{/* component content */}</div>;
 }
 
-// Custom comparison for better performance
+// Custom comparison for better performance (use memo directly for custom comparison)
 export const ComplexComponent = memo(ComplexComponent, (prevProps, nextProps) => {
   return (
     prevProps.id === nextProps.id &&
     JSON.stringify(prevProps.complexData) === JSON.stringify(nextProps.complexData)
   );
 });
+
+// Set displayName manually for custom memo usage
+ComplexComponent.displayName = 'ComplexComponent';
 ```
 
 #### When to Use React.memo

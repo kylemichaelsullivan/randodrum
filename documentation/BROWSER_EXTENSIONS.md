@@ -97,23 +97,11 @@ export function HydrationFix() {
 			'data-grammarly-shadow-root', // Grammarly
 			'data-lastpass-icon-root', // LastPass
 		];
-		// Use JSDoc type annotation to ensure TypeScript compatibility
-		const removedAttributes = /** @type {string[]} */ ([]);
-
 		attributesToRemove.forEach(attr => {
 			if (body.hasAttribute(attr)) {
 				body.removeAttribute(attr);
-				removedAttributes.push(attr);
 			}
 		});
-
-		// Store which attributes we removed for potential restoration
-		if (removedAttributes.length > 0) {
-			// Use JSDoc intersection type for type-safe window property access
-			/** @type {Window & { __removedExtensionAttributes?: string[] }} */ (
-				window
-			).__removedExtensionAttributes = removedAttributes;
-		}
 	}
 })();
 ```
@@ -130,21 +118,18 @@ export function HydrationFix() {
 The hydration fix script uses JSDoc type annotations to ensure TypeScript compatibility while maintaining pure JavaScript:
 
 ```javascript
-// Explicitly type the removed attributes array
-const removedAttributes = /** @type {string[]} */ ([]);
-
-// Store removed attributes on window object for potential restoration
-// Use intersection type for type-safe window property access
-/** @type {Window & { __removedExtensionAttributes?: string[] }} */ (
-	window
-).__removedExtensionAttributes = removedAttributes;
+// Clean attribute removal without tracking
+attributesToRemove.forEach(attr => {
+	if (body.hasAttribute(attr)) {
+		body.removeAttribute(attr);
+	}
+});
 ```
 
 **JSDoc Benefits**:
 
 - **Type Safety**: Provides TypeScript type checking without requiring `.ts` extension
 - **Linting Compliance**: Eliminates TypeScript linting errors for implicit `any` types
-- **Intersection Types**: Uses `Window & { __removedExtensionAttributes?: string[] }` for precise type definitions
 - **Runtime Compatibility**: Maintains pure JavaScript execution without compilation
 - **IDE Support**: Enables IntelliSense and type checking in development environments
 - **Documentation**: Serves as inline documentation for type expectations

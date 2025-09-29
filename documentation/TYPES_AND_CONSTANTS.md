@@ -150,8 +150,6 @@ export const DURATION_NAME_TO_VALUE_MAP: Record<DurationName, DurationValue> = {
 	Whole: 96,
 } as const;
 
-export const DURATION_CONFIGS = createConfigArray(DURATION_NAMES, DURATION_NAME_TO_VALUE_MAP);
-
 // Reverse mapping for lookup
 export const DURATION_TO_NAME_MAP = new Map<DurationValue, DurationName>(
 	Object.entries(DURATION_NAME_TO_VALUE_MAP).map(([name, value]) => [value, name as DurationName])
@@ -185,13 +183,6 @@ export type TechniqueTypeName = (typeof TECHNIQUE_TYPES)[number];
 
 export const ORNAMENTS = [...TECHNIQUE_TYPES, null] as const;
 export type OrnamentName = (typeof ORNAMENTS)[number];
-
-export const TECHNIQUE_SYMBOL_MAP: Record<TechniqueTypeName, string> = {
-	Flam: 'f',
-	Drag: 'd',
-} as const;
-
-export const ORNAMENT_CONFIGS = createConfigArray(TECHNIQUE_TYPES, TECHNIQUE_SYMBOL_MAP);
 ```
 
 ### Difficulty System
