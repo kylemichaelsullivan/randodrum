@@ -1,16 +1,17 @@
-# Types, Lookups, and Constants Documentation
+# Types and Constants Documentation
 
-This document provides comprehensive documentation for the type definitions, lookup tables, and constants used throughout the RandoDrum application.
+This document provides documentation for the type definitions, lookup tables, and constants used throughout the RandoDrum application.
 
-## Overview
+## Type System Overview
 
-RandoDrum uses a comprehensive type system built on TypeScript with runtime validation through Zod schemas. The type system is organized by domain and provides both compile-time type safety and runtime validation.
+RandoDrum uses a simple, consistent type system built on TypeScript with runtime validation through Zod schemas. The type system is organized by domain and provides both compile-time type safety and runtime validation.
 
-## Type System Architecture
+## File Organization
 
 ```
 src/types/
 ├── index.ts             # Central type exports
+├── type-utils.ts        # Generic utilities (createConfigArray, NamedConfig)
 ├── api.ts               # API-related types
 ├── beat.ts              # Beat generation types
 ├── color.ts             # Color definitions
@@ -19,159 +20,257 @@ src/types/
 ├── dynamic.ts           # Dynamic level types
 ├── error.ts             # Error handling types
 ├── form.ts              # Form-related types
-├── noteType.ts          # Note type definitions
 ├── ornament.ts          # Ornament types
+├── symbol.ts            # Symbol system for notation
 ├── store.ts             # Store and state types
 ├── test.ts              # Test-related types
 ├── ui.ts                # UI-specific types
 └── utils.ts             # Utility types
 ```
 
+## Standard Patterns
+
+### Basic Type Definition Pattern
+
+Most types follow this simple pattern:
+
+```typescript
+// 1. Define constant array
+export const ITEMS = ['value1', 'value2', 'value3'] as const;
+
+// 2. Derive type from array
+export type ItemName = (typeof ITEMS)[number];
+
+// 3. Optional: Create mapping
+export const ITEM_MAP: Record<ItemName, string> = {
+	value1: 'mapped1',
+	value2: 'mapped2',
+	value3: 'mapped3',
+} as const;
+```
+
+### Configuration Array Pattern
+
+For name-value mappings, use `createConfigArray`:
+
+```typescript
+import { createConfigArray } from './type-utils';
+import type { NamedConfig } from './type-utils';
+
+// Define mapping
+export const ITEM_VALUE_MAP: Record<ItemName, number> = {
+	value1: 1,
+	value2: 2,
+	value3: 3,
+} as const;
+
+// Create config array
+export const ITEM_CONFIGS = createConfigArray(ITEMS, ITEM_VALUE_MAP);
+
+// Type for config items
+export type ItemConfig = NamedConfig<ItemName, number>;
+```
+
 ## Core Type Definitions
 
 ### Beat Generation Types
 
-#### Note Structure
-
 ```typescript
 export type Note = {
-	start: NoteStart; // Start time in grid ticks
-	dur: Duration; // Duration in grid ticks
-	dynamic: Dynamic; // Dynamic level (normal, accent, rimshot)
-	isDominant: boolean; // Whether played with dominant hand
-	ornament: Ornament; // Ornament type (flam, drag, null)
+	dur: Duration;
+	start: number;
+	isRest: boolean;
+	dynamic?: DynamicName; // Not needed for rests
+	isDominant?: boolean; // Not needed for rests
+	ornament?: OrnamentName; // Not needed for rests
 };
-```
 
-#### Measure Structure
-
-```typescript
 export type Measure = Note[];
-```
-
-#### Generated Beat Structure
-
-```typescript
 export type GeneratedBeat = {
-	measures: Measure[]; // Array of measures
-	beatsPerMeasure: number; // Beats per measure (1-16)
-	difficulty: DifficultyLevel; // Difficulty level used
+	beatsPerMeasure: number;
+	difficulty: DifficultyLevel;
+	measures: Measure[];
 };
-```
 
-#### Form Data Structure
-
-```typescript
 export type BeatFormData = {
-	beats: number; // Beats per measure (1-16)
-	measures: number; // Number of measures (1-32)
-	difficulty: DifficultyLevel; // Selected difficulty level
+	beats: number;
+	difficulty: DifficultyLevel;
+	measures: number;
 };
 ```
 
-### Duration System Types
-
-#### Duration Values
+### Duration System
 
 The 96-grid system supports 10 distinct duration values:
 
 ```typescript
-// Straight durations (power-of-two divisions)
-export type StraightDuration = 6 | 12 | 24 | 48 | 96;
+// Duration arrays
+export const STRAIGHT_DURATIONS = [6, 12, 24, 48, 96] as const;
+export const DOTTED_DURATIONS = [18, 36, 72] as const;
+export const TRIPLET_DURATIONS = [8, 16] as const;
 
-// Triplet durations (divide by 3)
-export type TripletDuration = 8 | 16;
+// Combined durations array (used for validation)
+export const DURATIONS: readonly Duration[] = [
+	...STRAIGHT_DURATIONS,
+	...TRIPLET_DURATIONS,
+	...DOTTED_DURATIONS,
+] as Duration[];
 
-// Dotted durations (1.5x base duration)
-export type DottedDuration = 18 | 36 | 72;
-
-// Combined duration type
+// Combined type
 export type DurationValue = StraightDuration | DottedDuration | TripletDuration;
+export type Duration = DurationValue;
+
+// Name mapping
+export const DURATION_NAMES = [
+	'Whole',
+	'Dotted Half',
+	'Half',
+	'Dotted Quarter',
+	'Quarter',
+	'Dotted Eighth',
+	'Eighth',
+	'Sixteenth',
+	'Quarter Triplet',
+	'Eighth Triplet',
+] as const;
+
+export type DurationName = (typeof DURATION_NAMES)[number];
+
+// Configuration
+export const DURATION_NAME_TO_VALUE_MAP: Record<DurationName, DurationValue> = {
+	Sixteenth: 6,
+	'Eighth Triplet': 8,
+	Eighth: 12,
+	'Quarter Triplet': 16,
+	'Dotted Eighth': 18,
+	Quarter: 24,
+	'Dotted Quarter': 36,
+	Half: 48,
+	'Dotted Half': 72,
+	Whole: 96,
+} as const;
+
+export const DURATION_CONFIGS = createConfigArray(DURATION_NAMES, DURATION_NAME_TO_VALUE_MAP);
+
+// Reverse mapping for lookup
+export const DURATION_TO_NAME_MAP = new Map<DurationValue, DurationName>(
+	Object.entries(DURATION_NAME_TO_VALUE_MAP).map(([name, value]) => [value, name as DurationName])
+);
 ```
 
-#### Duration Configuration
+### Dynamic System
 
 ```typescript
-export type DurationConfig = {
-	value: DurationValue; // Grid tick value
-	name: NoteTypeName; // Human-readable name
-	symbol: string; // Display symbol
-};
-```
-
-### Dynamic System Types
-
-#### Dynamic Levels
-
-```typescript
-export const DYNAMICS = ['normal', 'accent', 'rimshot'] as const;
+export const DYNAMICS = ['Normal', 'Accent', 'Rimshot'] as const;
 export type DynamicName = (typeof DYNAMICS)[number];
-export type Dynamic = DynamicName;
-```
 
-#### Dynamic Configuration
+// Threshold types for dynamic note selection
+// Values are on a 0-1 scale where:
+// - accentThreshold: values below this result in normal dynamics
+// - rimshotThreshold: values between accentThreshold and rimshotThreshold result in accent dynamics
+// - values at or above rimshotThreshold result in rimshot dynamics
+// Constraint: accentThreshold must be <= rimshotThreshold for logical consistency
+//
+// Implementation: DynamicThresholds is a tuple [accentThreshold, rimshotThreshold]
+// This allows for concise configuration while maintaining type safety
 
-```typescript
-export type DynamicConfig = {
-	name: DynamicName; // Dynamic level name
-	symbol: string; // Display symbol
-};
-
-export type DynamicScale = [number, number]; // [normalThreshold, accentThreshold] where normalThreshold <= accentThreshold
+export type DynamicThresholds = [accentThreshold: number, rimshotThreshold: number];
 ```
 
 ### Ornament Types
 
-#### Ornament Definitions
-
 ```typescript
-export const ORNAMENTS = ['Flam', 'Drag', null] as const;
+export const TECHNIQUE_TYPES = ['Flam', 'Drag'] as const;
+export type TechniqueTypeName = (typeof TECHNIQUE_TYPES)[number];
+
+export const ORNAMENTS = [...TECHNIQUE_TYPES, null] as const;
 export type OrnamentName = (typeof ORNAMENTS)[number];
-export type Ornament = OrnamentName;
+
+export const TECHNIQUE_SYMBOL_MAP: Record<TechniqueTypeName, string> = {
+	Flam: 'f',
+	Drag: 'd',
+} as const;
+
+export const ORNAMENT_CONFIGS = createConfigArray(TECHNIQUE_TYPES, TECHNIQUE_SYMBOL_MAP);
 ```
 
-#### Ornament Configuration
-
-```typescript
-export type OrnamentConfig = {
-	name: OrnamentName; // Ornament name
-};
-```
-
-### Difficulty System Types
-
-#### Difficulty Levels
+### Difficulty System
 
 ```typescript
 export const DIFFICULTY_LEVELS = [
-	"I'm Too Young to Drum",
-	'Hey, Not Too Rough',
+	'I’m Too Young to Drum',
+	'Hey, Not Too Ruff',
 	'Hurt Me Plenty',
 	'Ultra-Violence',
 	'Drumline!',
 ] as const;
 
 export type DifficultyLevel = (typeof DIFFICULTY_LEVELS)[number];
-```
 
-#### Difficulty Configuration
-
-```typescript
 export type DifficultyConfig = {
-	durations: DurationWeightConfig[]; // Available durations with weights
-	dynamicScale: DynamicScale; // Dynamic level distribution
-	flamThreshold: number; // Flam probability (0-1)
-	dragThreshold: number; // Drag probability (0-1)
-	restProbability: number; // Rest probability (0-1)
-	maxClump: number; // Maximum consecutive same-hand notes
-	handRatio: [number, number]; // [min, max] dominant hand percentage
-	runLengths: RunLengthConfig[]; // Sticking pattern configuration
+	durations: DurationWeightConfig[];
+	restProbability: number;
+	runLengths: Record<number, number>;
+	switchProb: number;
+	dynamicThresholds: DynamicThresholds;
+	flamThreshold: number;
+	dragThreshold: number;
+	allowBalancing: boolean;
+	maxClump?: number;
+	minRatio?: number;
+	maxRatio?: number;
 };
 ```
 
-### Color System Types
+### Difficulty Configuration Examples
 
-#### Color Definitions
+Here are the actual configurations used in the application:
+
+```typescript
+// I’m Too Young to Drum
+{
+	durations: [
+		{ duration: 24, weight: 0.6 }, // Quarter
+		{ duration: 48, weight: 0.25 }, // Half
+		{ duration: 72 }, // Dotted Half
+		{ duration: 96 }, // Whole
+	],
+	restProbability: 0.3,
+	runLengths: { 1: 1.0 },
+	switchProb: 1.0,
+	dynamicThresholds: [1.0, 1.0], // Only normal dynamics
+	flamThreshold: 0,
+	dragThreshold: 0,
+	allowBalancing: true,
+	maxClump: 1,
+	minRatio: 0.45,
+	maxRatio: 0.55,
+}
+
+// Hurt Me Plenty
+{
+	durations: [
+		{ duration: 6, weight: 0.2 }, // Sixteenth
+		{ duration: 8, weight: 0.05 }, // Eighth Triplet
+		{ duration: 12, weight: 0.25 }, // Eighth
+		{ duration: 18, weight: 0.1 }, // Dotted Eighth
+		{ duration: 24, weight: 0.3 }, // Quarter
+		{ duration: 36, weight: 0.1 }, // Dotted Quarter
+	],
+	restProbability: 0.2,
+	runLengths: { 1: 0.5, 2: 0.3, 3: 0.2 },
+	switchProb: 0.6,
+	dynamicThresholds: [0.6, 0.9], // 60% normal, 30% accent, 10% rimshot
+	flamThreshold: 0.1,
+	dragThreshold: 0.1,
+	allowBalancing: true,
+	maxClump: 3,
+	minRatio: 0.4,
+	maxRatio: 0.6,
+}
+```
+
+### Color System
 
 ```typescript
 export const COLORS = [
@@ -190,261 +289,98 @@ export type ColorName = (typeof COLORS)[number];
 
 ### UI Types
 
-#### Dominant Hand
-
 ```typescript
-export type DominantHand = 'left' | 'right';
-```
+export const DOMINANT_HANDS = ['left', 'right'] as const;
+export type DominantHand = (typeof DOMINANT_HANDS)[number];
 
-#### Technique Types
-
-```typescript
-export type TechniqueTypeName = 'Basic' | 'Accent' | 'Flam' | 'Drag' | 'Rimshot';
-```
-
-#### Chart Data
-
-```typescript
 export type ChartData = Record<
 	DifficultyLevel,
 	{
-		notes: NoteTypeName[]; // Available note types
-		techniques: TechniqueTypeName[]; // Available techniques
-		restProbability: number; // Rest probability percentage
+		notes: DurationName[];
+		dynamics: DynamicName[];
+		techniques: TechniqueTypeName[];
+		restProbability: number;
 	}
 >;
 ```
 
-## Constants and Lookup Tables
-
-### Duration Constants
-
-#### Duration Arrays
+### Symbol System
 
 ```typescript
-// Straight note durations (power-of-two divisions)
-export const STRAIGHT_DURATIONS = [6, 12, 24, 48, 96] as const;
+export const NOTE_SYMBOLS = ['s', 'e', 'i', 'q', 'j', 'h', 'd', 'w', 'T', 't'] as const;
+export const REST_SYMBOLS = ['S', 'E', 'I', 'Q', 'J', 'H', 'D', 'W', 'T', 't'] as const;
 
-// Dotted note durations (1.5x base duration)
-export const DOTTED_DURATIONS = [18, 36, 72] as const;
+export type NoteSymbol = (typeof NOTE_SYMBOLS)[number];
+export type RestSymbol = (typeof REST_SYMBOLS)[number];
+export type SymbolMapping<T extends string> = Record<DurationValue, T>;
 
-// Triplet durations (divide by 3)
-export const TRIPLET_DURATIONS = [8, 16] as const;
-
-// Combined duration array
-export const DURATIONS: readonly Duration[] = [
-	...STRAIGHT_DURATIONS,
-	...TRIPLET_DURATIONS,
-	...DOTTED_DURATIONS,
-] as Duration[];
-```
-
-#### Duration Configuration Lookup
-
-```typescript
-export const DURATION_CONFIGS: readonly DurationConfig[] = [
-	// Straight notes
-	{ name: 'Sixteenth', symbol: 's', value: 6 },
-	{ name: 'Eighth', symbol: 'e', value: 12 },
-	{ name: 'Quarter', symbol: 'q', value: 24 },
-	{ name: 'Half', symbol: 'h', value: 48 },
-	{ name: 'Whole', symbol: 'w', value: 96 },
-
-	// Dotted notes
-	{ name: 'Dotted Eighth', symbol: 'i', value: 18 },
-	{ name: 'Dotted Quarter', symbol: 'j', value: 36 },
-	{ name: 'Dotted Half', symbol: 'd', value: 72 },
-
-	// Triplets
-	{ name: 'Eighth Triplet', symbol: 'T', value: 8 },
-	{ name: 'Quarter Triplet', symbol: 't', value: 16 },
-] as const;
-```
-
-### Dynamic Constants
-
-#### Dynamic Configuration
-
-```typescript
-export const DYNAMIC_CONFIGS: readonly DynamicConfig[] = [
-	{ name: 'normal', symbol: 'n' },
-	{ name: 'accent', symbol: 'a' },
-	{ name: 'rimshot', symbol: 'r' },
-] as const;
-```
-
-### Difficulty Constants
-
-#### Difficulty Configuration Lookup
-
-```typescript
-export const DIFFICULTY_CONFIGS: Record<DifficultyLevel, DifficultyConfig> = {
-	'I’m Too Young to Drum': {
-		durations: [
-			{ duration: 24, weight: 0.4 }, // Quarter
-			{ duration: 48, weight: 0.3 }, // Half
-			{ duration: 72, weight: 0.2 }, // Dotted Half
-			{ duration: 96, weight: 0.1 }, // Whole
-		],
-		dynamicScale: [0, 10, 0], // Only normal
-		flamThreshold: 0, // No flams
-		dragThreshold: 0, // No drags
-		restProbability: 0.1, // 10% rests
-		maxClump: 1, // No runs
-		handRatio: [45, 55], // Balanced hands
-		runLengths: [{ length: 1, weight: 1 }], // Only single notes
-	},
-	// ... other difficulty configurations
-};
-```
-
-### UI Constants
-
-#### Technique Types
-
-```typescript
-export const TECHNIQUE_TYPES: readonly TechniqueTypeName[] = [
-	'Basic',
-	'Accent',
-	'Flam',
-	'Drag',
-	'Rimshot',
-] as const;
-```
-
-#### Technique Definitions
-
-```typescript
-export const TECHNIQUE_DEFINITIONS: Record<TechniqueTypeName, string> = {
-	Basic: 'Standard note with normal volume and timing',
-	Accent: 'A note played louder than surrounding notes',
-	Flam: 'Two notes played almost simultaneously, with one slightly before the other',
-	Drag: 'Two grace notes before a main note',
-	Rimshot: 'A note played by hitting both the drumhead and rim simultaneously',
+export const NOTE_SYMBOL_MAP: SymbolMapping<NoteSymbol> = {
+	6: 's', // Sixteenth
+	8: 'T', // Eighth Triplet
+	12: 'e', // Eighth
+	16: 't', // Quarter Triplet
+	18: 'i', // Dotted Eighth
+	24: 'q', // Quarter
+	36: 'j', // Dotted Quarter
+	48: 'h', // Half
+	72: 'd', // Dotted Half
+	96: 'w', // Whole
 } as const;
+
+export const REST_SYMBOL_MAP: SymbolMapping<RestSymbol> = {
+	6: 'S', // Sixteenth
+	8: 'T', // Eighth Triplet
+	12: 'E', // Eighth
+	16: 't', // Quarter Triplet
+	18: 'I', // Dotted Eighth
+	24: 'Q', // Quarter
+	36: 'J', // Dotted Quarter
+	48: 'H', // Half
+	72: 'D', // Dotted Half
+	96: 'W', // Whole
+} as const;
+
+// Utility functions for symbol lookup
+export function getSymbol<T extends string>(
+	duration: DurationValue,
+	symbolMap: SymbolMapping<T>,
+	fallback: T
+): T;
+
+export const getNoteSymbol = (duration: DurationValue): NoteSymbol =>
+	getSymbol(duration, NOTE_SYMBOL_MAP, 'q');
+
+export const getRestSymbol = (duration: DurationValue): RestSymbol =>
+	getSymbol(duration, REST_SYMBOL_MAP, 'Q');
 ```
 
-#### Note Types
+### Error System
 
-```typescript
-export const NOTE_TYPES: readonly NoteType[] = DURATION_DISPLAY_ORDER.map(name => {
-	const config = DURATION_CONFIGS.find(c => c.name === name);
-	if (!config) throw new Error(`Duration config not found for ${name}`);
-	return {
-		name: config.name,
-		value: config.value,
-	};
-});
-```
+export type Result<T> =
+| { success: true; data: T; error?: never }
+| { success: false; error: AppError; data?: never };
 
-### Browser Extension Constants
-
-#### Extension Attributes
-
-```typescript
-export const BROWSER_EXTENSION_ATTRIBUTES = [
-	'cz-shortcut-listen', // Common password manager extension
-	'data-1password-root', // 1Password
-	'data-bitwarden-watching', // Bitwarden
-	'data-dashlane-id', // Dashlane
-	'data-grammarly-ignore', // Grammarly
-	'data-grammarly-shadow-root', // Grammarly
-	'data-lastpass-icon-root', // LastPass
-] as const;
-```
-
-## Validation System
-
-### Zod Schemas
-
-The application uses comprehensive Zod schemas for runtime validation:
-
-#### Basic Type Schemas
-
-```typescript
-export const difficultyLevelSchema = z.enum(
-	DIFFICULTY_LEVELS.map(level => level) as [string, ...string[]]
-);
-
-export const durationValueSchema = z.union([...DURATIONS.map(duration => z.literal(duration))]);
-
-export const dynamicNameSchema = z.enum(DYNAMICS.map(dynamic => dynamic) as [string, ...string[]]);
-
-export const ornamentNameSchema = z.union([...ORNAMENTS.map(ornament => z.literal(ornament))]);
-```
-
-#### Complex Object Schemas
-
-```typescript
-export const noteSchema = z.object({
-	start: z.number().min(0),
-	dur: durationValueSchema,
-	dynamic: dynamicNameSchema,
-	isDominant: z.boolean(),
-	ornament: ornamentNameSchema,
-});
-
-export const beatFormDataSchema = z.object({
-	beats: z.number().min(1).max(16).int(),
-	measures: z.number().min(1).max(32).int(),
-	difficulty: difficultyLevelSchema,
-});
-
-export const generatedBeatSchema = z.object({
-	measures: z.array(measureSchema),
-	beatsPerMeasure: z.number().min(1).max(16).int(),
-	difficulty: difficultyLevelSchema,
-});
-```
-
-### Validation Functions
-
-#### Strict Validation
-
-```typescript
-export const validateBeatFormData = (data: unknown): ValidatedBeatFormData => {
-	return beatFormDataSchema.parse(data);
-};
-
-export const validateGeneratedBeat = (data: unknown): ValidatedGeneratedBeat => {
-	return generatedBeatSchema.parse(data);
-};
-```
-
-#### Safe Validation
-
-```typescript
-export const safeValidateBeatFormData = (
-	data: unknown
-): { success: true; data: ValidatedBeatFormData } | { success: false; error: string } => {
-	try {
-		const validated = beatFormDataSchema.parse(data);
-		return { success: true, data: validated };
-	} catch (error) {
-		if (error instanceof z.ZodError) {
-			return {
-				success: false,
-				error: `Invalid beat form data: ${error.errors.map(e => e.message).join(', ')}`,
-			};
-		}
-		return { success: false, error: 'Invalid beat form data format' };
-	}
-};
-```
-
-#### Type Guards
-
-```typescript
-export const isBeatFormData = (data: unknown): data is ValidatedBeatFormData => {
-	return beatFormDataSchema.safeParse(data).success;
-};
-
-export const isGeneratedBeat = (data: unknown): data is ValidatedGeneratedBeat => {
-	return generatedBeatSchema.safeParse(data).success;
-};
-```
+````
 
 ## Utility Functions
+
+### Type Utilities
+
+```typescript
+// Generic config type
+export type NamedConfig<T, V = string> = {
+	name: T;
+	value: V;
+};
+
+// Create config array from mapping
+export function createConfigArray<T extends string | number | symbol, V>(
+	items: readonly T[],
+	valueMap: Record<T, V>
+): readonly NamedConfig<T, V>[] {
+	return items.map(name => ({ name, value: valueMap[name] }));
+}
+````
 
 ### Duration Utilities
 
@@ -462,62 +398,106 @@ export const isStraightDuration = (duration: DurationValue): duration is Straigh
 };
 ```
 
-### Beat Validation Utilities
+## Validation System
+
+The application uses Zod schemas for runtime validation:
 
 ```typescript
-export const isValidDynamic = (value: string): value is Dynamic =>
-	DYNAMICS.includes(value as Dynamic);
+// Basic schemas
+export const difficultyLevelSchema = createEnumSchema(DIFFICULTY_LEVELS);
+export const durationValueSchema = z.union([...DURATIONS.map(duration => z.literal(duration))] as [
+	ZodLiteral<number>,
+	ZodLiteral<number>,
+	...ZodLiteral<number>[],
+]);
+export const dynamicNameSchema = createEnumSchema(DYNAMICS);
 
-export const isValidDuration = (value: number): value is Duration =>
-	DURATIONS.includes(value as Duration);
+// Complex schemas
+export const noteSchema = z.object({
+	dur: durationValueSchema,
+	isRest: z.boolean(),
+	start: z.number().min(0),
+	dynamic: dynamicNameSchema.optional(),
+	isDominant: z.boolean().optional(),
+	ornament: ornamentNameSchema.optional(),
+});
 
-export const isValidOrnament = (value: string | null): value is Ornament =>
-	ORNAMENTS.includes(value as Ornament);
-```
-
-### Browser Extension Utilities
-
-```typescript
-export const isBrowserExtensionAttribute = (attributeName: string): boolean => {
-	return BROWSER_EXTENSION_ATTRIBUTES.some(attr => attributeName.includes(attr));
-};
-```
-
-## Type Inference
-
-The system provides comprehensive type inference from Zod schemas:
-
-```typescript
-// Type inference from schemas
-export type ValidatedBeatFormData = z.infer<typeof beatFormDataSchema>;
-export type ValidatedGeneratedBeat = z.infer<typeof generatedBeatSchema>;
-export type ValidatedMeasure = z.infer<typeof measureSchema>;
+// Type inference
 export type ValidatedNote = z.infer<typeof noteSchema>;
+```
+
+## Implementation Patterns
+
+### Dynamic Thresholds Usage
+
+The `DynamicThresholds` tuple is used throughout the codebase:
+
+```typescript
+// In difficulty configurations
+dynamicThresholds: [0.6, 0.9], // [accentThreshold, rimshotThreshold]
+	// In beat generation
+	function selectDynamic(randomValue: number, dynamicThresholds: DynamicThresholds): DynamicName {
+		const [accentThreshold, rimshotThreshold] = dynamicThresholds;
+		return (
+			randomValue >= rimshotThreshold ? 'Rimshot'
+			: randomValue >= accentThreshold ? 'Accent'
+			: 'Normal'
+		);
+	};
+
+// In UI utilities
+function getAvailableDynamics(config: DifficultyConfig): DynamicName[] {
+	const dynamics: DynamicName[] = ['Normal'];
+	const [accentThreshold, rimshotThreshold] = config.dynamicThresholds;
+
+	if (accentThreshold < 1.0) {
+		dynamics.push('Accent');
+	}
+
+	if (rimshotThreshold < 1.0) {
+		dynamics.push('Rimshot');
+	}
+
+	return dynamics;
+}
+```
+
+### Duration Weight Configuration
+
+Duration configurations use a flexible weight system:
+
+```typescript
+// With explicit weights
+{ duration: 24, weight: 0.6 } // 60% probability
+
+// Without weights (equal probability among unweighted durations)
+{ duration: 72 } // Equal share of remaining probability
+```
+
+### Symbol System Integration
+
+The symbol system provides unified access to notation symbols:
+
+```typescript
+// Get symbols for display
+const noteSymbol = getNoteSymbol(24); // 'q' for quarter note
+const restSymbol = getRestSymbol(24); // 'Q' for quarter rest
+
+// Direct mapping access
+const symbol = NOTE_SYMBOL_MAP[24]; // 'q'
 ```
 
 ## Best Practices
 
-### Type Safety
+1. **Use `as const`** on all constant arrays and mappings
+2. **Derive types** from constants using `typeof`
+3. **Use `createConfigArray`** for name-value mappings
+4. **Keep it simple** - most types are just const arrays with derived types
+5. **Use Zod schemas** for runtime validation when needed
+6. **Destructure tuples** when working with `DynamicThresholds`
+7. **Use utility functions** for symbol lookup rather than direct mapping access
 
-- Always use the provided type definitions instead of creating custom types
-- Leverage Zod schemas for both runtime validation and type inference
-- Use type guards for runtime type checking
-- Prefer safe validation functions for user input
-
-### Constants Usage
-
-- Use the provided constants instead of hardcoding values
-- Leverage lookup tables for configuration data
-- Use readonly arrays and objects for immutable data structures
-
-### Validation
-
-- Use strict validation for internal data processing
-- Use safe validation for user input and external data
-- Provide meaningful error messages for validation failures
-- Use type guards for runtime type checking
-
-## Integration with Application
+## Integration
 
 The type system integrates with:
 
@@ -526,5 +506,3 @@ The type system integrates with:
 - **API Layer**: tRPC with typed procedures
 - **Component System**: React components with typed props
 - **Testing**: Comprehensive test type definitions
-
-This type system provides a solid foundation for type-safe development throughout the RandoDrum application, ensuring both compile-time type safety and runtime data validation.

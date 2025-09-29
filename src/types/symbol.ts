@@ -3,16 +3,16 @@
  * Eliminates duplication between notes and rests
  */
 
-import type { DurationValue } from './durations';
+import type { DurationValue } from './duration';
 
-// Base symbol types
-export type NoteSymbol = 's' | 'e' | 'i' | 'q' | 'j' | 'h' | 'd' | 'w' | 'T' | 't';
-export type RestSymbol = 'S' | 'E' | 'I' | 'Q' | 'J' | 'H' | 'D' | 'W' | 'T' | 't';
+export const NOTE_SYMBOLS = ['s', 'e', 'i', 'q', 'j', 'h', 'd', 'w', 'T', 't'] as const;
+export const REST_SYMBOLS = ['S', 'E', 'I', 'Q', 'J', 'H', 'D', 'W', 'T', 't'] as const;
 
-// Generic symbol mapping configuration
+export type NoteSymbol = (typeof NOTE_SYMBOLS)[number];
+export type RestSymbol = (typeof REST_SYMBOLS)[number];
+
 export type SymbolMapping<T extends string> = Record<DurationValue, T>;
 
-// Note symbol mappings (lowercase)
 export const NOTE_SYMBOL_MAP: SymbolMapping<NoteSymbol> = {
 	6: 's', // Sixteenth
 	8: 'T', // Eighth Triplet
@@ -26,7 +26,6 @@ export const NOTE_SYMBOL_MAP: SymbolMapping<NoteSymbol> = {
 	96: 'w', // Whole
 } as const;
 
-// Rest symbol mappings (uppercase)
 export const REST_SYMBOL_MAP: SymbolMapping<RestSymbol> = {
 	6: 'S', // Sixteenth
 	8: 'T', // Eighth Triplet
@@ -40,7 +39,6 @@ export const REST_SYMBOL_MAP: SymbolMapping<RestSymbol> = {
 	96: 'W', // Whole
 } as const;
 
-// Generic symbol lookup function
 export function getSymbol<T extends string>(
 	duration: DurationValue,
 	symbolMap: SymbolMapping<T>,
@@ -49,7 +47,6 @@ export function getSymbol<T extends string>(
 	return symbolMap[duration] ?? fallback;
 }
 
-// Specific lookup functions
 export const getNoteSymbol = (duration: DurationValue): NoteSymbol =>
 	getSymbol(duration, NOTE_SYMBOL_MAP, 'q');
 

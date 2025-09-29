@@ -6,18 +6,10 @@
  */
 
 // API types
-export type { ApiError, ApiResponse, ApiSuccess, BeatGenerationResponse } from './api';
+export type { BeatGenerationResponse } from './api';
 
 // Beat generation types
-export type {
-	BeatFormData,
-	Exercise,
-	GeneratedBeat,
-	Measure,
-	Note,
-	NoteStart,
-	Samples,
-} from './beat';
+export type { BeatFormData, GeneratedBeat, Measure, Note, NoteStart } from './beat';
 
 // Form types
 export type { BeatsFieldProps, DifficultyFieldProps, MeasuresFieldProps } from './form';
@@ -27,103 +19,51 @@ export { COLORS } from './color';
 export type { ColorName } from './color';
 
 // Difficulty types
+export { DIFFICULTY_LEVELS } from './difficulty';
 export type { DifficultyConfig, DifficultyLevel, DurationWeightConfig } from './difficulty';
 
 // Dynamic types
 export { DYNAMICS } from './dynamic';
-export type { Dynamic, DynamicConfig, DynamicName, DynamicScale } from './dynamic';
+export type { DynamicName, DynamicThresholds } from './dynamic';
 
 // Duration types
 export {
 	DOTTED_DURATIONS,
 	DURATION_DISPLAY_ORDER,
+	DURATION_NAMES,
 	DURATION_TO_NAME_MAP,
-	NAME_TO_DURATION_MAP,
+	DURATIONS,
+	DURATION_NAME_TO_VALUE_MAP,
 	STRAIGHT_DURATIONS,
 	TRIPLET_DURATIONS,
-	getDurationFromName,
-	getNameFromDuration,
 	isDottedDuration,
 	isStraightDuration,
 	isTripletDuration,
-} from './durations';
-export type { Duration, DurationValue, DurationType, DurationName } from './durations';
-
-// Error handling types
-export type {
-	AppError,
-	AsyncErrorHandler,
-	BeatGenerationError,
-	ErrorBoundaryProps,
-	ErrorBoundaryState,
-	ErrorCode,
-	ErrorHandler,
-	ErrorLogger,
-	ErrorRecovery,
-	ErrorResult,
-	NetworkError,
-	Result,
-	StorageError,
-	SuccessResult,
-	ValidationError,
-} from './error';
-
-export {
-	ERROR_CODES,
-	createBeatGenerationError,
-	createNetworkError,
-	createStorageError,
-	createValidationError,
-} from './error';
+} from './duration';
+export type { Duration, DurationName, DurationType, DurationValue } from './duration';
 
 // Symbol system
-export { NOTE_SYMBOL_MAP, REST_SYMBOL_MAP, getNoteSymbol, getRestSymbol } from './symbols';
-export type { NoteSymbol, RestSymbol } from './symbols';
+export {
+	NOTE_SYMBOLS,
+	NOTE_SYMBOL_MAP,
+	REST_SYMBOLS,
+	REST_SYMBOL_MAP,
+	getNoteSymbol,
+	getRestSymbol,
+} from './symbol';
+export type { NoteSymbol, RestSymbol } from './symbol';
 
 // Ornament types
-export { ORNAMENTS } from './ornament';
-export type { Ornament, OrnamentConfig, OrnamentName } from './ornament';
+export { ORNAMENTS, TECHNIQUE_TYPES } from './ornament';
+export type { OrnamentName, TechniqueTypeName } from './ornament';
 
 // Type utilities
-export { createConstArray, createConfigArray } from './type-utils';
-export type { ConstArray, NamedConfig } from './type-utils';
+export { createConfigArray } from './type-utils';
+export type { NamedConfig } from './type-utils';
 
 // Store and state management types
 export type { BeatStore, DominantHandContextType, FormStore } from './store';
 
-// Test types
-export type {
-	BeatTestDataFactory,
-	FormDataTestDataFactory,
-	MeasureTestDataFactory,
-	MockFunction,
-	NoteTestDataFactory,
-	TestBeatFormData,
-	TestConfig,
-	TestCase,
-	TestDataFactory,
-	TestGeneratedBeat,
-	TestMeasure,
-	TestNote,
-	TestResult,
-	TestSuite,
-} from './test';
-
-// UI-specific types
-export type { ChartData, DominantHand, TechniqueTypeName } from './ui';
-
-// Utility types
-export type {
-	ArrayElement,
-	Brand,
-	DeepPartial,
-	DeepReadonly,
-	Email,
-	Id,
-	KeysOfType,
-	PartialBy,
-	RequiredBy,
-	Timestamp,
-	UnionToIntersection,
-	Url,
-} from './utils';
+// UI types
+export { DOMINANT_HANDS } from './ui';
+export type { ChartData, DominantHand } from './ui';

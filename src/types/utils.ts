@@ -32,15 +32,3 @@ export type RequiredBy<T, K extends keyof T> = Omit<T, K> & Required<Pick<T, K>>
 
 // Branded types for better type safety
 export type Brand<T, B> = T & { readonly __brand: B };
-
-// Email type
-export type Email = Brand<string, 'Email'>;
-
-// ID type
-export type Id = Brand<string, 'Id'>;
-
-// Timestamp type
-export type Timestamp = Brand<number, 'Timestamp'>;
-
-// URL type
-export type Url = Brand<string, 'Url'>;

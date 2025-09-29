@@ -1,21 +1,25 @@
-import type { Duration } from './durations';
-import type { DynamicScale } from './dynamic';
+/**
+ * Difficulty level and configuration types
+ */
 
-// Difficulty level constants
-export type DifficultyLevel =
-	| 'I’m Too Young to Drum'
-	| 'Hey, Not Too Rough'
-	| 'Hurt Me Plenty'
-	| 'Ultra-Violence'
-	| 'Drumline!';
+import type { Duration } from './duration';
+import type { DynamicThresholds } from './dynamic';
 
-// Duration configuration (optional weight)
+export const DIFFICULTY_LEVELS = [
+	'I’m Too Young to Drum',
+	'Hey, Not Too Ruff',
+	'Hurt Me Plenty',
+	'Ultra-Violence',
+	'Drumline!',
+] as const;
+
+export type DifficultyLevel = (typeof DIFFICULTY_LEVELS)[number];
+
 export type DurationWeightConfig = {
 	duration: Duration;
 	weight?: number; // 0-1 probability weight
 };
 
-// Difficulty configuration type
 export type DifficultyConfig = {
 	// Rhythm generation
 	durations: DurationWeightConfig[];
@@ -26,7 +30,7 @@ export type DifficultyConfig = {
 	switchProb: number;
 
 	// Dynamics
-	dynamicScale: DynamicScale;
+	dynamicThresholds: DynamicThresholds;
 
 	// Ornaments
 	flamThreshold: number;

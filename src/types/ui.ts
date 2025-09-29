@@ -3,14 +3,13 @@
  */
 
 import type { DifficultyLevel } from './difficulty';
-import type { DurationName } from './durations';
+import type { DurationName } from './duration';
 import type { DynamicName } from './dynamic';
-import type { OrnamentName } from './ornament';
+import type { TechniqueTypeName } from './ornament';
 
-export type DominantHand = 'left' | 'right';
+export const DOMINANT_HANDS = ['left', 'right'] as const;
 
-// Filter out null from ornaments to get only actual techniques
-export type TechniqueTypeName = Exclude<OrnamentName, null>;
+export type DominantHand = (typeof DOMINANT_HANDS)[number];
 
 export type ChartData = Record<
 	DifficultyLevel,

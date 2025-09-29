@@ -5,7 +5,6 @@
 import type { BeatFormData, GeneratedBeat } from './beat';
 import type { DominantHand } from './ui';
 
-// Beat store type
 export type BeatStore = {
 	currentBeat: GeneratedBeat | null;
 	isLoading: boolean;
@@ -15,7 +14,6 @@ export type BeatStore = {
 	clearCorruptedBeat: () => void;
 };
 
-// Dominant hand context type
 export type DominantHandContextType = {
 	dominantHand: DominantHand;
 	isHydrated: boolean;
@@ -23,7 +21,6 @@ export type DominantHandContextType = {
 	toggleDominantHand: () => void;
 };
 
-// Form store type
 export type FormStore = {
 	formValues: BeatFormData;
 	resetFormValues: () => void;
