@@ -2,21 +2,17 @@
  * Beat-related utility functions and constants
  */
 
-import {
-	DYNAMICS,
-	ORNAMENTS,
-	STRAIGHT_DURATIONS,
-	TRIPLET_DURATIONS,
-	DOTTED_DURATIONS,
-} from '@/types';
+import { DURATIONS, DYNAMICS, ORNAMENTS } from '@/types';
 import { isValidDifficultyLevel } from './difficulty';
-import type { Duration, Dynamic, GeneratedBeat, Measure, Note, NoteStart, Ornament } from '@/types';
-
-export const DURATIONS: readonly Duration[] = [
-	...STRAIGHT_DURATIONS,
-	...TRIPLET_DURATIONS,
-	...DOTTED_DURATIONS,
-] as Duration[];
+import type {
+	DynamicName,
+	Duration,
+	GeneratedBeat,
+	Measure,
+	Note,
+	NoteStart,
+	OrnamentName,
+} from '@/types';
 
 export { DYNAMICS, ORNAMENTS };
 
@@ -26,12 +22,6 @@ export const createNoteStart = (value: number): NoteStart => {
 	}
 	return value as NoteStart;
 };
-
-export const isValidDynamic = (value: string): value is Dynamic =>
-	DYNAMICS.includes(value as Dynamic);
-
-export const isValidDuration = (value: number): value is Duration =>
-	DURATIONS.includes(value as Duration);
 
 export const isValidGeneratedBeat = (value: unknown): value is GeneratedBeat => {
 	if (typeof value !== 'object' || value === null) return false;
@@ -60,12 +50,9 @@ export const isValidNote = (value: unknown): value is Note => {
 	return (
 		typeof note.start === 'number' &&
 		note.start >= 0 &&
-		isValidDuration(note.dur as number) &&
+		DURATIONS.includes(note.dur as Duration) &&
 		typeof note.isDominant === 'boolean' &&
-		isValidDynamic(note.dynamic as string) &&
-		isValidOrnament(note.ornament as string | null)
+		DYNAMICS.includes(note.dynamic as DynamicName) &&
+		ORNAMENTS.includes(note.ornament as OrnamentName)
 	);
 };
-
-export const isValidOrnament = (value: string | null): value is Ornament =>
-	ORNAMENTS.includes(value as Ornament);

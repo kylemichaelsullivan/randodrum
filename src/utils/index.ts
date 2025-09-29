@@ -4,14 +4,8 @@
 
 export * from './beat';
 export * from './browser-extensions';
+export * from './component-utils';
 export * from './difficulty';
+export * from './form-factory';
 export * from './ui';
 export * from './validation';
-
-export {
-	NAME_TO_DURATION_MAP,
-	NOTE_SYMBOL_MAP,
-	REST_SYMBOL_MAP,
-	getNoteSymbol,
-	getRestSymbol,
-} from '@/types';

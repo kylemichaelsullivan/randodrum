@@ -15,20 +15,32 @@ src/utils/validation.ts
 ├── Type Inference Helpers      # TypeScript type derivation
 ├── Individual Validation       # Single-value validation functions
 ├── Complex Object Validation   # Multi-field validation functions
-├── Safe Validation Functions   # Error-safe validation with results
+├── Validation Functions        # Error-safe validation with results
 └── Type Guards                 # Runtime type checking
 ```
 
 ## Core Validation Schemas
+
+### Helper Functions
+
+The validation system uses a helper function to create enum schemas from readonly arrays, eliminating the need for awkward type assertions:
+
+```typescript
+/**
+ * Creates a Zod enum schema from a readonly array
+ * This is cleaner than using type assertions
+ */
+function createEnumSchema<T extends readonly string[]>(values: T) {
+	return z.enum(values as unknown as [string, ...string[]]);
+}
+```
 
 ### Basic Type Schemas
 
 #### Difficulty Level Schema
 
 ```typescript
-export const difficultyLevelSchema = z.enum(
-	DIFFICULTY_LEVELS.map(level => level) as [string, ...string[]]
-);
+export const difficultyLevelSchema = createEnumSchema(DIFFICULTY_LEVELS);
 ```
 
 **Purpose**: Validates difficulty level strings against the predefined difficulty levels.
@@ -36,7 +48,7 @@ export const difficultyLevelSchema = z.enum(
 **Valid Values**:
 
 - "I’m Too Young to Drum"
-- "Hey, Not Too Rough"
+- "Hey, Not Too Ruff"
 - "Hurt Me Plenty"
 - "Ultra-Violence"
 - "Drumline!"
@@ -58,26 +70,24 @@ export const durationValueSchema = z.union([...DURATIONS.map(duration => z.liter
 #### Dynamic Name Schema
 
 ```typescript
-export const dynamicNameSchema = z.enum(DYNAMICS.map(dynamic => dynamic) as [string, ...string[]]);
+export const dynamicNameSchema = createEnumSchema(DYNAMICS);
 ```
 
 **Purpose**: Validates dynamic level names.
 
-**Valid Values**: `"normal", "accent", "rimshot"`
+**Valid Values**: `"Normal", "Accent", "Rimshot"`
 
 **Logic**: Dynamic selection uses a 0-1 probability scale:
 
-- Values below `normalThreshold` become 'normal'
-- Values below `accentThreshold` become 'accent'
-- Values above `accentThreshold` become 'rimshot'
-- **Constraint**: `normalThreshold <= accentThreshold` for logical consistency
+- Values below `accentThreshold` become 'normal'
+- Values between `accentThreshold` and `rimshotThreshold` become 'accent'
+- Values above `rimshotThreshold` become 'rimshot'
+- **Constraint**: `accentThreshold <= rimshotThreshold` for logical consistency
 
 #### Note Type Name Schema
 
 ```typescript
-export const noteTypeNameSchema = z.enum(
-	DURATION_CONFIGS.map(config => config.name).map(name => name) as [string, ...string[]]
-);
+export const noteTypeNameSchema = createEnumSchema(DURATION_DISPLAY_ORDER);
 ```
 
 **Purpose**: Validates note type names against duration configurations.
@@ -100,19 +110,17 @@ export const ornamentNameSchema = z.union([...ORNAMENTS.map(ornament => z.litera
 
 **Purpose**: Validates ornament names, including null for no ornament.
 
-**Valid Values**: `"flam", "drag", null`
+**Valid Values**: `"Flam", "Drag", null`
 
 #### Technique Type Name Schema
 
 ```typescript
-export const techniqueTypeNameSchema = z.enum(
-	TECHNIQUE_TYPES.map(type => type) as [string, ...string[]]
-);
+export const techniqueTypeNameSchema = createEnumSchema(TECHNIQUE_TYPES);
 ```
 
 **Purpose**: Validates technique type names.
 
-**Valid Values**: `"Accent", "Basic", "Drag", "Flam", "Rimshot"`
+**Valid Values**: `"Flam", "Drag"`
 
 ### Complex Object Schemas
 
@@ -122,21 +130,23 @@ export const techniqueTypeNameSchema = z.enum(
 export const noteSchema = z.object({
 	start: z.number().min(0), // Start time must be non-negative
 	dur: durationValueSchema, // Duration must be valid grid value
-	dynamic: dynamicNameSchema, // Dynamic must be valid level
-	isDominant: z.boolean(), // Boolean for hand dominance
-	ornament: ornamentNameSchema, // Ornament must be valid or null
+	isRest: z.boolean(), // Boolean indicating if this is a rest
+	dynamic: dynamicNameSchema.optional(), // Dynamic level (optional for rests)
+	isDominant: z.boolean().optional(), // Hand dominance (optional for rests)
+	ornament: ornamentNameSchema.optional(), // Ornament (optional for rests)
 });
 ```
 
-**Purpose**: Validates individual note objects with all required properties.
+**Purpose**: Validates individual note objects with properties that vary based on whether the note is a rest or not.
 
 **Validation Rules**:
 
 - `start`: Non-negative number (grid tick position)
 - `dur`: Must be a valid duration value from the 96-grid system
-- `dynamic`: Must be a valid dynamic level name
-- `isDominant`: Boolean indicating dominant hand usage
-- `ornament`: Must be a valid ornament name or null
+- `isRest`: Boolean indicating whether this note is a rest
+- `dynamic`: Optional dynamic level name (not used for rests)
+- `isDominant`: Optional boolean indicating dominant hand usage (not used for rests)
+- `ornament`: Optional ornament name (not used for rests)
 
 #### Measure Schema
 
@@ -239,36 +249,12 @@ export const validateTechniqueTypeName = (
 };
 ```
 
-**Usage**: These functions throw errors on validation failure, suitable for internal data processing where invalid data should cause immediate failure.
+### Validation Functions
 
-#### Complex Object Validation Functions
-
-```typescript
-export const validateBeatFormData = (data: unknown): ValidatedBeatFormData => {
-	return beatFormDataSchema.parse(data);
-};
-
-export const validateGeneratedBeat = (data: unknown): ValidatedGeneratedBeat => {
-	return generatedBeatSchema.parse(data);
-};
-
-export const validateMeasure = (data: unknown): ValidatedMeasure => {
-	return measureSchema.parse(data);
-};
-
-export const validateNote = (data: unknown): ValidatedNote => {
-	return noteSchema.parse(data);
-};
-```
-
-**Usage**: These functions validate complex objects and throw errors on failure, suitable for internal data processing.
-
-### Safe Validation Functions
-
-Safe validation functions return result objects instead of throwing errors, making them suitable for user input and external data:
+All validation functions return result objects instead of throwing errors, making them suitable for user input, external data, and internal processing:
 
 ```typescript
-export const safeValidateBeatFormData = (
+export const validateBeatFormData = (
 	data: unknown
 ): { success: true; data: ValidatedBeatFormData } | { success: false; error: string } => {
 	try {
@@ -285,7 +271,7 @@ export const safeValidateBeatFormData = (
 	}
 };
 
-export const safeValidateGeneratedBeat = (
+export const validateGeneratedBeat = (
 	data: unknown
 ): { success: true; data: ValidatedGeneratedBeat } | { success: false; error: string } => {
 	try {
@@ -308,6 +294,7 @@ export const safeValidateGeneratedBeat = (
 - User input validation
 - External API data validation
 - Data import/export validation
+- Internal data processing
 - Any scenario where graceful error handling is preferred
 
 ### Type Guards
@@ -366,11 +353,11 @@ const form = useForm<ValidatedBeatFormData>({
 	defaultValues: {
 		beats: 4,
 		measures: 4,
-		difficulty: 'Hey, Not Too Rough',
+		difficulty: 'Hey, Not Too Ruff',
 	},
 	onSubmit: async ({ value }) => {
 		// value is automatically typed as ValidatedBeatFormData
-		const result = safeValidateBeatFormData(value);
+		const result = validateBeatFormData(value);
 		if (result.success) {
 			// Process validated data
 		} else {
@@ -396,7 +383,11 @@ export async function generateBeat(
 	});
 
 	const data = await response.json();
-	return validateGeneratedBeat(data); // Throws if invalid
+	const result = validateGeneratedBeat(data);
+	if (!result.success) {
+		throw new Error(`Invalid beat data: ${result.error}`);
+	}
+	return result.data;
 }
 ```
 
@@ -443,7 +434,7 @@ The validation system provides comprehensive error messages:
 
 ```typescript
 // Example error message generation
-const result = safeValidateBeatFormData(invalidData);
+const result = validateBeatFormData(invalidData);
 if (!result.success) {
 	console.log(result.error);
 	// Output: "Invalid beat form data: Expected number, received string at 'beats'; Expected 1-16, received 0 at 'beats'"
@@ -503,12 +494,12 @@ describe('beatFormDataSchema', () => {
 
 ```typescript
 import { describe, it, expect } from 'vitest';
-import { safeValidateBeatFormData } from '@/utils/validation';
+import { validateBeatFormData } from '@/utils/validation';
 
-describe('safeValidateBeatFormData', () => {
+describe('validateBeatFormData', () => {
 	it('returns success for valid data', () => {
 		const validData = { beats: 4, measures: 4, difficulty: 'Hey, Not Too Rough' };
-		const result = safeValidateBeatFormData(validData);
+		const result = validateBeatFormData(validData);
 		expect(result.success).toBe(true);
 		if (result.success) {
 			expect(result.data).toEqual(validData);
@@ -517,7 +508,7 @@ describe('safeValidateBeatFormData', () => {
 
 	it('returns error for invalid data', () => {
 		const invalidData = { beats: 0, measures: 4, difficulty: 'Hey, Not Too Rough' };
-		const result = safeValidateBeatFormData(invalidData);
+		const result = validateBeatFormData(invalidData);
 		expect(result.success).toBe(false);
 		if (!result.success) {
 			expect(result.error).toContain('Invalid beat form data');

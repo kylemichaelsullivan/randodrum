@@ -2,15 +2,10 @@
  * Difficulty-related utility functions and constants
  */
 
-import type { DifficultyConfig, DifficultyLevel, DynamicScale } from '@/types';
+import { DIFFICULTY_LEVELS } from '@/types';
+import type { DifficultyConfig, DifficultyLevel } from '@/types';
 
-export const DIFFICULTY_LEVELS: readonly DifficultyLevel[] = [
-	'I’m Too Young to Drum',
-	'Hey, Not Too Rough',
-	'Hurt Me Plenty',
-	'Ultra-Violence',
-	'Drumline!',
-] as const;
+export { DIFFICULTY_LEVELS };
 
 export const DIFFICULTY_CONFIGS: Record<DifficultyLevel, DifficultyConfig> = {
 	'I’m Too Young to Drum': {
@@ -23,7 +18,7 @@ export const DIFFICULTY_CONFIGS: Record<DifficultyLevel, DifficultyConfig> = {
 		restProbability: 0.3,
 		runLengths: { 1: 1.0 },
 		switchProb: 1.0,
-		dynamicScale: [1.0, 1.0] as DynamicScale,
+		dynamicThresholds: [1.0, 1.0], // [accentThreshold, rimshotThreshold]
 		flamThreshold: 0,
 		dragThreshold: 0,
 		allowBalancing: true,
@@ -31,7 +26,7 @@ export const DIFFICULTY_CONFIGS: Record<DifficultyLevel, DifficultyConfig> = {
 		minRatio: 0.45,
 		maxRatio: 0.55,
 	},
-	'Hey, Not Too Rough': {
+	'Hey, Not Too Ruff': {
 		durations: [
 			{ duration: 12, weight: 0.3 }, // Eighth
 			{ duration: 24, weight: 0.5 }, // Quarter
@@ -41,7 +36,7 @@ export const DIFFICULTY_CONFIGS: Record<DifficultyLevel, DifficultyConfig> = {
 		restProbability: 0.25,
 		runLengths: { 1: 0.7, 2: 0.3 },
 		switchProb: 0.8,
-		dynamicScale: [0.8, 1.0] as DynamicScale,
+		dynamicThresholds: [0.8, 1.0], // [accentThreshold, rimshotThreshold]
 		flamThreshold: 0.05,
 		dragThreshold: 0,
 		allowBalancing: true,
@@ -61,7 +56,7 @@ export const DIFFICULTY_CONFIGS: Record<DifficultyLevel, DifficultyConfig> = {
 		restProbability: 0.2,
 		runLengths: { 1: 0.5, 2: 0.3, 3: 0.2 },
 		switchProb: 0.6,
-		dynamicScale: [0.6, 0.9] as DynamicScale,
+		dynamicThresholds: [0.6, 0.9], // [accentThreshold, rimshotThreshold]
 		flamThreshold: 0.1,
 		dragThreshold: 0.1,
 		allowBalancing: true,
@@ -82,7 +77,7 @@ export const DIFFICULTY_CONFIGS: Record<DifficultyLevel, DifficultyConfig> = {
 		restProbability: 0.15,
 		runLengths: { 1: 0.4, 2: 0.3, 3: 0.2, 4: 0.1 },
 		switchProb: 0.4,
-		dynamicScale: [0.5, 0.8] as DynamicScale,
+		dynamicThresholds: [0.5, 0.8], // [accentThreshold, rimshotThreshold]
 		flamThreshold: 0.15,
 		dragThreshold: 0.15,
 		allowBalancing: true,
@@ -103,25 +98,24 @@ export const DIFFICULTY_CONFIGS: Record<DifficultyLevel, DifficultyConfig> = {
 		restProbability: 0.1,
 		runLengths: { 1: 0.25, 2: 0.25, 3: 0.25, 4: 0.25 },
 		switchProb: 0.5,
-		dynamicScale: [0.5, 0.8] as DynamicScale,
+		dynamicThresholds: [0.5, 0.8], // [accentThreshold, rimshotThreshold]
 		flamThreshold: 0.25,
 		dragThreshold: 0.25,
 		allowBalancing: false,
 	},
 } as const;
 
-// Utility functions
 export const getDifficultyConfig = (difficulty: DifficultyLevel): DifficultyConfig => {
 	const config = DIFFICULTY_CONFIGS[difficulty];
 	if (!config) {
 		throw new Error(`Unknown difficulty level: ${difficulty}`);
 	}
 
-	// Validate dynamicScale consistency
-	const [normalThreshold, accentThreshold] = config.dynamicScale;
-	if (normalThreshold > accentThreshold) {
+	// Validate dynamicThresholds consistency
+	const [accentThreshold, rimshotThreshold] = config.dynamicThresholds;
+	if (accentThreshold > rimshotThreshold) {
 		throw new Error(
-			`Invalid dynamicScale for ${difficulty}: normalThreshold (${normalThreshold}) must be <= accentThreshold (${accentThreshold})`
+			`Invalid dynamicThresholds for ${difficulty}: accentThreshold (${accentThreshold}) must be <= rimshotThreshold (${rimshotThreshold})`
 		);
 	}
 
@@ -135,23 +129,3 @@ export const getDifficultyOptions = (): readonly DifficultyLevel[] => {
 export const isValidDifficultyLevel = (value: string): value is DifficultyLevel => {
 	return DIFFICULTY_LEVELS.includes(value as DifficultyLevel);
 };
-
-// Validation function to ensure all difficulty configurations are valid
-export const validateDifficultyConfigs = (): void => {
-	for (const difficulty of DIFFICULTY_LEVELS) {
-		try {
-			getDifficultyConfig(difficulty);
-		} catch (error) {
-			throw new Error(
-				`Configuration validation failed for ${difficulty}: ${error instanceof Error ? error.message : 'Unknown error'}`
-			);
-		}
-	}
-};
-
-export const getDifficultyDisplayName = (difficulty: DifficultyLevel): string => {
-	return difficulty;
-};
-
-// Validate all configurations at module load time
-validateDifficultyConfigs();

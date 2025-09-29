@@ -2,34 +2,28 @@
  * UI-related constants and utilities
  */
 
-import { DIFFICULTY_CONFIGS, DIFFICULTY_LEVELS } from './difficulty';
+import { DIFFICULTY_CONFIGS } from './difficulty';
 import {
+	createConfigArray,
+	DIFFICULTY_LEVELS,
 	DURATION_DISPLAY_ORDER,
-	getNameFromDuration,
-	NAME_TO_DURATION_MAP,
-	ORNAMENTS,
+	DURATION_TO_NAME_MAP,
+	DURATION_NAME_TO_VALUE_MAP,
 } from '@/types';
 
-import type {
-	ChartData,
-	DurationType,
-	DurationName,
-	TechniqueTypeName,
-	DynamicName,
-} from '@/types';
-
-export const TECHNIQUE_TYPES = ORNAMENTS.filter((item): item is TechniqueTypeName => item !== null);
+import type { ChartData, DurationName, TechniqueTypeName, DynamicName } from '@/types';
 
 function getAvailableDynamics(
 	config: (typeof DIFFICULTY_CONFIGS)[keyof typeof DIFFICULTY_CONFIGS]
 ): DynamicName[] {
 	const dynamics: DynamicName[] = ['Normal'];
+	const [accentThreshold, rimshotThreshold] = config.dynamicThresholds;
 
-	if (config.dynamicScale[0] < 1.0) {
+	if (accentThreshold < 1.0) {
 		dynamics.push('Accent');
 	}
 
-	if (config.dynamicScale[1] < 1.0) {
+	if (rimshotThreshold < 1.0) {
 		dynamics.push('Rimshot');
 	}
 
@@ -60,7 +54,7 @@ function generateChartData(): ChartData {
 
 		const notes: DurationName[] = [];
 		for (const durationConfig of config.durations) {
-			const noteName = getNameFromDuration(durationConfig.duration);
+			const noteName = DURATION_TO_NAME_MAP.get(durationConfig.duration);
 			if (noteName && !notes.includes(noteName)) {
 				notes.push(noteName);
 			}
@@ -82,22 +76,18 @@ function generateChartData(): ChartData {
 
 export const CHART_DATA: ChartData = generateChartData();
 
-export const NOTE_TYPES: readonly DurationType[] = DURATION_DISPLAY_ORDER.map(name => {
-	const duration = NAME_TO_DURATION_MAP.get(name);
-	if (!duration) throw new Error(`Duration not found for ${name}`);
-	return {
-		name: name,
-		value: duration,
-	};
-});
+export const NOTE_TYPES = createConfigArray(DURATION_DISPLAY_ORDER, DURATION_NAME_TO_VALUE_MAP);
 
-export const DYNAMIC_DEFINITIONS: Record<DynamicName, string> = {
+const DYNAMIC_DEFINITIONS_MAP: Record<DynamicName, string> = {
 	Normal: 'Standard note with normal volume and timing',
 	Accent: 'A note played louder than surrounding notes',
 	Rimshot: 'A note played by hitting both the drumhead and rim simultaneously',
 } as const;
 
-export const TECHNIQUE_DEFINITIONS: Record<TechniqueTypeName, string> = {
+const TECHNIQUE_DEFINITIONS_MAP: Record<TechniqueTypeName, string> = {
 	Flam: 'Two notes played almost simultaneously, with one slightly before the other',
 	Drag: 'Two grace notes before a main note',
 } as const;
+
+export const DYNAMIC_DEFINITIONS = DYNAMIC_DEFINITIONS_MAP;
+export const TECHNIQUE_DEFINITIONS = TECHNIQUE_DEFINITIONS_MAP;
