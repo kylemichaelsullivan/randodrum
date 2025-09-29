@@ -6,8 +6,11 @@ import type {
 	DifficultyConfig,
 	Duration,
 	DurationWeightConfig,
+	DynamicName,
+	DynamicThresholds,
 	GeneratedBeat,
 	Measure,
+	Note,
 } from '@/types';
 import type { OrnamentName } from '@/types';
 
@@ -65,7 +68,7 @@ export function generateRhythm(
 		const remaining = measureLen - t;
 		const dur = pickWeightedDuration(durationConfigs, remaining);
 
-		// Apply rest probability - create a rest object if random value is below threshold
+		// Create a rest object if random value is below threshold
 		if (Math.random() < restProbability) {
 			m.push({
 				start: t,
@@ -138,31 +141,21 @@ function generateHandRuns(measure: Measure, difficultyConfig: DifficultyConfig):
 	return measure;
 }
 
-function selectDynamicFlags(
-	randomValue: number,
-	dynamicScale: [number, number]
-): { isAccent: boolean; isRimshot: boolean } {
-	const [normalThreshold, accentThreshold] = dynamicScale;
-
-	if (randomValue < normalThreshold) return { isAccent: false, isRimshot: false };
-	if (randomValue < accentThreshold) return { isAccent: true, isRimshot: false };
-	return { isAccent: false, isRimshot: true };
+function selectDynamic(randomValue: number, dynamicThresholds: DynamicThresholds): DynamicName {
+	const [accentThreshold, rimshotThreshold] = dynamicThresholds;
+	return (
+		randomValue >= rimshotThreshold ? 'Rimshot'
+		: randomValue >= accentThreshold ? 'Accent'
+		: 'Normal'
+	);
 }
 
 function addDynamics(measure: Measure, difficultyConfig: DifficultyConfig): Measure {
 	measure.forEach(note => {
-		// Rests don't need dynamic assignment
+		// Rests don't need dynamics
 		if (!note.isRest) {
 			const randomValue = Math.random(); // 0-1 scale
-			const dynamicFlags = selectDynamicFlags(randomValue, difficultyConfig.dynamicScale);
-
-			if (dynamicFlags.isAccent) {
-				note.dynamic = 'Accent';
-			} else if (dynamicFlags.isRimshot) {
-				note.dynamic = 'Rimshot';
-			} else {
-				note.dynamic = 'Normal';
-			}
+			note.dynamic = selectDynamic(randomValue, difficultyConfig.dynamicThresholds);
 		}
 	});
 	return measure;
@@ -180,7 +173,7 @@ function selectOrnament(
 
 function addOrnaments(measure: Measure, difficultyConfig: DifficultyConfig): Measure {
 	measure.forEach(note => {
-		// Rests don't need ornament assignment
+		// Rests don't need ornaments
 		if (!note.isRest) {
 			const randomValue = Math.random();
 			note.ornament = selectOrnament(
@@ -257,9 +250,185 @@ function applyBalancing(measure: Measure, difficultyConfig: DifficultyConfig): M
 	return measure;
 }
 
-function fixRender(measure: Measure): Measure {
-	// TODO: Implement ligature/symbol replacement for grouped notes
-	return measure;
+export function fixRender(measure: Measure): Measure {
+	const allPossibleDurations = [6, 8, 12, 16, 18, 24, 36, 48, 72, 96];
+	const availableDurations = new Set(allPossibleDurations);
+	const sortedDurations = Array.from(availableDurations).sort((a, b) => b - a);
+
+	const result: Measure = [];
+	const processed = new Set<number>();
+
+	for (let i = 0; i < measure.length; i++) {
+		if (processed.has(i)) continue;
+
+		const currentNote = measure[i]!;
+
+		// Try to find the best grouping starting from this position
+		const bestGroup = findBestGroup(measure, i, processed, sortedDurations);
+
+		if (bestGroup.length > 1) {
+			// We found a group that can be combined
+			const combinedDuration = bestGroup.reduce((sum, note) => sum + note.dur, 0);
+			const isRestGroup = bestGroup[0]!.isRest;
+			const allSameType = bestGroup.every(note => note.isRest === isRestGroup);
+
+			if (allSameType) {
+				// All same type grouping
+				if (isRestGroup) {
+					// Special case: 4 consecutive quarter rests = whole rest
+					if (bestGroup.length === 4 && bestGroup.every(note => note.dur === 24)) {
+						result.push({
+							start: currentNote.start,
+							dur: 96, // Whole rest
+							isRest: true,
+						});
+					} else {
+						const optimalRest = getOptimalRestDuration(combinedDuration, sortedDurations);
+						if (optimalRest && optimalRest === combinedDuration) {
+							result.push({
+								start: currentNote.start,
+								dur: optimalRest,
+								isRest: true,
+							});
+						} else {
+							for (const note of bestGroup) {
+								result.push(note);
+							}
+						}
+					}
+				} else {
+					// Notes should not be combined - preserve them as individual notes
+					for (const note of bestGroup) {
+						result.push(note);
+					}
+				}
+			} else {
+				// Mixed grouping - only combine if it's all rests
+				if (isRestGroup) {
+					const optimalRest = getOptimalRestDuration(combinedDuration, sortedDurations);
+					if (optimalRest && optimalRest === combinedDuration) {
+						result.push({
+							start: currentNote.start,
+							dur: optimalRest,
+							isRest: true,
+						});
+					} else {
+						for (const note of bestGroup) {
+							result.push(note);
+						}
+					}
+				} else {
+					// Mixed grouping with notes - preserve all notes individually
+					for (const note of bestGroup) {
+						result.push(note);
+					}
+				}
+			}
+
+			bestGroup.forEach((_, index) => processed.add(i + index));
+		} else {
+			// No grouping possible, just add the single note
+			result.push(currentNote);
+			processed.add(i);
+		}
+	}
+
+	return result;
+}
+
+function findBestGroup(
+	measure: Measure,
+	startIndex: number,
+	processed: Set<number>,
+	availableDurations: number[]
+): Note[] {
+	const currentNote = measure[startIndex]!;
+
+	// Try different group sizes to find the best combination
+	let bestGroup: Note[] = [currentNote];
+	let bestScore = 0;
+
+	// Try groups of size 2, 3, 4, etc.
+	for (let groupSize = 2; groupSize <= Math.min(4, measure.length - startIndex); groupSize++) {
+		const group: Note[] = [];
+		let canFormGroup = true;
+
+		// Check if we can form a group of this size
+		for (let i = 0; i < groupSize; i++) {
+			const index = startIndex + i;
+			if (index >= measure.length || processed.has(index)) {
+				canFormGroup = false;
+				break;
+			}
+			group.push(measure[index]!);
+		}
+
+		if (!canFormGroup) break;
+
+		// Check if the notes are temporally consecutive (no gaps in time)
+		let isTemporallyConsecutive = true;
+		for (let i = 1; i < group.length; i++) {
+			const prevNote = group[i - 1]!;
+			const currentNote = group[i]!;
+			const expectedStart = prevNote.start + prevNote.dur;
+			if (currentNote.start !== expectedStart) {
+				isTemporallyConsecutive = false;
+				break;
+			}
+		}
+
+		if (!isTemporallyConsecutive) continue;
+
+		// Allow mixed groupings - we'll handle them in the scoring logic
+
+		// Calculate the combined duration
+		const combinedDuration = group.reduce((sum, note) => sum + note.dur, 0);
+
+		// Check if this combination is valid
+		let score = 0;
+
+		// Check if all notes in the group are the same type
+		const isRestGroup = group[0]!.isRest;
+		const allSameType = group.every(note => note.isRest === isRestGroup);
+
+		if (allSameType) {
+			// Same type grouping - only score rest combinations
+			if (isRestGroup) {
+				// Special case: 4 consecutive quarter rests = whole rest
+				if (group.length === 4 && group.every(note => note.dur === 24)) {
+					score = 100; // High score for this special case
+				} else if (availableDurations.includes(combinedDuration)) {
+					score = group.length; // Score based on how many rests we're combining
+				}
+			}
+			// Notes should not be combined, so no scoring for note groups
+		} else {
+			// Mixed grouping - only score if ALL notes in the group are rests
+			const allRests = group.every(note => note.isRest);
+			if (allRests && availableDurations.includes(combinedDuration)) {
+				score = group.length; // Score based on how many rests we're combining
+			}
+		}
+
+		if (score > bestScore) {
+			bestScore = score;
+			bestGroup = group;
+		}
+	}
+
+	return bestGroup;
+}
+
+function getOptimalRestDuration(
+	totalDuration: number,
+	availableDurations: number[]
+): Duration | null {
+	for (const duration of availableDurations) {
+		if (duration === totalDuration) {
+			return duration as Duration;
+		}
+	}
+	return null;
 }
 
 export function generateBeat(formData: BeatFormData): GeneratedBeat {

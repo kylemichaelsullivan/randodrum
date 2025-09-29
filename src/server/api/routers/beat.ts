@@ -1,5 +1,5 @@
-import { beatFormDataSchema } from '@/utils';
-import { createTRPCRouter, publicProcedure } from '@/server';
+import { beatFormDataSchema } from '@/utils/validation';
+import { createTRPCRouter, publicProcedure } from '../trpc';
 import { generateBeat } from '@/server';
 
 import type { BeatFormData, BeatGenerationResponse } from '@/types';

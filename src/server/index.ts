@@ -3,5 +3,10 @@
  */
 
 export { appRouter, createCaller, type AppRouter } from './api/root';
-export { createTRPCContext, createTRPCRouter, publicProcedure } from './api/trpc';
-export { generateBeat, generateRhythm } from './beat-generator';
+export {
+	createCallerFactory,
+	createTRPCContext,
+	createTRPCRouter,
+	publicProcedure,
+} from './api/trpc';
+export { fixRender, generateBeat, generateRhythm } from './beat-generator';
