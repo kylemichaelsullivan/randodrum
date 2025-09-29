@@ -1,8 +1,10 @@
 import { memo, useMemo } from 'react';
 
+import { createConfigArray, DIFFICULTY_LEVELS } from '@/types';
 import { MeasureContent } from './MeasureContent';
 import { MeasureError } from './MeasureError';
 import { MeasureHeader } from './MeasureHeader';
+
 import type { DifficultyLevel, Measure } from '@/types';
 
 type MeasureDisplayProps = {
@@ -11,24 +13,20 @@ type MeasureDisplayProps = {
 	measureIndex: number;
 };
 
+const DIFFICULTY_WIDTH_MAP: Record<DifficultyLevel, number> = {
+	'I’m Too Young to Drum': 10,
+	'Hey, Not Too Ruff': 14,
+	'Hurt Me Plenty': 24,
+	'Ultra-Violence': 28,
+	'Drumline!': 32,
+} as const;
+
+const DIFFICULTY_WIDTH_CONFIGS = createConfigArray(DIFFICULTY_LEVELS, DIFFICULTY_WIDTH_MAP);
+
 function MeasureDisplayComponent({ difficulty, measure, measureIndex }: MeasureDisplayProps) {
 	const minWidth = useMemo(() => {
-		const getMinWidth = (() => {
-			const widthMap: Record<DifficultyLevel, number> = {
-				'I’m Too Young to Drum': 10,
-				'Hey, Not Too Rough': 14,
-				'Hurt Me Plenty': 24,
-				'Ultra-Violence': 28,
-				'Drumline!': 32,
-			};
-
-			return (difficulty: DifficultyLevel) => {
-				const width = widthMap[difficulty];
-				return width ? `min-w-[${width}rem]` : 'min-w-0';
-			};
-		})();
-
-		return getMinWidth(difficulty);
+		const config = DIFFICULTY_WIDTH_CONFIGS.find(c => c.name === difficulty);
+		return config ? `min-w-[${config.value}rem]` : 'min-w-0';
 	}, [difficulty]);
 
 	if (!Array.isArray(measure)) {
