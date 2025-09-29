@@ -2,7 +2,7 @@
 
 import { useEffect, useState, type ReactNode } from 'react';
 
-import { createMemoizedComponentWithDisplayName } from '@/utils';
+import { createMemoizedComponent } from '@/utils';
 
 type ClientOnlyProps = {
 	children: ReactNode;
@@ -27,4 +27,4 @@ function ClientOnlyComponent({ children, fallback = null }: ClientOnlyProps) {
 	return <>{children}</>;
 }
 
-export const ClientOnly = createMemoizedComponentWithDisplayName(ClientOnlyComponent, 'ClientOnly');
+export const ClientOnly = createMemoizedComponent(ClientOnlyComponent, 'ClientOnly');

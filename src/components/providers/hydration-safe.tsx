@@ -2,7 +2,7 @@
 
 import { useEffect, useState, type ReactNode } from 'react';
 
-import { createMemoizedComponentWithDisplayName } from '@/utils';
+import { createMemoizedComponent } from '@/utils';
 
 type HydrationSafeProps = {
 	children: ReactNode;
@@ -28,7 +28,4 @@ function HydrationSafeComponent({ children, fallback = null, className }: Hydrat
 	return <div className={className}>{children}</div>;
 }
 
-export const HydrationSafe = createMemoizedComponentWithDisplayName(
-	HydrationSafeComponent,
-	'HydrationSafe'
-);
+export const HydrationSafe = createMemoizedComponent(HydrationSafeComponent, 'HydrationSafe');
