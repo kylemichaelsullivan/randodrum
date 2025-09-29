@@ -2,7 +2,7 @@
 
 import { useCallback, useMemo } from 'react';
 
-import { createMemoizedComponentWithDisplayName } from '@/utils';
+import { createMemoizedComponent } from '@/utils';
 import { FormField, FormLabel, FormSelect } from '@/components';
 import { useFormStore } from '@/stores';
 
@@ -77,7 +77,4 @@ function SelectFieldComponent({
 	});
 }
 
-export const SelectField = createMemoizedComponentWithDisplayName(
-	SelectFieldComponent,
-	'SelectField'
-);
+export const SelectField = createMemoizedComponent(SelectFieldComponent, 'SelectField');

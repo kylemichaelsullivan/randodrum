@@ -2,7 +2,7 @@
 
 import { useCallback } from 'react';
 
-import { createMemoizedComponentWithDisplayName } from '@/utils';
+import { createMemoizedComponent } from '@/utils';
 import { FormField, FormLabel } from '@/components';
 import { useFormStore } from '@/stores';
 
@@ -66,7 +66,4 @@ function NumberFieldComponent({
 	});
 }
 
-export const NumberField = createMemoizedComponentWithDisplayName(
-	NumberFieldComponent,
-	'NumberField'
-);
+export const NumberField = createMemoizedComponent(NumberFieldComponent, 'NumberField');

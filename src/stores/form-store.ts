@@ -5,7 +5,7 @@ import type { BeatFormData, FormStore } from '@/types';
 const defaultFormValues: BeatFormData = {
 	beats: 4,
 	measures: 4,
-	difficulty: 'Hey, Not Too Rough' as BeatFormData['difficulty'],
+	difficulty: 'Hey, Not Too Ruff' as BeatFormData['difficulty'],
 };
 
 export const useFormStore = create<FormStore>()(

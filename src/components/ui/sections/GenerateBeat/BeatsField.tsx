@@ -1,42 +1,9 @@
 'use client';
 
-import { memo, useCallback } from 'react';
+import { NumberField } from '@/components';
 
-import { FormField, FormLabel } from '@/components';
-import { useFormStore } from '@/stores';
-
-import type { ChangeEvent } from 'react';
 import type { BeatsFieldProps } from '@/types';
 
-function BeatsFieldComponent({ form }: BeatsFieldProps) {
-	const { setFormValues } = useFormStore();
-
-	const handleChange = useCallback(
-		(e: ChangeEvent<HTMLInputElement>, field: { handleChange: (value: number) => void }) => {
-			const newValue = parseInt(e.target.value) || 4;
-			field.handleChange(newValue);
-			setFormValues({ beats: newValue });
-		},
-		[setFormValues]
-	);
-
-	return form.Field({
-		name: 'beats',
-		children: field => (
-			<FormField className='flex-1'>
-				<FormLabel htmlFor='beats'>Beats</FormLabel>
-				<input
-					type='number'
-					className='w-full'
-					value={field.state.value}
-					min='1'
-					max='16'
-					onChange={e => handleChange(e, field)}
-					id='beats'
-				/>
-			</FormField>
-		),
-	});
+export function BeatsField({ form }: BeatsFieldProps) {
+	return <NumberField form={form} name='beats' label='Beats' min={1} max={16} defaultValue={4} />;
 }
-
-export const BeatsField = memo(BeatsFieldComponent);
