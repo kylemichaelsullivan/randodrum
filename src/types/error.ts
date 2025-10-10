@@ -87,59 +87,43 @@ export type ErrorRecovery<T> = {
 	recover: (error: AppError) => T | Promise<T>;
 };
 
-// Helper Functions
+const createError = <T extends AppError>(
+	code: T['code'],
+	message: string,
+	specificFields: Omit<T, 'code' | 'message' | 'timestamp'>
+): T =>
+	({
+		code,
+		message,
+		timestamp: Date.now(),
+		...specificFields,
+	}) as T;
+
 export const createBeatGenerationError = (
 	message: string,
 	difficulty?: string,
 	formData?: Record<string, unknown>,
 	details?: Record<string, unknown>
-): BeatGenerationError => ({
-	code: 'BEAT_GENERATION_ERROR',
-	message,
-	difficulty,
-	formData,
-	details,
-	timestamp: Date.now(),
-});
+): BeatGenerationError =>
+	createError('BEAT_GENERATION_ERROR', message, { difficulty, formData, details });
 
 export const createNetworkError = (
 	message: string,
 	status?: number,
 	url?: string,
 	details?: Record<string, unknown>
-): NetworkError => ({
-	code: 'NETWORK_ERROR',
-	message,
-	status,
-	url,
-	details,
-	timestamp: Date.now(),
-});
+): NetworkError => createError('NETWORK_ERROR', message, { status, url, details });
 
 export const createStorageError = (
 	message: string,
 	operation: 'read' | 'write' | 'delete' | 'clear',
 	key?: string,
 	details?: Record<string, unknown>
-): StorageError => ({
-	code: 'STORAGE_ERROR',
-	message,
-	operation,
-	key,
-	details,
-	timestamp: Date.now(),
-});
+): StorageError => createError('STORAGE_ERROR', message, { operation, key, details });
 
 export const createValidationError = (
 	message: string,
 	field?: string,
 	value?: unknown,
 	details?: Record<string, unknown>
-): ValidationError => ({
-	code: 'VALIDATION_ERROR',
-	message,
-	field,
-	value,
-	details,
-	timestamp: Date.now(),
-});
+): ValidationError => createError('VALIDATION_ERROR', message, { field, value, details });

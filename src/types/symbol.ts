@@ -5,7 +5,29 @@
 
 import type { DurationValue } from './duration';
 
-export const NOTE_SYMBOLS = ['s', 'e', 'i', 'q', 'j', 'h', 'd', 'w', 'T', 't'] as const;
+export const NOTE_SYMBOLS = [
+	's',
+	'e',
+	'n',
+	'i',
+	'q',
+	'j',
+	'h',
+	'd',
+	'w',
+	'T',
+	't',
+	'M',
+	'O',
+	'š',
+	'm',
+	'o',
+	'Ò', // Triplet: 010
+	'¤', // Triplet: 001
+	'Ó', // Triplet: 110
+	'Ñ', // Triplet: 101
+	'Õ', // Triplet: 011
+] as const;
 export const REST_SYMBOLS = ['S', 'E', 'I', 'Q', 'J', 'H', 'D', 'W', 'T', 't'] as const;
 
 export type NoteSymbol = (typeof NOTE_SYMBOLS)[number];
@@ -24,6 +46,7 @@ export const NOTE_SYMBOL_MAP: SymbolMapping<NoteSymbol> = {
 	48: 'h', // Half
 	72: 'd', // Dotted Half
 	96: 'w', // Whole
+	// Note: 'n' is not in this map - it's created dynamically for beamed eighth note pairs
 } as const;
 
 export const REST_SYMBOL_MAP: SymbolMapping<RestSymbol> = {
@@ -47,8 +70,12 @@ export function getSymbol<T extends string>(
 	return symbolMap[duration] ?? fallback;
 }
 
-export const getNoteSymbol = (duration: DurationValue): NoteSymbol =>
-	getSymbol(duration, NOTE_SYMBOL_MAP, 'q');
+export const getNoteSymbol = (duration: DurationValue, override?: string): NoteSymbol => {
+	if (override && NOTE_SYMBOLS.includes(override as NoteSymbol)) {
+		return override as NoteSymbol;
+	}
+	return getSymbol(duration, NOTE_SYMBOL_MAP, 'q');
+};
 
 export const getRestSymbol = (duration: DurationValue): RestSymbol =>
 	getSymbol(duration, REST_SYMBOL_MAP, 'Q');

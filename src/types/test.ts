@@ -4,13 +4,14 @@
 
 import type { BeatFormData, GeneratedBeat, Measure, Note } from './beat';
 
-// Test data types
-export type TestNote = Note;
-export type TestMeasure = Measure;
-export type TestGeneratedBeat = GeneratedBeat;
-export type TestBeatFormData = BeatFormData;
+// Test data types (re-exported for test isolation)
+export type {
+	Note as TestNote,
+	Measure as TestMeasure,
+	GeneratedBeat as TestGeneratedBeat,
+	BeatFormData as TestBeatFormData,
+};
 
-// Mock function types
 export type MockFunction<T extends (...args: unknown[]) => unknown> = {
 	(...args: Parameters<T>): ReturnType<T>;
 	mockResolvedValue: (value: ReturnType<T>) => MockFunction<T>;
@@ -21,14 +22,12 @@ export type MockFunction<T extends (...args: unknown[]) => unknown> = {
 	mockReset: () => void;
 };
 
-// Test configuration types
 export type TestConfig = {
 	timeout?: number;
 	retries?: number;
 	parallel?: boolean;
 };
 
-// Test result types
 export type TestResult<T = unknown> = {
 	success: boolean;
 	data?: T;
@@ -36,7 +35,6 @@ export type TestResult<T = unknown> = {
 	duration: number;
 };
 
-// Test suite types
 export type TestSuite = {
 	name: string;
 	tests: TestCase[];
@@ -54,14 +52,12 @@ export type TestCase = {
 	only?: boolean;
 };
 
-// Test data factory types
 export type TestDataFactory<T> = {
 	create: (overrides?: Partial<T>) => T;
 	createMany: (count: number, overrides?: Partial<T>) => T[];
 };
 
-// Beat test data factories
-export type BeatTestDataFactory = TestDataFactory<TestGeneratedBeat>;
-export type NoteTestDataFactory = TestDataFactory<TestNote>;
-export type MeasureTestDataFactory = TestDataFactory<TestMeasure>;
-export type FormDataTestDataFactory = TestDataFactory<TestBeatFormData>;
+export type BeatTestDataFactory = TestDataFactory<GeneratedBeat>;
+export type NoteTestDataFactory = TestDataFactory<Note>;
+export type MeasureTestDataFactory = TestDataFactory<Measure>;
+export type FormDataTestDataFactory = TestDataFactory<BeatFormData>;

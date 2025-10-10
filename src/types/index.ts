@@ -9,10 +9,22 @@
 export type { BeatGenerationResponse } from './api';
 
 // Beat generation types
-export type { BeatFormData, GeneratedBeat, Measure, Note, NoteStart } from './beat';
+export type {
+	BeatFormData,
+	BeamedNotePair,
+	DisplayMeasure,
+	DisplayUnit,
+	GeneratedBeat,
+	Measure,
+	Note,
+	NoteStart,
+	SingleNoteDisplay,
+	SyncopatedPattern,
+	TripletPattern,
+} from './beat';
 
 // Form types
-export type { BeatsFieldProps, DifficultyFieldProps, MeasuresFieldProps } from './form';
+export type { FormInputProps, FormSelectProps } from './form';
 
 // Color types
 export { COLORS } from './color';

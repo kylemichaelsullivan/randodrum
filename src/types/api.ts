@@ -11,18 +11,13 @@ export type ApiError = {
 	code?: string;
 };
 
-export type ApiResponse<T = unknown> = {
-	success: boolean;
-	data?: T;
-	error?: string;
-	message?: string;
-};
-
 export type ApiSuccess<T = unknown> = {
 	success: true;
 	data: T;
 	message?: string;
 };
+
+export type ApiResponse<T = unknown> = ApiSuccess<T> | ApiError;
 
 export type BeatGenerationResponse = ApiResponse<{
 	beat: GeneratedBeat;

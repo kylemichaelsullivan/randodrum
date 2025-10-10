@@ -6,19 +6,16 @@
 import type { ReactNode } from 'react';
 import type { BeatFormData } from './beat';
 
-type FormFieldProps = {
+type BaseField = {
+	state: { value: BeatFormData[keyof BeatFormData] };
+	handleChange: (value: BeatFormData[keyof BeatFormData]) => void;
+};
+
+type FormProps<F> = {
 	form: {
-		Field: (props: {
-			name: keyof BeatFormData;
-			children: (field: {
-				state: { value: BeatFormData[keyof BeatFormData] };
-				handleChange: (value: BeatFormData[keyof BeatFormData]) => void;
-			}) => ReactNode;
-		}) => ReactNode;
+		Field: (props: { name: keyof BeatFormData; children: (field: F) => ReactNode }) => ReactNode;
 	};
 };
 
-// Specific field prop types
-export type BeatsFieldProps = FormFieldProps;
-export type MeasuresFieldProps = FormFieldProps;
-export type DifficultyFieldProps = FormFieldProps;
+export type FormInputProps = FormProps<BaseField & { handleBlur: () => void }>;
+export type FormSelectProps = FormProps<BaseField>;

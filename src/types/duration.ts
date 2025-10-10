@@ -72,14 +72,11 @@ export const DURATION_TO_NAME_MAP = new Map<DurationValue, DurationName>(
 	Object.entries(DURATION_NAME_TO_VALUE_MAP).map(([name, value]) => [value, name as DurationName])
 );
 
-export const isTripletDuration = (duration: DurationValue): duration is TripletDuration => {
-	return [8, 16].includes(duration);
-};
+export const isTripletDuration = (duration: DurationValue): duration is TripletDuration =>
+	TRIPLET_DURATIONS.includes(duration as TripletDuration);
 
-export const isDottedDuration = (duration: DurationValue): duration is DottedDuration => {
-	return [18, 36, 72].includes(duration);
-};
+export const isDottedDuration = (duration: DurationValue): duration is DottedDuration =>
+	DOTTED_DURATIONS.includes(duration as DottedDuration);
 
-export const isStraightDuration = (duration: DurationValue): duration is StraightDuration => {
-	return [6, 12, 24, 48, 96].includes(duration);
-};
+export const isStraightDuration = (duration: DurationValue): duration is StraightDuration =>
+	STRAIGHT_DURATIONS.includes(duration as StraightDuration);
