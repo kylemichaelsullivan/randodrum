@@ -589,9 +589,32 @@ a:hover {
 }
 
 /* Component Styles */
-.NoteSymbol {
+.NoteSymbol,
+.RestSymbol {
 	position: relative;
 	transform: translateX(0.1em);
+}
+
+.NoteAccent {
+	height: 0.5rem;
+}
+
+.NoteAccent:has(+ .NoteSymbol.is2Eigths) > span,
+.NoteAccent:has(+ .NoteSymbol.is4Sixteenths) > span,
+.NoteAccent:has(+ .NoteSymbol.isEighthTriplet) > span,
+.NoteAccent:has(+ .NoteSymbol.isQuarterTriplet) > span {
+	text-align: right;
+}
+
+.NoteAccent:has(+ .NoteSymbol.is4Sixteenths) {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+}
+
+.NoteAccent:has(+ .NoteSymbol.isEighthTriplet),
+.NoteAccent:has(+ .NoteSymbol.isQuarterTriplet) {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
 }
 
 .NoteSymbol::before,
@@ -599,13 +622,15 @@ a:hover {
 	position: absolute;
 }
 
-/* .NoteSymbol.hasDrag,
-.NoteSymbol.hasFlam {
-	padding-left: 0.125em;
-} */
+.NoteSymbol.hasAccent::before {
+	content: '>';
+	font-family: var(--font-geist-sans);
+	font-size: 0.5em;
+	top: -0.5em;
+}
 
-.NoteSymbol.hasAccent::before,
-.NoteSymbol.hasRimshot::before {
+.NoteSymbol.hasAccent-1::before,
+.NoteSymbol.hasAccent-2::before {
 	content: '>';
 	font-family: var(--font-geist-sans);
 	font-size: 0.5em;
@@ -619,12 +644,42 @@ a:hover {
 	bottom: 0;
 }
 
-.NoteSymbol.hasRimshot::before {
+.NoteAccent .hasRimshot {
 	transform: rotate(-90deg);
+}
+
+.NoteDisplay:has(> .hasFlam) {
+	padding-left: 0.25rem;
 }
 
 .NoteSymbol.hasFlam::after {
 	content: '♪';
+}
+
+.NoteSymbol.hasFlam + .NoteSticking {
+	position: relative;
+}
+
+.NoteSymbol.hasFlam + .NoteSticking::before {
+	font-size: 0.75em;
+	font-weight: 400;
+	bottom: 0.125em;
+	left: -1em;
+	position: absolute;
+}
+
+.NoteSymbol.hasFlam + .NoteSticking.text-green::before {
+	content: 'L';
+	color: var(--color-red);
+}
+
+.NoteSymbol.hasFlam + .NoteSticking.text-red::before {
+	content: 'R';
+	color: var(--color-green);
+}
+
+.NoteDisplay:has(> .hasDrag) {
+	padding-left: 0.5rem;
 }
 
 .NoteSymbol.hasDrag::after {
