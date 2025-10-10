@@ -5,9 +5,9 @@ import { useMemo } from 'react';
 import { SelectField, HelpButton } from '@/components';
 import { getDifficultyOptions } from '@/utils';
 
-import type { DifficultyFieldProps } from '@/types';
+import type { FormSelectProps } from '@/types';
 
-export function DifficultyField({ form }: DifficultyFieldProps) {
+export function DifficultyField({ form }: FormSelectProps) {
 	const difficultyOptions = useMemo(() => getDifficultyOptions(), []);
 
 	return (

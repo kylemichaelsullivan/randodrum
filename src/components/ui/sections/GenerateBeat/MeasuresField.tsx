@@ -2,10 +2,8 @@
 
 import { NumberField } from '@/components';
 
-import type { MeasuresFieldProps } from '@/types';
+import type { FormInputProps } from '@/types';
 
-export function MeasuresField({ form }: MeasuresFieldProps) {
-	return (
-		<NumberField form={form} name='measures' label='Measures' min={1} max={32} defaultValue={4} />
-	);
+export function MeasuresField({ form }: FormInputProps) {
+	return <NumberField form={form} name='measures' label='Measures' max={32} defaultValue={4} />;
 }

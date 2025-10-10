@@ -7,18 +7,9 @@ import { FormField, FormLabel, FormSelect } from '@/components';
 import { useFormStore } from '@/stores';
 
 import type { ChangeEvent, ReactNode } from 'react';
-import type { BeatFormData } from '@/types';
+import type { BeatFormData, FormSelectProps } from '@/types';
 
-type SelectFieldProps = {
-	form: {
-		Field: (props: {
-			name: keyof BeatFormData;
-			children: (field: {
-				state: { value: BeatFormData[keyof BeatFormData] };
-				handleChange: (value: BeatFormData[keyof BeatFormData]) => void;
-			}) => ReactNode;
-		}) => ReactNode;
-	};
+type SelectFieldProps = FormSelectProps & {
 	name: keyof BeatFormData;
 	label: string;
 	options: readonly string[];
