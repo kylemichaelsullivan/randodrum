@@ -20,6 +20,28 @@ export function GenerateBeat() {
 			try {
 				const result = await generateBeatMutation.mutateAsync(value);
 				if (result.success && result.data) {
+					// Log simplified rhythm data in a readable format
+					console.log('\n=== GENERATED BEAT ANALYSIS ===');
+					console.log(`Total measures: ${result.data.beat.measures.length}`);
+					console.log(`Beats per measure: ${result.data.beat.beatsPerMeasure}`);
+					console.log(`Difficulty: ${result.data.beat.difficulty}`);
+					console.log('\n--- MEASURE BREAKDOWN ---');
+
+					result.data.beat.measures.forEach((measure, index) => {
+						const measureData = measure
+							.map(note => `${note.isRest ? 'R' : 'N'}${note.dur}@${note.start}`)
+							.join(' | ');
+
+						const noteCount = measure.filter(n => !n.isRest).length;
+						const restCount = measure.filter(n => n.isRest).length;
+
+						console.log(
+							`M${String(index + 1).padStart(2, '0')}: ${measureData} (${noteCount}N/${restCount}R)`
+						);
+					});
+
+					console.log('=== END ANALYSIS ===\n');
+
 					setCurrentBeat(result.data.beat);
 				}
 			} catch (error) {
