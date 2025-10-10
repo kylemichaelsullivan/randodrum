@@ -1,5 +1,6 @@
-import { memo } from 'react';
+import { memo, useMemo } from 'react';
 import { NoteDisplay } from './NoteDisplay';
+import { createDisplayMeasure } from '@/utils';
 import type { Measure } from '@/types';
 
 type MeasureContentProps = {
@@ -7,12 +8,14 @@ type MeasureContentProps = {
 };
 
 function MeasureContentComponent({ measure }: MeasureContentProps) {
+	const displayMeasure = useMemo(() => createDisplayMeasure(measure), [measure]);
+
 	return (
 		<div
 			className={`MeasureContent flex flex-row flex-nowrap items-center justify-center bg-white rounded p-3 min-h-[6.25rem]`}
 		>
-			{measure.map((note, noteIndex) => (
-				<NoteDisplay note={note} key={noteIndex} />
+			{displayMeasure.map((displayUnit, index) => (
+				<NoteDisplay displayUnit={displayUnit} key={index} />
 			))}
 		</div>
 	);

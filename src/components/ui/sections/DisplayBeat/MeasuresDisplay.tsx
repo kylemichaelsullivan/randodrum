@@ -10,7 +10,7 @@ function MeasuresDisplayComponent() {
 	}
 
 	return (
-		<div className='MeasuresDisplay flex flex-col justify-around gap-4 w-full sm:flex-row sm:flex-wrap sm:justify-center'>
+		<div className='MeasuresDisplay flex flex-wrap justify-center gap-4 w-full'>
 			{currentBeat.measures.map((measure, measureIndex) => (
 				<MeasureDisplay
 					difficulty={currentBeat.difficulty}
