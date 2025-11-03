@@ -1,15 +1,7 @@
 ---
-globs: ['**/*.tsx', '**/*.ts']
-exclude:
-  [
-    '**/__tests__/**',
-    '**/*.test.*',
-    '**/*.spec.*',
-    '**/config/**',
-    '**/server/**',
-    '**/trpc/**',
-    '**/env.js',
-  ]
+globs: **/*.tsx, **/*.ts
+exclude: **/__tests__/**, **/*.test.*, **/*.spec.*, **/config/**, **/server/**, **/trpc/**, **/env.js, **/components/**, **/*.css
+alwaysApply: false
 ---
 
 # React Development Standards for RandoDrum
@@ -70,9 +62,12 @@ The `createMemoizedComponent` utility function provides a type-safe way to creat
 
 ```typescript
 // Utility function definition
-export const createMemoizedComponent = <T extends ComponentType<P>, P = ComponentProps<T>>(
+export const createMemoizedComponent = <
+	T extends ComponentType<P>,
+	P = ComponentProps<T>,
+>(
 	Component: T,
-	displayName: string
+	displayName: string,
 ): MemoExoticComponent<T> => {
 	const MemoizedComponent = memo(Component);
 	MemoizedComponent.displayName = displayName;
@@ -224,8 +219,8 @@ export const useBeatStore = create<BeatStore>()(
 				set({ currentBeat: null });
 			},
 		}),
-		{ name: 'beat-storage' }
-	)
+		{ name: 'beat-storage' },
+	),
 );
 ```
 
@@ -236,7 +231,7 @@ export const useBeatStore = create<BeatStore>()(
 const { currentBeat, setCurrentBeat, isLoading } = useBeatStore();
 
 // ❌ Don't create wrapper hooks unless necessary
-const useBeatData = () => useBeatStore(state => state.currentBeat);
+const useBeatData = () => useBeatStore((state) => state.currentBeat);
 ```
 
 ### Context Optimization

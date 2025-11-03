@@ -1,14 +1,5 @@
 ---
-description: Testing standards and best practices for RandoDrum
-globs:
-  [
-    '**/__tests__/**/*.ts',
-    '**/__tests__/**/*.tsx',
-    '**/*.test.ts',
-    '**/*.test.tsx',
-    '**/*.spec.ts',
-    '**/*.spec.tsx',
-  ]
+globs: **/__tests__/**/*.ts, **/__tests__/**/*.tsx, **/*.test.ts, **/*.test.tsx, **/*.spec.ts, **/*.spec.tsx
 alwaysApply: true
 ---
 

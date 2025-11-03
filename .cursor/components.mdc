@@ -1,6 +1,7 @@
 ---
-globs: ['**/components/**/*.tsx', '**/components/**/*.ts']
-exclude: ['**/__tests__/**', '**/*.test.*', '**/*.spec.*']
+globs: **/components/**/*.tsx, **/components/**/*.ts
+exclude: **/__tests__/**, **/*.test.*, **/*.spec.*
+alwaysApply: false
 ---
 
 # RandoDrum Component Development Standards
@@ -68,7 +69,6 @@ Always use the project's utility components instead of creating custom HTML elem
 ### Core UI Components
 
 - **Button** (`@/components/ui/buttons/Button`) - Use for all button interactions
-
   - Supports variants: `default`, `icon`, `generate`, `help`
   - Required props: `title`, `children`
   - Optional props: `variant`, `aria-label`, `isDisabled`
@@ -159,10 +159,17 @@ type ComponentProps = {
 	children?: ReactNode;
 };
 
-export function ComponentName({ title, variant = 'primary', children }: ComponentProps) {
+export function ComponentName({
+	title,
+	variant = 'primary',
+	children,
+}: ComponentProps) {
 	return (
 		<div
-			className={clsx('ComponentName base-classes', variant === 'secondary' && 'secondary-classes')}
+			className={clsx(
+				'ComponentName base-classes',
+				variant === 'secondary' && 'secondary-classes',
+			)}
 		>
 			{children}
 		</div>
@@ -179,13 +186,13 @@ export const ComponentName = forwardRef<HTMLDivElement, ComponentProps>(
 				ref={ref}
 				className={clsx(
 					'ComponentName base-classes',
-					variant === 'secondary' && 'secondary-classes'
+					variant === 'secondary' && 'secondary-classes',
 				)}
 			>
 				{children}
 			</div>
 		);
-	}
+	},
 );
 ```
 

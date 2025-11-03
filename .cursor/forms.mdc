@@ -1,7 +1,7 @@
 ---
-globs:
-  ['**/forms/**/*.tsx', '**/forms/**/*.ts', '**/utils/validation.ts', '**/stores/form-store.ts']
-exclude: ['**/__tests__/**', '**/*.test.*', '**/*.spec.*']
+globs: **/forms/**/*.tsx, **/forms/**/*.ts, **/utils/validation.ts, **/stores/form-store.ts
+exclude: **/__tests__/**, **/*.test.*, **/*.spec.*
+alwaysApply: false
 ---
 
 # Form Development Standards
@@ -65,33 +65,28 @@ Always use the project's utility components instead of creating custom HTML elem
 ### Core Form Components
 
 - **Form** (`@/components/ui/forms/Form`) - Use for consistent form containers
-
   - **Consistent styling**: Uses `Form` class for uniform appearance
   - **Form handling**: Automatically handles `preventDefault` and `stopPropagation`
   - **Flexible content**: Accepts any children components
   - **Customizable**: Optional `className` prop for additional styling
 
 - **FormField** (`@/components/ui/forms/FormField`) - Use for all form input containers
-
   - **Layout**: Uses `FormField flex flex-col gap-1` classes for consistent spacing
   - **Flexible content**: Accepts any children components
   - **Customizable**: Optional `className` prop for additional styling
   - **Accessibility**: Properly forwards refs for accessibility
 
 - **FormLabel** (`@/components/ui/forms/FormLabel`) - Use for form labels
-
   - **Typography**: Uses `text-sm font-medium` for consistent styling
   - **Layout**: Uses `table` display for proper alignment
   - **Accessibility**: Properly associates with form controls
 
 - **FormInput** (`@/components/ui/forms/FormInput`) - Use for text inputs
-
   - **Layout**: Uses `FormInput w-full` classes for consistent styling and width
   - **Customizable**: Optional `className` prop for additional styling
   - **Accessibility**: Properly forwards refs for accessibility
 
 - **FormSelect** (`@/components/ui/forms/FormSelect`) - Use for select dropdowns
-
   - **Layout**: Uses `FormSelect w-full` classes for consistent styling and width
   - **Flexible content**: Accepts any children components (option elements)
   - **Customizable**: Optional `className` prop for additional styling
@@ -105,7 +100,7 @@ import { useFormStore } from '@/stores';
 
 <form.Field
 	name='beats'
-	children={field => (
+	children={(field) => (
 		<FormField className='flex-1'>
 			<FormLabel htmlFor='beats'>Beats</FormLabel>
 			<input
@@ -114,7 +109,7 @@ import { useFormStore } from '@/stores';
 				value={field.state.value}
 				min='1'
 				max='16'
-				onChange={e => {
+				onChange={(e) => {
 					const newValue = parseInt(e.target.value) || 4;
 					field.handleChange(newValue);
 					setFormValues({ beats: newValue });

@@ -1,14 +1,7 @@
 ---
-globs: ['**/*.tsx', '**/*.ts', '**/*.css']
-exclude:
-  [
-    '**/__tests__/**',
-    '**/*.test.*',
-    '**/*.spec.*',
-    '**/config/**',
-    '**/lib/schemas.ts',
-    '**/lib/openai.ts',
-  ]
+globs: **/*.tsx, **/*.ts, **/*.css
+exclude: **/__tests__/**, **/*.test.*, **/*.spec.*, **/config/**, **/lib/schemas.ts, **/lib/openai.ts, **/server/**, **/trpc/**
+alwaysApply: false
 ---
 
 # Styling Standards
@@ -64,7 +57,7 @@ Follow this specific order for JSX attributes:
 ```tsx
 <button
 	type='button'
-	className='Button rounded-lg border p-4 bg-white'
+	className='Button rounded-lg border bg-white p-4'
 	disabled={isDisabled}
 	title='Submit form'
 	onClick={handleClick}
@@ -143,7 +136,11 @@ className = 'flex items-center gap-1.5 sm:gap-2';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSort } from '@fortawesome/free-solid-svg-icons';
 
-<FontAwesomeIcon icon={faSort} className='h-3 w-3 sm:h-4 sm:w-4' aria-hidden='true' />;
+<FontAwesomeIcon
+	icon={faSort}
+	className='h-3 w-3 sm:h-4 sm:w-4'
+	aria-hidden='true'
+/>;
 ```
 
 #### Adding New Icons

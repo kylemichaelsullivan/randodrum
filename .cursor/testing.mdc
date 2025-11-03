@@ -1,14 +1,7 @@
 ---
-globs:
-  [
-    '**/__tests__/**/*.ts',
-    '**/__tests__/**/*.tsx',
-    '**/*.test.ts',
-    '**/*.test.tsx',
-    '**/*.spec.ts',
-    '**/*.spec.tsx',
-  ]
-exclude: ['**/node_modules/**', '**/dist/**', '**/.next/**']
+globs: **/__tests__/**/*.ts, **/__tests__/**/*.tsx, **/*.test.ts, **/*.test.tsx, **/*.spec.ts, **/*.spec.tsx
+exclude: **/node_modules/**, **/dist/**, **/.next/**
+alwaysApply: false
 ---
 
 # Testing Guidelines for RandoDrum

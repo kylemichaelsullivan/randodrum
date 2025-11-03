@@ -1,6 +1,7 @@
 ---
-globs: ['**/utils/validation.ts', '**/types/**/*.ts']
-exclude: ['**/__tests__/**', '**/*.test.*', '**/*.spec.*']
+globs: **/utils/validation.ts, **/types/**/*.ts
+exclude: **/__tests__/**, **/*.test.*, **/*.spec.*
+alwaysApply: false
 ---
 
 # Validation System Standards
@@ -93,7 +94,9 @@ export const difficultyLevelSchema = createEnumSchema(DIFFICULTY_LEVELS);
 #### Duration Value Schema
 
 ```typescript
-export const durationValueSchema = z.union([...DURATIONS.map(duration => z.literal(duration))]);
+export const durationValueSchema = z.union([
+	...DURATIONS.map((duration) => z.literal(duration)),
+]);
 ```
 
 #### Dynamic Name Schema
@@ -105,7 +108,9 @@ export const dynamicNameSchema = createEnumSchema(DYNAMICS);
 #### Ornament Name Schema
 
 ```typescript
-export const ornamentNameSchema = z.union([...ORNAMENTS.map(ornament => z.literal(ornament))]);
+export const ornamentNameSchema = z.union([
+	...ORNAMENTS.map((ornament) => z.literal(ornament)),
+]);
 ```
 
 ### Complex Object Schemas
@@ -154,15 +159,21 @@ export const validateDifficultyLevel = (value: unknown): DifficultyLevel => {
 	return difficultyLevelSchema.parse(value);
 };
 
-export const validateDurationValue = (value: unknown): z.infer<typeof durationValueSchema> => {
+export const validateDurationValue = (
+	value: unknown,
+): z.infer<typeof durationValueSchema> => {
 	return durationValueSchema.parse(value);
 };
 
-export const validateDynamicName = (value: unknown): z.infer<typeof dynamicNameSchema> => {
+export const validateDynamicName = (
+	value: unknown,
+): z.infer<typeof dynamicNameSchema> => {
 	return dynamicNameSchema.parse(value);
 };
 
-export const validateOrnamentName = (value: unknown): z.infer<typeof ornamentNameSchema> => {
+export const validateOrnamentName = (
+	value: unknown,
+): z.infer<typeof ornamentNameSchema> => {
 	return ornamentNameSchema.parse(value);
 };
 
@@ -179,7 +190,9 @@ export const validateBeatFormData = (data: unknown): ValidatedBeatFormData => {
 	return beatFormDataSchema.parse(data);
 };
 
-export const validateGeneratedBeat = (data: unknown): ValidatedGeneratedBeat => {
+export const validateGeneratedBeat = (
+	data: unknown,
+): ValidatedGeneratedBeat => {
 	return generatedBeatSchema.parse(data);
 };
 ```
@@ -266,7 +279,10 @@ export type SafeValidationResult<T> =
 
 ```typescript
 import { useForm } from '@tanstack/react-form';
-import { beatFormDataSchema, type ValidatedBeatFormData } from '@/utils/validation';
+import {
+	beatFormDataSchema,
+	type ValidatedBeatFormData,
+} from '@/utils/validation';
 
 const form = useForm<ValidatedBeatFormData>({
 	defaultValues: {
@@ -292,7 +308,7 @@ const form = useForm<ValidatedBeatFormData>({
 import { validateGeneratedBeat } from '@/utils/validation';
 
 export async function generateBeat(
-	formData: ValidatedBeatFormData
+	formData: ValidatedBeatFormData,
 ): Promise<ValidatedGeneratedBeat> {
 	const response = await fetch('/api/generate-beat', {
 		method: 'POST',
@@ -315,9 +331,9 @@ interface BeatStore {
 	setCurrentBeat: (beat: ValidatedGeneratedBeat) => void;
 }
 
-export const useBeatStore = create<BeatStore>(set => ({
+export const useBeatStore = create<BeatStore>((set) => ({
 	currentBeat: null,
-	setCurrentBeat: beat => set({ currentBeat: beat }),
+	setCurrentBeat: (beat) => set({ currentBeat: beat }),
 }));
 ```
 
@@ -354,12 +370,20 @@ import { beatFormDataSchema } from '@/utils/validation';
 
 describe('beatFormDataSchema', () => {
 	it('validates correct form data', () => {
-		const validData = { beats: 4, measures: 4, difficulty: 'Hey, Not Too Ruff' };
+		const validData = {
+			beats: 4,
+			measures: 4,
+			difficulty: 'Hey, Not Too Ruff',
+		};
 		expect(() => beatFormDataSchema.parse(validData)).not.toThrow();
 	});
 
 	it('rejects invalid form data', () => {
-		const invalidData = { beats: 0, measures: 4, difficulty: 'Hey, Not Too Ruff' };
+		const invalidData = {
+			beats: 0,
+			measures: 4,
+			difficulty: 'Hey, Not Too Ruff',
+		};
 		expect(() => beatFormDataSchema.parse(invalidData)).toThrow();
 	});
 });
@@ -373,7 +397,11 @@ import { safeValidateBeatFormData } from '@/utils/validation';
 
 describe('safeValidateBeatFormData', () => {
 	it('returns success for valid data', () => {
-		const validData = { beats: 4, measures: 4, difficulty: 'Hey, Not Too Ruff' };
+		const validData = {
+			beats: 4,
+			measures: 4,
+			difficulty: 'Hey, Not Too Ruff',
+		};
 		const result = safeValidateBeatFormData(validData);
 		expect(result.success).toBe(true);
 		if (result.success) {
@@ -382,7 +410,11 @@ describe('safeValidateBeatFormData', () => {
 	});
 
 	it('returns error for invalid data', () => {
-		const invalidData = { beats: 0, measures: 4, difficulty: 'Hey, Not Too Ruff' };
+		const invalidData = {
+			beats: 0,
+			measures: 4,
+			difficulty: 'Hey, Not Too Ruff',
+		};
 		const result = safeValidateBeatFormData(invalidData);
 		expect(result.success).toBe(false);
 		if (!result.success) {
@@ -448,11 +480,11 @@ const beatGenerationValidator = z
 		difficulty: difficultyLevelSchema,
 	})
 	.refine(
-		data => data.beats * data.measures <= 128, // Max total notes
+		(data) => data.beats * data.measures <= 128, // Max total notes
 		{
 			message: 'Total notes (beats × measures) cannot exceed 128',
 			path: ['beats', 'measures'],
-		}
+		},
 	);
 ```
 
@@ -465,14 +497,14 @@ const asyncBeatValidator = z
 		// ... schema definition
 	})
 	.refineAsync(
-		async data => {
+		async (data) => {
 			// Check if beat is too complex for current system
 			const complexity = await calculateBeatComplexity(data);
 			return complexity < MAX_COMPLEXITY;
 		},
 		{
 			message: 'Beat is too complex for current system',
-		}
+		},
 	);
 ```
 
