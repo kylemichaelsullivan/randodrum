@@ -7,8 +7,13 @@ import { Button } from './Button';
 
 export const Export = () => {
 	return (
-		<Button variant='hidden' title='Export Beat' aria-label='Export beat to file'>
-			<FontAwesomeIcon icon={faDownload} className='w-4 h-4 text-black' />
+		<Button
+			variant='hidden'
+			componentName='Export'
+			title='Export Beat'
+			aria-label='Export beat to file'
+		>
+			<FontAwesomeIcon icon={faDownload} className='h-4 w-4 text-black' />
 		</Button>
 	);
 };

@@ -7,8 +7,13 @@ import { Button } from './Button';
 
 export const Import = () => {
 	return (
-		<Button variant='hidden' title='Import Beat' aria-label='Import beat from file'>
-			<FontAwesomeIcon icon={faUpload} className='w-4 h-4 text-black' />
+		<Button
+			variant='hidden'
+			componentName='Import'
+			title='Import Beat'
+			aria-label='Import beat from file'
+		>
+			<FontAwesomeIcon icon={faUpload} className='h-4 w-4 text-black' />
 		</Button>
 	);
 };
