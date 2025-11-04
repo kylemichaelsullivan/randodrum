@@ -51,14 +51,17 @@ export const BROWSER_EXTENSION_ATTRIBUTES = [
 	'data-lastpass-icon-root', // LastPass
 ] as const;
 
-export type BrowserExtensionAttribute = (typeof BROWSER_EXTENSION_ATTRIBUTES)[number];
+export type BrowserExtensionAttribute =
+	(typeof BROWSER_EXTENSION_ATTRIBUTES)[number];
 ```
 
 ### Extension Detection Function
 
 ```typescript
 export const isBrowserExtensionAttribute = (attributeName: string): boolean => {
-	return BROWSER_EXTENSION_ATTRIBUTES.some(attr => attributeName.includes(attr));
+	return BROWSER_EXTENSION_ATTRIBUTES.some((attr) =>
+		attributeName.includes(attr),
+	);
 };
 ```
 
@@ -97,7 +100,7 @@ export function HydrationFix() {
 			'data-grammarly-shadow-root', // Grammarly
 			'data-lastpass-icon-root', // LastPass
 		];
-		attributesToRemove.forEach(attr => {
+		attributesToRemove.forEach((attr) => {
 			if (body.hasAttribute(attr)) {
 				body.removeAttribute(attr);
 			}
@@ -119,7 +122,7 @@ The hydration fix script uses JSDoc type annotations to ensure TypeScript compat
 
 ```javascript
 // Clean attribute removal without tracking
-attributesToRemove.forEach(attr => {
+attributesToRemove.forEach((attr) => {
 	if (body.hasAttribute(attr)) {
 		body.removeAttribute(attr);
 	}
@@ -241,9 +244,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 				<HydrationFix />
 				<HydrationErrorBoundary>
 					<ThemeProvider>
-						<DominantHandProvider>
+						<StickingProvider>
 							<TRPCReactProvider>{children}</TRPCReactProvider>
-						</DominantHandProvider>
+						</StickingProvider>
 					</ThemeProvider>
 				</HydrationErrorBoundary>
 			</body>
@@ -305,8 +308,10 @@ export function simulateExtensionAttributes() {
 
 // Test cleanup
 export function cleanupExtensionAttributes() {
-	const elements = document.querySelectorAll('[data-grammarly-ignore], [data-1password-root]');
-	elements.forEach(element => element.remove());
+	const elements = document.querySelectorAll(
+		'[data-grammarly-ignore], [data-1password-root]',
+	);
+	elements.forEach((element) => element.remove());
 }
 ```
 
@@ -397,8 +402,8 @@ export function debugExtensionDetection() {
 	const allElements = document.querySelectorAll('*');
 	const extensionAttributes: Record<string, string[]> = {};
 
-	allElements.forEach(element => {
-		Array.from(element.attributes).forEach(attr => {
+	allElements.forEach((element) => {
+		Array.from(element.attributes).forEach((attr) => {
 			if (isBrowserExtensionAttribute(attr.name)) {
 				if (!extensionAttributes[attr.name]) {
 					extensionAttributes[attr.name] = [];
@@ -452,7 +457,7 @@ export function communicateWithExtension(extensionName: string, message: any) {
 			extension: extensionName,
 			message,
 		},
-		'*'
+		'*',
 	);
 }
 ```

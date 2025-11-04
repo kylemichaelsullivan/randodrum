@@ -152,7 +152,10 @@ export const DURATION_NAME_TO_VALUE_MAP: Record<DurationName, DurationValue> = {
 
 // Reverse mapping for lookup
 export const DURATION_TO_NAME_MAP = new Map<DurationValue, DurationName>(
-	Object.entries(DURATION_NAME_TO_VALUE_MAP).map(([name, value]) => [value, name as DurationName])
+	Object.entries(DURATION_NAME_TO_VALUE_MAP).map(([name, value]) => [
+		value,
+		name as DurationName,
+	]),
 );
 ```
 
@@ -172,7 +175,10 @@ export type DynamicName = (typeof DYNAMICS)[number];
 // Implementation: DynamicThresholds is a tuple [accentThreshold, rimshotThreshold]
 // This allows for concise configuration while maintaining type safety
 
-export type DynamicThresholds = [accentThreshold: number, rimshotThreshold: number];
+export type DynamicThresholds = [
+	accentThreshold: number,
+	rimshotThreshold: number,
+];
 ```
 
 ### Ornament Types
@@ -282,7 +288,7 @@ export type ColorName = (typeof COLORS)[number];
 
 ```typescript
 export const DOMINANT_HANDS = ['left', 'right'] as const;
-export type DominantHand = (typeof DOMINANT_HANDS)[number];
+export type Sticking = (typeof DOMINANT_HANDS)[number];
 
 export type ChartData = Record<
 	DifficultyLevel,
@@ -298,8 +304,30 @@ export type ChartData = Record<
 ### Symbol System
 
 ```typescript
-export const NOTE_SYMBOLS = ['s', 'e', 'i', 'q', 'j', 'h', 'd', 'w', 'T', 't'] as const;
-export const REST_SYMBOLS = ['S', 'E', 'I', 'Q', 'J', 'H', 'D', 'W', 'T', 't'] as const;
+export const NOTE_SYMBOLS = [
+	's',
+	'e',
+	'i',
+	'q',
+	'j',
+	'h',
+	'd',
+	'w',
+	'T',
+	't',
+] as const;
+export const REST_SYMBOLS = [
+	'S',
+	'E',
+	'I',
+	'Q',
+	'J',
+	'H',
+	'D',
+	'W',
+	'T',
+	't',
+] as const;
 
 export type NoteSymbol = (typeof NOTE_SYMBOLS)[number];
 export type RestSymbol = (typeof REST_SYMBOLS)[number];
@@ -335,7 +363,7 @@ export const REST_SYMBOL_MAP: SymbolMapping<RestSymbol> = {
 export function getSymbol<T extends string>(
 	duration: DurationValue,
 	symbolMap: SymbolMapping<T>,
-	fallback: T
+	fallback: T,
 ): T;
 
 export const getNoteSymbol = (duration: DurationValue): NoteSymbol =>
@@ -376,15 +404,21 @@ export function createConfigArray<T extends string | number | symbol, V>(
 ### Duration Utilities
 
 ```typescript
-export const isTripletDuration = (duration: DurationValue): duration is TripletDuration => {
+export const isTripletDuration = (
+	duration: DurationValue,
+): duration is TripletDuration => {
 	return [8, 16].includes(duration);
 };
 
-export const isDottedDuration = (duration: DurationValue): duration is DottedDuration => {
+export const isDottedDuration = (
+	duration: DurationValue,
+): duration is DottedDuration => {
 	return [18, 36, 72].includes(duration);
 };
 
-export const isStraightDuration = (duration: DurationValue): duration is StraightDuration => {
+export const isStraightDuration = (
+	duration: DurationValue,
+): duration is StraightDuration => {
 	return [6, 12, 24, 48, 96].includes(duration);
 };
 ```
@@ -396,11 +430,9 @@ The application uses Zod schemas for runtime validation:
 ```typescript
 // Basic schemas
 export const difficultyLevelSchema = createEnumSchema(DIFFICULTY_LEVELS);
-export const durationValueSchema = z.union([...DURATIONS.map(duration => z.literal(duration))] as [
-	ZodLiteral<number>,
-	ZodLiteral<number>,
-	...ZodLiteral<number>[],
-]);
+export const durationValueSchema = z.union([
+	...DURATIONS.map((duration) => z.literal(duration)),
+] as [ZodLiteral<number>, ZodLiteral<number>, ...ZodLiteral<number>[]]);
 export const dynamicNameSchema = createEnumSchema(DYNAMICS);
 
 // Complex schemas
@@ -425,16 +457,19 @@ The `DynamicThresholds` tuple is used throughout the codebase:
 
 ```typescript
 // In difficulty configurations
-dynamicThresholds: [0.6, 0.9], // [accentThreshold, rimshotThreshold]
+dynamicThresholds: ([0.6, 0.9], // [accentThreshold, rimshotThreshold]
 	// In beat generation
-	function selectDynamic(randomValue: number, dynamicThresholds: DynamicThresholds): DynamicName {
+	function selectDynamic(
+		randomValue: number,
+		dynamicThresholds: DynamicThresholds,
+	): DynamicName {
 		const [accentThreshold, rimshotThreshold] = dynamicThresholds;
-		return (
-			randomValue >= rimshotThreshold ? 'Rimshot'
-			: randomValue >= accentThreshold ? 'Accent'
-			: 'Normal'
-		);
-	};
+		return randomValue >= rimshotThreshold
+			? 'Rimshot'
+			: randomValue >= accentThreshold
+				? 'Accent'
+				: 'Normal';
+	});
 
 // In UI utilities
 function getAvailableDynamics(config: DifficultyConfig): DynamicName[] {
