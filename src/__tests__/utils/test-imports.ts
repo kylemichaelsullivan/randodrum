@@ -5,17 +5,31 @@
 
 // Core testing imports
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { act, renderHook, render, screen, fireEvent } from '@testing-library/react';
+import {
+	act,
+	renderHook,
+	render,
+	screen,
+	fireEvent,
+} from '@testing-library/react';
 
 // Re-export for external use
 export { describe, it, expect, beforeEach, afterEach, vi };
-export { act, renderHook, render, screen, fireEvent };
+export { act, renderHook, screen, fireEvent };
+// Note: render is exported from test-utils.tsx to avoid conflicts
 
 // Common test utilities
-export { createFormStoreTestSuite, createBeatStoreTestSuite } from './store-test-utils';
+export {
+	createFormStoreTestSuite,
+	createBeatStoreTestSuite,
+} from './store-test-utils';
 
 // Mock data
-export { mockGeneratedBeat, mockUltraViolenceBeat, mockBeatFormData } from '../fixtures';
+export {
+	mockGeneratedBeat,
+	mockUltraViolenceBeat,
+	mockBeatFormData,
+} from '../fixtures';
 
 // Store hooks
 export { useFormStore, useBeatStore } from '@/stores';

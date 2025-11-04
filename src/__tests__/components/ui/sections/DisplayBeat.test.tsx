@@ -4,12 +4,23 @@ import { mockGeneratedBeat, render, screen } from '@/__tests__';
 import { useBeatStore } from '@/stores';
 
 import type { ReactNode } from 'react';
-import type { BeatStore } from '@/types';
+import type { BeatStore, DisplayStore } from '@/types';
 
-// Mock the beat store
-vi.mock('@/stores', () => ({
-	useBeatStore: vi.fn(),
-}));
+// Mock the stores
+vi.mock('@/stores', () => {
+	const mockDisplayStore: DisplayStore = {
+		displaySize: 100,
+		setDisplaySize: vi.fn(),
+		resetDisplaySize: vi.fn(),
+	};
+
+	return {
+		useBeatStore: vi.fn(),
+		useDisplayStore: vi.fn((selector: (state: DisplayStore) => unknown) =>
+			selector(mockDisplayStore),
+		),
+	};
+});
 
 // Mock the hydration boundary
 vi.mock('@/components/providers/hydration-boundary', () => ({
@@ -35,7 +46,9 @@ describe('DisplayBeat', () => {
 
 		render(<DisplayBeat />);
 
-		expect(screen.getByText('Use the form above to create a beat!')).toBeInTheDocument();
+		expect(
+			screen.getByText('Use the form above to create a beat!'),
+		).toBeInTheDocument();
 	});
 
 	it('renders beat display when beat is available', () => {
@@ -51,7 +64,9 @@ describe('DisplayBeat', () => {
 		render(<DisplayBeat />);
 
 		// Should render the beat display container
-		const displayContainer = screen.getByText('- Right Hand').closest('.DisplayBeat');
+		const displayContainer = screen
+			.getByText('- Right Hand')
+			.closest('.DisplayBeat');
 		expect(displayContainer).toBeInTheDocument();
 
 		// Should render hand legend
@@ -88,7 +103,9 @@ describe('DisplayBeat', () => {
 
 		render(<DisplayBeat />);
 
-		const displayContainer = screen.getByText('- Right Hand').closest('.DisplayBeat');
+		const displayContainer = screen
+			.getByText('- Right Hand')
+			.closest('.DisplayBeat');
 		expect(displayContainer).toHaveClass(
 			'DisplayBeat',
 			'flex',
@@ -100,7 +117,7 @@ describe('DisplayBeat', () => {
 			'rounded-lg',
 			'shadow-sm',
 			'w-full',
-			'p-6'
+			'p-6',
 		);
 	});
 });

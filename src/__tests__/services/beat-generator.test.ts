@@ -63,10 +63,9 @@ describe('BeatGenerator', () => {
 				const rhythm = generateRhythm(durationConfigs, MEASURE_LENGTH);
 
 				// Check that all triplet notes start on a downbeat (multiple of BEAT_LENGTH)
-				rhythm.forEach(note => {
+				rhythm.forEach((note) => {
 					if (note.dur === 8 || note.dur === 16) {
 						// This is a triplet note - its start position should be on a downbeat or part of a triplet group
-						const beatStart = Math.floor(note.start / BEAT_LENGTH) * BEAT_LENGTH;
 						// The note should either start on a downbeat or be part of a triplet group starting on downbeat
 						expect(note.start % 8).toBe(0); // All triplets align to 8-tick boundaries
 						// The first note of the triplet group should be on a downbeat
@@ -149,7 +148,14 @@ describe('BeatGenerator', () => {
 		it('does not combine non-consecutive rests', () => {
 			const measure: Measure = [
 				{ start: 0, dur: 24, isRest: true },
-				{ start: 24, dur: 24, dynamic: 'Normal', isDominant: true, ornament: null, isRest: false },
+				{
+					start: 24,
+					dur: 24,
+					dynamic: 'Normal',
+					isDominant: true,
+					ornament: null,
+					isRest: false,
+				},
 				{ start: 48, dur: 24, isRest: true },
 			];
 
@@ -178,17 +184,52 @@ describe('BeatGenerator', () => {
 
 		it('splits notes that cross beat boundaries (dotted quarter example)', () => {
 			const measure: Measure = [
-				{ start: 0, dur: 24, dynamic: 'Normal', isDominant: true, ornament: null, isRest: false },
-				{ start: 24, dur: 36, dynamic: 'Accent', isDominant: false, ornament: null, isRest: false },
+				{
+					start: 0,
+					dur: 24,
+					dynamic: 'Normal',
+					isDominant: true,
+					ornament: null,
+					isRest: false,
+				},
+				{
+					start: 24,
+					dur: 36,
+					dynamic: 'Accent',
+					isDominant: false,
+					ornament: null,
+					isRest: false,
+				},
 			];
 
 			const result = fixRender(measure);
 
 			// The dotted quarter (36) starting at 24 should be split at the beat boundary (48)
 			expect(result).toEqual([
-				{ start: 0, dur: 24, dynamic: 'Normal', isDominant: true, ornament: null, isRest: false },
-				{ start: 24, dur: 24, dynamic: 'Accent', isDominant: false, ornament: null, isRest: false },
-				{ start: 48, dur: 12, dynamic: 'Accent', isDominant: false, ornament: null, isRest: false },
+				{
+					start: 0,
+					dur: 24,
+					dynamic: 'Normal',
+					isDominant: true,
+					ornament: null,
+					isRest: false,
+				},
+				{
+					start: 24,
+					dur: 24,
+					dynamic: 'Accent',
+					isDominant: false,
+					ornament: null,
+					isRest: false,
+				},
+				{
+					start: 48,
+					dur: 12,
+					dynamic: 'Accent',
+					isDominant: false,
+					ornament: null,
+					isRest: false,
+				},
 			]);
 		});
 
@@ -196,43 +237,176 @@ describe('BeatGenerator', () => {
 			// This is the case: N12@0 | N24@12 | N24@36 | N24@60 | N12@84
 			// Expected: 8 eighth notes (e-e-E-e-E-e-E-e pattern)
 			const measure: Measure = [
-				{ start: 0, dur: 12, dynamic: 'Normal', isDominant: true, ornament: null, isRest: false },
-				{ start: 12, dur: 24, dynamic: 'Normal', isDominant: false, ornament: null, isRest: false },
-				{ start: 36, dur: 24, dynamic: 'Normal', isDominant: true, ornament: null, isRest: false },
-				{ start: 60, dur: 24, dynamic: 'Normal', isDominant: false, ornament: null, isRest: false },
-				{ start: 84, dur: 12, dynamic: 'Normal', isDominant: true, ornament: null, isRest: false },
+				{
+					start: 0,
+					dur: 12,
+					dynamic: 'Normal',
+					isDominant: true,
+					ornament: null,
+					isRest: false,
+				},
+				{
+					start: 12,
+					dur: 24,
+					dynamic: 'Normal',
+					isDominant: false,
+					ornament: null,
+					isRest: false,
+				},
+				{
+					start: 36,
+					dur: 24,
+					dynamic: 'Normal',
+					isDominant: true,
+					ornament: null,
+					isRest: false,
+				},
+				{
+					start: 60,
+					dur: 24,
+					dynamic: 'Normal',
+					isDominant: false,
+					ornament: null,
+					isRest: false,
+				},
+				{
+					start: 84,
+					dur: 12,
+					dynamic: 'Normal',
+					isDominant: true,
+					ornament: null,
+					isRest: false,
+				},
 			];
 
 			const result = fixRender(measure);
 
 			// Each quarter note crossing a beat boundary should be split into two eighth notes
 			expect(result).toEqual([
-				{ start: 0, dur: 12, dynamic: 'Normal', isDominant: true, ornament: null, isRest: false },
-				{ start: 12, dur: 12, dynamic: 'Normal', isDominant: false, ornament: null, isRest: false },
-				{ start: 24, dur: 12, dynamic: 'Normal', isDominant: false, ornament: null, isRest: false },
-				{ start: 36, dur: 12, dynamic: 'Normal', isDominant: true, ornament: null, isRest: false },
-				{ start: 48, dur: 12, dynamic: 'Normal', isDominant: true, ornament: null, isRest: false },
-				{ start: 60, dur: 12, dynamic: 'Normal', isDominant: false, ornament: null, isRest: false },
-				{ start: 72, dur: 12, dynamic: 'Normal', isDominant: false, ornament: null, isRest: false },
-				{ start: 84, dur: 12, dynamic: 'Normal', isDominant: true, ornament: null, isRest: false },
+				{
+					start: 0,
+					dur: 12,
+					dynamic: 'Normal',
+					isDominant: true,
+					ornament: null,
+					isRest: false,
+				},
+				{
+					start: 12,
+					dur: 12,
+					dynamic: 'Normal',
+					isDominant: false,
+					ornament: null,
+					isRest: false,
+				},
+				{
+					start: 24,
+					dur: 12,
+					dynamic: 'Normal',
+					isDominant: false,
+					ornament: null,
+					isRest: false,
+				},
+				{
+					start: 36,
+					dur: 12,
+					dynamic: 'Normal',
+					isDominant: true,
+					ornament: null,
+					isRest: false,
+				},
+				{
+					start: 48,
+					dur: 12,
+					dynamic: 'Normal',
+					isDominant: true,
+					ornament: null,
+					isRest: false,
+				},
+				{
+					start: 60,
+					dur: 12,
+					dynamic: 'Normal',
+					isDominant: false,
+					ornament: null,
+					isRest: false,
+				},
+				{
+					start: 72,
+					dur: 12,
+					dynamic: 'Normal',
+					isDominant: false,
+					ornament: null,
+					isRest: false,
+				},
+				{
+					start: 84,
+					dur: 12,
+					dynamic: 'Normal',
+					isDominant: true,
+					ornament: null,
+					isRest: false,
+				},
 			]);
 		});
 
 		it('exempts whole notes, dotted half notes, and half notes from splitting (but not rests)', () => {
 			// Test that 96 (whole), 72 (dotted half), and 48 (half) notes are not split
 			const measure: Measure = [
-				{ start: 0, dur: 96, dynamic: 'Normal', isDominant: true, ornament: null, isRest: false },
-				{ start: 0, dur: 72, dynamic: 'Normal', isDominant: true, ornament: null, isRest: false },
-				{ start: 24, dur: 48, dynamic: 'Accent', isDominant: false, ornament: null, isRest: false },
+				{
+					start: 0,
+					dur: 96,
+					dynamic: 'Normal',
+					isDominant: true,
+					ornament: null,
+					isRest: false,
+				},
+				{
+					start: 0,
+					dur: 72,
+					dynamic: 'Normal',
+					isDominant: true,
+					ornament: null,
+					isRest: false,
+				},
+				{
+					start: 24,
+					dur: 48,
+					dynamic: 'Accent',
+					isDominant: false,
+					ornament: null,
+					isRest: false,
+				},
 			];
 
 			const result = fixRender(measure);
 
 			// These notes should remain unchanged despite crossing beat boundaries
 			expect(result).toEqual([
-				{ start: 0, dur: 96, dynamic: 'Normal', isDominant: true, ornament: null, isRest: false },
-				{ start: 0, dur: 72, dynamic: 'Normal', isDominant: true, ornament: null, isRest: false },
-				{ start: 24, dur: 48, dynamic: 'Accent', isDominant: false, ornament: null, isRest: false },
+				{
+					start: 0,
+					dur: 96,
+					dynamic: 'Normal',
+					isDominant: true,
+					ornament: null,
+					isRest: false,
+				},
+				{
+					start: 0,
+					dur: 72,
+					dynamic: 'Normal',
+					isDominant: true,
+					ornament: null,
+					isRest: false,
+				},
+				{
+					start: 24,
+					dur: 48,
+					dynamic: 'Accent',
+					isDominant: false,
+					ornament: null,
+					isRest: false,
+				},
 			]);
 		});
 
@@ -249,14 +423,28 @@ describe('BeatGenerator', () => {
 		it('converts eighth note + eighth rest on downbeat to quarter note', () => {
 			// N12@0 + R12@12 should become N24@0
 			const measure: Measure = [
-				{ start: 0, dur: 12, dynamic: 'Normal', isDominant: true, ornament: null, isRest: false },
+				{
+					start: 0,
+					dur: 12,
+					dynamic: 'Normal',
+					isDominant: true,
+					ornament: null,
+					isRest: false,
+				},
 				{ start: 12, dur: 12, isRest: true },
 			];
 
 			const result = fixRender(measure);
 
 			expect(result).toEqual([
-				{ start: 0, dur: 24, dynamic: 'Normal', isDominant: true, ornament: null, isRest: false },
+				{
+					start: 0,
+					dur: 24,
+					dynamic: 'Normal',
+					isDominant: true,
+					ornament: null,
+					isRest: false,
+				},
 			]);
 		});
 
@@ -266,7 +454,14 @@ describe('BeatGenerator', () => {
 			// After note+rest opt: N24@0 | R36@24 | R12@60 | R24@72
 			// After rest opt: N24@0 | R72@24 (36+12=48, then 48+24=72)
 			const measure: Measure = [
-				{ start: 0, dur: 12, dynamic: 'Normal', isDominant: true, ornament: null, isRest: false },
+				{
+					start: 0,
+					dur: 12,
+					dynamic: 'Normal',
+					isDominant: true,
+					ornament: null,
+					isRest: false,
+				},
 				{ start: 12, dur: 48, isRest: true },
 				{ start: 60, dur: 36, isRest: true },
 			];
@@ -292,7 +487,14 @@ describe('BeatGenerator', () => {
 		it('does not convert eighth note + eighth rest when not on downbeat', () => {
 			// N12@12 + R12@24 should remain unchanged (not on downbeat)
 			const measure: Measure = [
-				{ start: 12, dur: 12, dynamic: 'Normal', isDominant: true, ornament: null, isRest: false },
+				{
+					start: 12,
+					dur: 12,
+					dynamic: 'Normal',
+					isDominant: true,
+					ornament: null,
+					isRest: false,
+				},
 				{ start: 24, dur: 12, isRest: true },
 			];
 
@@ -319,8 +521,22 @@ describe('BeatGenerator', () => {
 
 		it('handles measure with only non-rest notes', () => {
 			const measure: Measure = [
-				{ start: 0, dur: 24, dynamic: 'Normal', isDominant: true, ornament: null, isRest: false },
-				{ start: 24, dur: 24, dynamic: 'Accent', isDominant: false, ornament: null, isRest: false },
+				{
+					start: 0,
+					dur: 24,
+					dynamic: 'Normal',
+					isDominant: true,
+					ornament: null,
+					isRest: false,
+				},
+				{
+					start: 24,
+					dur: 24,
+					dynamic: 'Accent',
+					isDominant: false,
+					ornament: null,
+					isRest: false,
+				},
 			];
 
 			const result = fixRender(measure);
@@ -333,7 +549,14 @@ describe('BeatGenerator', () => {
 			const measure: Measure = [
 				{ start: 0, dur: 24, isRest: true },
 				{ start: 24, dur: 24, isRest: true },
-				{ start: 48, dur: 24, dynamic: 'Normal', isDominant: true, ornament: null, isRest: false },
+				{
+					start: 48,
+					dur: 24,
+					dynamic: 'Normal',
+					isDominant: true,
+					ornament: null,
+					isRest: false,
+				},
 				{ start: 72, dur: 24, isRest: true },
 			];
 
@@ -473,9 +696,30 @@ describe('BeatGenerator', () => {
 			it('converts 1e&- pattern (note+note+note+rest) to M symbol with dotted eighth duration', () => {
 				// Pattern: sixteenth + sixteenth + sixteenth + sixteenth rest on downbeat
 				const measure: Measure = [
-					{ start: 0, dur: 6, dynamic: 'Normal', isDominant: true, ornament: null, isRest: false },
-					{ start: 6, dur: 6, dynamic: 'Normal', isDominant: false, ornament: null, isRest: false },
-					{ start: 12, dur: 6, dynamic: 'Normal', isDominant: true, ornament: null, isRest: false },
+					{
+						start: 0,
+						dur: 6,
+						dynamic: 'Normal',
+						isDominant: true,
+						ornament: null,
+						isRest: false,
+					},
+					{
+						start: 6,
+						dur: 6,
+						dynamic: 'Normal',
+						isDominant: false,
+						ornament: null,
+						isRest: false,
+					},
+					{
+						start: 12,
+						dur: 6,
+						dynamic: 'Normal',
+						isDominant: true,
+						ornament: null,
+						isRest: false,
+					},
 					{ start: 18, dur: 6, isRest: true },
 				];
 
@@ -493,8 +737,22 @@ describe('BeatGenerator', () => {
 			it('converts 1e-- pattern (note+note+rest+rest) to O symbol with eighth duration', () => {
 				// Pattern: sixteenth + sixteenth + sixteenth rest + sixteenth rest on downbeat
 				const measure: Measure = [
-					{ start: 0, dur: 6, dynamic: 'Normal', isDominant: true, ornament: null, isRest: false },
-					{ start: 6, dur: 6, dynamic: 'Normal', isDominant: false, ornament: null, isRest: false },
+					{
+						start: 0,
+						dur: 6,
+						dynamic: 'Normal',
+						isDominant: true,
+						ornament: null,
+						isRest: false,
+					},
+					{
+						start: 6,
+						dur: 6,
+						dynamic: 'Normal',
+						isDominant: false,
+						ornament: null,
+						isRest: false,
+					},
 					{ start: 12, dur: 6, isRest: true },
 					{ start: 18, dur: 6, isRest: true },
 				];
@@ -513,10 +771,31 @@ describe('BeatGenerator', () => {
 			it('converts 1e-a pattern (note+note+rest+note) to š symbol with quarter duration', () => {
 				// Pattern: sixteenth + sixteenth + sixteenth rest + sixteenth on downbeat
 				const measure: Measure = [
-					{ start: 0, dur: 6, dynamic: 'Normal', isDominant: true, ornament: null, isRest: false },
-					{ start: 6, dur: 6, dynamic: 'Normal', isDominant: false, ornament: null, isRest: false },
+					{
+						start: 0,
+						dur: 6,
+						dynamic: 'Normal',
+						isDominant: true,
+						ornament: null,
+						isRest: false,
+					},
+					{
+						start: 6,
+						dur: 6,
+						dynamic: 'Normal',
+						isDominant: false,
+						ornament: null,
+						isRest: false,
+					},
 					{ start: 12, dur: 6, isRest: true },
-					{ start: 18, dur: 6, dynamic: 'Normal', isDominant: true, ornament: null, isRest: false },
+					{
+						start: 18,
+						dur: 6,
+						dynamic: 'Normal',
+						isDominant: true,
+						ornament: null,
+						isRest: false,
+					},
 				];
 
 				const result = fixRender(measure);
@@ -533,7 +812,14 @@ describe('BeatGenerator', () => {
 			it('converts 1-&a pattern (note+rest+note+note) to m symbol with quarter duration', () => {
 				// Pattern: sixteenth + sixteenth rest + sixteenth + sixteenth on downbeat
 				const measure: Measure = [
-					{ start: 0, dur: 6, dynamic: 'Normal', isDominant: true, ornament: null, isRest: false },
+					{
+						start: 0,
+						dur: 6,
+						dynamic: 'Normal',
+						isDominant: true,
+						ornament: null,
+						isRest: false,
+					},
 					{ start: 6, dur: 6, isRest: true },
 					{
 						start: 12,
@@ -543,7 +829,14 @@ describe('BeatGenerator', () => {
 						ornament: null,
 						isRest: false,
 					},
-					{ start: 18, dur: 6, dynamic: 'Normal', isDominant: true, ornament: null, isRest: false },
+					{
+						start: 18,
+						dur: 6,
+						dynamic: 'Normal',
+						isDominant: true,
+						ornament: null,
+						isRest: false,
+					},
 				];
 
 				const result = fixRender(measure);
@@ -560,7 +853,14 @@ describe('BeatGenerator', () => {
 			it('converts 1--a pattern (note+rest+rest+note) to o symbol with quarter duration', () => {
 				// Pattern: sixteenth + sixteenth rest + sixteenth rest + sixteenth on downbeat
 				const measure: Measure = [
-					{ start: 0, dur: 6, dynamic: 'Normal', isDominant: true, ornament: null, isRest: false },
+					{
+						start: 0,
+						dur: 6,
+						dynamic: 'Normal',
+						isDominant: true,
+						ornament: null,
+						isRest: false,
+					},
 					{ start: 6, dur: 6, isRest: true },
 					{ start: 12, dur: 6, isRest: true },
 					{
@@ -587,7 +887,14 @@ describe('BeatGenerator', () => {
 			it('does not convert patterns that do not start on downbeat', () => {
 				// Same pattern but starting at position 6 (not on downbeat)
 				const measure: Measure = [
-					{ start: 6, dur: 6, dynamic: 'Normal', isDominant: true, ornament: null, isRest: false },
+					{
+						start: 6,
+						dur: 6,
+						dynamic: 'Normal',
+						isDominant: true,
+						ornament: null,
+						isRest: false,
+					},
 					{
 						start: 12,
 						dur: 6,
@@ -596,7 +903,14 @@ describe('BeatGenerator', () => {
 						ornament: null,
 						isRest: false,
 					},
-					{ start: 18, dur: 6, dynamic: 'Normal', isDominant: true, ornament: null, isRest: false },
+					{
+						start: 18,
+						dur: 6,
+						dynamic: 'Normal',
+						isDominant: true,
+						ornament: null,
+						isRest: false,
+					},
 					{ start: 24, dur: 6, isRest: true },
 				];
 
@@ -610,9 +924,30 @@ describe('BeatGenerator', () => {
 			it('handles multiple sixteenth patterns in the same measure', () => {
 				// Two patterns: 1e&- at 0, and 1-&a at 24
 				const measure: Measure = [
-					{ start: 0, dur: 6, dynamic: 'Normal', isDominant: true, ornament: null, isRest: false },
-					{ start: 6, dur: 6, dynamic: 'Normal', isDominant: false, ornament: null, isRest: false },
-					{ start: 12, dur: 6, dynamic: 'Normal', isDominant: true, ornament: null, isRest: false },
+					{
+						start: 0,
+						dur: 6,
+						dynamic: 'Normal',
+						isDominant: true,
+						ornament: null,
+						isRest: false,
+					},
+					{
+						start: 6,
+						dur: 6,
+						dynamic: 'Normal',
+						isDominant: false,
+						ornament: null,
+						isRest: false,
+					},
+					{
+						start: 12,
+						dur: 6,
+						dynamic: 'Normal',
+						isDominant: true,
+						ornament: null,
+						isRest: false,
+					},
 					{ start: 18, dur: 6, isRest: true },
 					{
 						start: 24,
@@ -623,7 +958,14 @@ describe('BeatGenerator', () => {
 						isRest: false,
 					},
 					{ start: 30, dur: 6, isRest: true },
-					{ start: 36, dur: 6, dynamic: 'Normal', isDominant: true, ornament: null, isRest: false },
+					{
+						start: 36,
+						dur: 6,
+						dynamic: 'Normal',
+						isDominant: true,
+						ornament: null,
+						isRest: false,
+					},
 					{
 						start: 42,
 						dur: 6,

@@ -14,7 +14,7 @@ describe('FormStore', () => {
 				formValues: {
 					beats: 4,
 					measures: 4,
-					difficulty: 'Hey, Not Too Ruff',
+					difficulty: 'I’m Too Young to Drum',
 				},
 			});
 		});
@@ -29,7 +29,7 @@ describe('FormStore', () => {
 			expect(result.current.formValues).toEqual({
 				beats: 8,
 				measures: 4,
-				difficulty: 'Hey, Not Too Ruff',
+				difficulty: 'I’m Too Young to Drum',
 			});
 		});
 
@@ -97,7 +97,7 @@ describe('FormStore', () => {
 			expect(result.current.formValues).toEqual({
 				beats: 4,
 				measures: 4,
-				difficulty: 'Hey, Not Too Ruff',
+				difficulty: 'I’m Too Young to Drum',
 			});
 		});
 
@@ -111,7 +111,7 @@ describe('FormStore', () => {
 				'Drumline!',
 			];
 
-			difficulties.forEach(difficulty => {
+			difficulties.forEach((difficulty) => {
 				act(() => {
 					result.current.setFormValues({ difficulty });
 				});
