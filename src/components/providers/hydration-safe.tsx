@@ -6,7 +6,6 @@ import { createMemoizedComponent } from '@/utils';
 
 type HydrationSafeProps = {
 	children: ReactNode;
-	className?: string;
 	fallback?: ReactNode;
 };
 
@@ -14,7 +13,10 @@ type HydrationSafeProps = {
  * HydrationSafe ensures that content only renders after hydration is complete.
  * This prevents hydration mismatches by showing a fallback during SSR and initial hydration.
  */
-function HydrationSafeComponent({ children, fallback = null, className }: HydrationSafeProps) {
+function HydrationSafeComponent({
+	children,
+	fallback = null,
+}: HydrationSafeProps) {
 	const [isHydrated, setIsHydrated] = useState(false);
 
 	useEffect(() => {
@@ -22,10 +24,13 @@ function HydrationSafeComponent({ children, fallback = null, className }: Hydrat
 	}, []);
 
 	if (!isHydrated) {
-		return fallback ? <div className={className}>{fallback}</div> : null;
+		return fallback ? <>{fallback}</> : null;
 	}
 
-	return <div className={className}>{children}</div>;
+	return <>{children}</>;
 }
 
-export const HydrationSafe = createMemoizedComponent(HydrationSafeComponent, 'HydrationSafe');
+export const HydrationSafe = createMemoizedComponent(
+	HydrationSafeComponent,
+	'HydrationSafe',
+);

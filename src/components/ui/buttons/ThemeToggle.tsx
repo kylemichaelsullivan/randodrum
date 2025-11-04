@@ -16,13 +16,32 @@ export function ThemeToggle() {
 	return (
 		<HydrationSafe
 			fallback={
-				<Button variant='icon' title='Loading theme…' disabled>
-					<FontAwesomeIcon icon={faLightbulb} className={`text-gray ${size}`} />
+				<Button
+					variant='icon'
+					className='bg-gray'
+					title='Loading theme…'
+					disabled
+				>
+					<FontAwesomeIcon
+						icon={faLightbulb}
+						className={`text-white ${size}`}
+						style={{ width: '1.25rem', height: '1.25rem' }}
+					/>
 				</Button>
 			}
 		>
-			<Button variant='icon' title={title} onClick={toggleTheme}>
-				<FontAwesomeIcon icon={icon} className={`text-black ${size}`} />
+			<Button
+				variant='icon'
+				className='bg-gray hover:opacity-60'
+				componentName='ThemeToggle'
+				title={title}
+				onClick={toggleTheme}
+			>
+				<FontAwesomeIcon
+					icon={icon}
+					className={`text-white ${size}`}
+					style={{ width: '1.25rem', height: '1.25rem' }}
+				/>
 			</Button>
 		</HydrationSafe>
 	);

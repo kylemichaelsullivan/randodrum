@@ -10,14 +10,18 @@ type HelpButtonProps = {
 	title?: string;
 };
 
-export function HelpButton({ title = 'Help', className = '' }: HelpButtonProps) {
+export function HelpButton({
+	className = 'absolute right-0 top-0',
+	title = 'Help',
+}: HelpButtonProps) {
 	const [isModalOpen, setIsModalOpen] = useState(false);
 
 	return (
 		<>
 			<Button
-				className={`HelpButton ${className}`}
+				className={`${className}`}
 				variant='help'
+				componentName='HelpButton'
 				title={title}
 				aria-label='Show difficulty explanation'
 				onClick={() => setIsModalOpen(true)}
