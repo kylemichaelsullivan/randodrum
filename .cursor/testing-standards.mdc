@@ -27,7 +27,7 @@ vi.mock('@/stores', () => ({
 }));
 
 // 3. Import component under test (after mocks)
-import { ComponentName } from '@/components/path/ComponentName';
+import { ComponentName } from '@/components/ui/sections';
 
 // 4. Test suite
 describe('ComponentName', () => {

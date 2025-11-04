@@ -155,11 +155,11 @@ ComplexComponent.displayName = 'ComplexComponent';
 - **UI components**: Button, FormField, DisplayBeat, etc.
 - **Display components**: MeasureDisplay, NoteDisplay, HandLegend, etc.
 - **Form components**: FormField, FormInput, FormSelect, etc.
-- **Navigation components**: ThemeToggle, DominantHand, etc.
+- **Navigation components**: StickingButton, ThemeToggle, etc.
 
 #### When NOT to Use React.memo
 
-- **Context providers**: ThemeProvider, DominantHandProvider, etc.
+- **Context providers**: StickingProvider, ThemeProvider, etc.
 - **Layout components**: Header, Footer, Main, etc.
 - **Components with frequently changing props**
 - **Components that are already optimized**
@@ -295,10 +295,10 @@ const useBeatData = () => useBeatStore((state) => state.currentBeat);
 
 ### Theme and UI
 
+- **Button variants**: Use appropriate button variants (default, icon, generate, help)
+- **StickingButton**: Handle left/right hand preference
 - **ThemeProvider**: Manage light/dark theme switching
 - **ThemeToggle**: Toggle between light and dark modes
-- **DominantHand**: Handle left/right hand preference
-- **Button variants**: Use appropriate button variants (default, icon, generate, help)
 
 ### Typography
 

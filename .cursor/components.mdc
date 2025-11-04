@@ -11,7 +11,7 @@ alwaysApply: false
 ```
 src/components/
 ├── ui/                    # UI components by function
-│   ├── buttons/          # Button components (Button, DominantHand, Export, Import, HelpButton, ThemeToggle)
+│   ├── buttons/          # Button components (Button, Export, Import, HelpButton, StickingButton, ThemeToggle)
 │   ├── forms/            # Form components (Form, FormField, FormInput, FormLabel, FormSelect)
 │   ├── globals/          # Global layout components (Header, Footer, Main, EmptyState)
 │   ├── modals/           # Modal components (Modal, DifficultyExplanation)
@@ -112,10 +112,10 @@ import { Form, FormField, FormInput, FormLabel, FormSelect } from '@/components/
 
 ### Specialized Button Components
 
-- **DominantHand** (`@/components/ui/buttons/DominantHand`) - Use for dominant hand selection
 - **Export** (`@/components/ui/buttons/Export`) - Use for beat export functionality
 - **Import** (`@/components/ui/buttons/Import`) - Use for beat import functionality
 - **HelpButton** (`@/components/ui/buttons/HelpButton`) - Use for help/explanation modals
+- **StickingButton** (`@/components/ui/buttons/StickingButton`) - Use for dominant hand selection
 - **ThemeToggle** (`@/components/ui/buttons/ThemeToggle`) - Use for theme switching
 
 ### Global Layout Components
@@ -217,12 +217,12 @@ export function Button({ title, children, ...props }: ButtonProps) {
 
 // Index file: src/components/ui/buttons/index.ts
 export { Button } from './Button';
-export { DominantHand } from './DominantHand';
 export { Export } from './Export';
+export { StickingButton } from './StickingButton';
 // ... other button exports
 
 // Usage: Clean imports from index files
-import { Button, DominantHand } from '@/components/ui/buttons';
+import { Button, StickingButton } from '@/components/ui/buttons';
 import { Form, FormField } from '@/components/ui/forms';
 import { DisplayBeat, MeasuresDisplay } from '@/components/ui/sections';
 ```
@@ -247,13 +247,13 @@ import { DisplayBeat, MeasuresDisplay } from '@/components/ui/sections';
 
 ### Provider Components
 
-- **DominantHandProvider** (`@/components/providers/dominant-hand-provider`) - Context for dominant hand preference
-- **ThemeProvider** (`@/components/providers/theme-provider`) - Theme context provider
-- **HydrationBoundary** (`@/components/providers/hydration-boundary`) - Hydration safety wrapper
-- **HydrationManager** (`@/components/providers/hydration-manager`) - Comprehensive hydration management
 - **BrowserExtensionHandler** (`@/components/providers/browser-extension-handler`) - Browser extension detection and handling
 - **ErrorBoundary** (`@/components/providers/error-boundary`) - Error boundary for graceful error handling
+- **HydrationBoundary** (`@/components/providers/hydration-boundary`) - Hydration safety wrapper
+- **HydrationManager** (`@/components/providers/hydration-manager`) - Comprehensive hydration management
 - **HydrationSafe** (`@/components/providers/hydration-safe`) - Extension-aware rendering wrapper
+- **StickingProvider** (`@/components/providers/sticking`) - Context for dominant hand preference
+- **ThemeProvider** (`@/components/providers/theme-provider`) - Theme context provider
 
 ### Modal Components
 
@@ -316,7 +316,7 @@ import { DisplayBeat, MeasuresDisplay } from '@/components/ui/sections';
 
 - **useBeatStore**: Zustand store for beat state management
 - **useFormStore**: Zustand store for form state management
-- **useDominantHand**: Context hook for dominant hand preference
+- **useSticking**: Context hook for dominant hand preference
 
 ### Typography
 

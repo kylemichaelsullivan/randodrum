@@ -5,9 +5,9 @@
 ### Component Tests
 
 - **Forms**: Beat generation form components (`BeatForm`, `BeatsField`, `DifficultyField`, `MeasuresField`)
-- **UI**: Reusable UI components (`Button`, `Form`, `Modal`, `ThemeToggle`, etc.)
+- **Providers**: Context providers (`ErrorBoundary`, `StickingProvider`, `ThemeProvider`)
 - **Sections**: Feature-specific sections (`DisplayBeat`, `GenerateBeat`)
-- **Providers**: Context providers (`ThemeProvider`, `DominantHandProvider`, `ErrorBoundary`)
+- **UI**: Reusable UI components (`Button`, `Form`, `Modal`, `ThemeToggle`, etc.)
 - **Globals**: Layout components (`Header`, `Footer`, `Main`, `EmptyState`)
 
 ### Service Tests
@@ -36,10 +36,10 @@ src/__tests__/
 │   ├── ui/
 │   │   ├── buttons/
 │   │   │   ├── Button.test.tsx
-│   │   │   ├── DominantHand.test.tsx
 │   │   │   ├── Export.test.tsx
 │   │   │   ├── HelpButton.test.tsx
 │   │   │   ├── Import.test.tsx
+│   │   │   ├── StickingButton.test.tsx
 │   │   │   └── ThemeToggle.test.tsx
 │   │   ├── forms/
 │   │   │   ├── Form.test.tsx

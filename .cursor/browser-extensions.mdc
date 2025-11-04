@@ -218,9 +218,9 @@ export default function RootLayout({ children }: { children: ReactNode }) {
 				<HydrationManager>
 					<BrowserExtensionHandler>
 						<ThemeProvider>
-							<DominantHandProvider>
+							<StickingProvider>
 								{children}
-							</DominantHandProvider>
+							</StickingProvider>
 						</ThemeProvider>
 					</BrowserExtensionHandler>
 				</HydrationManager>
