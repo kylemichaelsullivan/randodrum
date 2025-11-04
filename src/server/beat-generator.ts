@@ -14,20 +14,32 @@ import type {
 } from '@/types';
 import type { OrnamentName } from '@/types';
 
-function pickWeightedDuration(durationConfigs: DurationWeightConfig[], cap: number): Duration {
-	const validConfigs = durationConfigs.filter(config => config.duration <= cap);
+function pickWeightedDuration(
+	durationConfigs: DurationWeightConfig[],
+	cap: number,
+): Duration {
+	const validConfigs = durationConfigs.filter(
+		(config) => config.duration <= cap,
+	);
 	if (validConfigs.length === 0) return 6;
 
 	// Normalize weights so they sum to 1.0
-	const explicitWeights = validConfigs.filter(config => config.weight !== undefined);
-	const implicitWeights = validConfigs.filter(config => config.weight === undefined);
+	const explicitWeights = validConfigs.filter(
+		(config) => config.weight !== undefined,
+	);
+	const implicitWeights = validConfigs.filter(
+		(config) => config.weight === undefined,
+	);
 
-	const explicitTotal = explicitWeights.reduce((sum, config) => sum + config.weight!, 0);
+	const explicitTotal = explicitWeights.reduce(
+		(sum, config) => sum + config.weight!,
+		0,
+	);
 	const remainingWeight = 1.0 - explicitTotal;
 	const implicitWeightEach =
 		implicitWeights.length > 0 ? remainingWeight / implicitWeights.length : 0;
 
-	const normalizedConfigs = validConfigs.map(config => ({
+	const normalizedConfigs = validConfigs.map((config) => ({
 		...config,
 		weight: config.weight ?? implicitWeightEach,
 	}));
@@ -44,7 +56,7 @@ function pickWeightedDuration(durationConfigs: DurationWeightConfig[], cap: numb
 function sampleFromDist(dist: Record<number, number>, cap: number): number {
 	const items = Object.entries(dist)
 		.map(([k, w]) => ({ len: Number(k), w: Number(w) }))
-		.filter(x => x.len <= cap);
+		.filter((x) => x.len <= cap);
 
 	if (items.length === 0) return 6;
 
@@ -59,7 +71,7 @@ function sampleFromDist(dist: Record<number, number>, cap: number): number {
 export function generateRhythm(
 	durationConfigs: DurationWeightConfig[],
 	measureLen: number,
-	restProbability = 0
+	restProbability = 0,
 ): Measure {
 	const m: Measure = [];
 	let t = 0;
@@ -103,7 +115,7 @@ export function generateRhythm(
 			} else {
 				// If we can't place a triplet, pick a non-triplet duration instead
 				const nonTripletConfigs = durationConfigs.filter(
-					config => !isTripletDuration(config.duration)
+					(config) => !isTripletDuration(config.duration),
 				);
 				if (nonTripletConfigs.length > 0) {
 					const newDur = pickWeightedDuration(nonTripletConfigs, remaining);
@@ -119,7 +131,10 @@ export function generateRhythm(
 					continue;
 				}
 				// Fallback: if no non-triplet durations available, use the smallest available duration
-				const fallbackDur = Math.min(remaining, ...durationConfigs.map(c => c.duration));
+				const fallbackDur = Math.min(
+					remaining,
+					...durationConfigs.map((c) => c.duration),
+				);
 				m.push({
 					start: t,
 					dur: fallbackDur as Duration,
@@ -154,16 +169,29 @@ function shouldSwitchHands(switchProbability: number): boolean {
 	return Math.random() < switchProbability;
 }
 
-function generateHandRuns(measure: Measure, difficultyConfig: DifficultyConfig): Measure {
+function generateHandRuns(
+	measure: Measure,
+	difficultyConfig: DifficultyConfig,
+): Measure {
 	let currentIsDominant = shouldStartWithDominantHand();
 	let noteIndex = 0;
 
 	while (noteIndex < measure.length) {
-		const runLength = sampleFromDist(difficultyConfig.runLengths, measure.length - noteIndex);
+		const runLength = sampleFromDist(
+			difficultyConfig.runLengths,
+			measure.length - noteIndex,
+		);
 
-		for (let j = 0; j < runLength && noteIndex < measure.length; j++, noteIndex++) {
+		for (
+			let j = 0;
+			j < runLength && noteIndex < measure.length;
+			j++, noteIndex++
+		) {
 			if (!measure[noteIndex]!.isRest) {
-				measure[noteIndex] = { ...measure[noteIndex]!, isDominant: currentIsDominant };
+				measure[noteIndex] = {
+					...measure[noteIndex]!,
+					isDominant: currentIsDominant,
+				};
 			}
 		}
 
@@ -174,21 +202,30 @@ function generateHandRuns(measure: Measure, difficultyConfig: DifficultyConfig):
 	return measure;
 }
 
-function selectDynamic(randomValue: number, dynamicThresholds: DynamicThresholds): DynamicName {
+function selectDynamic(
+	randomValue: number,
+	dynamicThresholds: DynamicThresholds,
+): DynamicName {
 	const [accentThreshold, rimshotThreshold] = dynamicThresholds;
-	return (
-		randomValue >= rimshotThreshold ? 'Rimshot'
-		: randomValue >= accentThreshold ? 'Accent'
-		: 'Normal'
-	);
+	return randomValue >= rimshotThreshold
+		? 'Rimshot'
+		: randomValue >= accentThreshold
+			? 'Accent'
+			: 'Normal';
 }
 
-function addDynamics(measure: Measure, difficultyConfig: DifficultyConfig): Measure {
-	measure.forEach(note => {
+function addDynamics(
+	measure: Measure,
+	difficultyConfig: DifficultyConfig,
+): Measure {
+	measure.forEach((note) => {
 		// Rests don't need dynamics
 		if (!note.isRest) {
 			const randomValue = Math.random(); // 0-1 scale
-			note.dynamic = selectDynamic(randomValue, difficultyConfig.dynamicThresholds);
+			note.dynamic = selectDynamic(
+				randomValue,
+				difficultyConfig.dynamicThresholds,
+			);
 		}
 	});
 	return measure;
@@ -197,29 +234,35 @@ function addDynamics(measure: Measure, difficultyConfig: DifficultyConfig): Meas
 function selectOrnament(
 	randomValue: number,
 	flamThreshold: number,
-	dragThreshold: number
+	dragThreshold: number,
 ): OrnamentName {
 	if (randomValue < flamThreshold) return 'Flam';
 	if (randomValue < flamThreshold + dragThreshold) return 'Drag';
 	return null;
 }
 
-function addOrnaments(measure: Measure, difficultyConfig: DifficultyConfig): Measure {
-	measure.forEach(note => {
+function addOrnaments(
+	measure: Measure,
+	difficultyConfig: DifficultyConfig,
+): Measure {
+	measure.forEach((note) => {
 		// Rests don't need ornaments
 		if (!note.isRest) {
 			const randomValue = Math.random();
 			note.ornament = selectOrnament(
 				randomValue,
 				difficultyConfig.flamThreshold,
-				difficultyConfig.dragThreshold
+				difficultyConfig.dragThreshold,
 			);
 		}
 	});
 	return measure;
 }
 
-function preventConsecutiveHandClumps(measure: Measure, maxClump: number): Measure {
+function preventConsecutiveHandClumps(
+	measure: Measure,
+	maxClump: number,
+): Measure {
 	let consecutiveCount = 1;
 	for (let i = 1; i < measure.length; i++) {
 		// no balancing for rests
@@ -241,10 +284,14 @@ function preventConsecutiveHandClumps(measure: Measure, maxClump: number): Measu
 	return measure;
 }
 
-function balanceHandRatio(measure: Measure, minRatio: number, maxRatio: number): Measure {
-	const playableNotes = measure.filter(n => !n.isRest);
+function balanceHandRatio(
+	measure: Measure,
+	minRatio: number,
+	maxRatio: number,
+): Measure {
+	const playableNotes = measure.filter((n) => !n.isRest);
 	const total = playableNotes.length;
-	let dominantCount = playableNotes.filter(n => n.isDominant).length;
+	let dominantCount = playableNotes.filter((n) => n.isDominant).length;
 	let ratio = dominantCount / total;
 
 	if (ratio > maxRatio || ratio < minRatio) {
@@ -269,7 +316,10 @@ function balanceHandRatio(measure: Measure, minRatio: number, maxRatio: number):
 	return measure;
 }
 
-function applyBalancing(measure: Measure, difficultyConfig: DifficultyConfig): Measure {
+function applyBalancing(
+	measure: Measure,
+	difficultyConfig: DifficultyConfig,
+): Measure {
 	if (!difficultyConfig.allowBalancing) return measure;
 
 	if (difficultyConfig.maxClump) {
@@ -277,7 +327,11 @@ function applyBalancing(measure: Measure, difficultyConfig: DifficultyConfig): M
 	}
 
 	if (difficultyConfig.minRatio != null && difficultyConfig.maxRatio != null) {
-		balanceHandRatio(measure, difficultyConfig.minRatio, difficultyConfig.maxRatio);
+		balanceHandRatio(
+			measure,
+			difficultyConfig.minRatio,
+			difficultyConfig.maxRatio,
+		);
 	}
 
 	return measure;
@@ -316,20 +370,23 @@ function splitNotesAcrossBeatBoundaries(measure: Measure): Measure {
 			const durationUntilBoundary = nextBeatBoundary - currentPos;
 
 			// Determine the duration for this segment
-			const segmentDuration = Math.min(remainingDuration, durationUntilBoundary);
+			const segmentDuration = Math.min(
+				remainingDuration,
+				durationUntilBoundary,
+			);
 
 			// Create a new note segment with the same properties
 			const newNote: Note = {
 				start: currentPos,
 				dur: segmentDuration as Duration,
 				isRest: note.isRest,
-				...(note.isRest ?
-					{}
-				:	{
-						dynamic: note.dynamic,
-						isDominant: note.isDominant,
-						ornament: note.ornament,
-					}),
+				...(note.isRest
+					? {}
+					: {
+							dynamic: note.dynamic,
+							isDominant: note.isDominant,
+							ornament: note.ornament,
+						}),
 			};
 
 			result.push(newNote);
@@ -356,7 +413,10 @@ export function fixRender(measure: Measure): Measure {
 	const sixteenthOptimized = optimizeSixteenthPatterns(noteRestOptimized);
 
 	// Fourth, apply rest optimization
-	const restOptimizedMeasure = optimizeRests(sixteenthOptimized, availableDurations);
+	const restOptimizedMeasure = optimizeRests(
+		sixteenthOptimized,
+		availableDurations,
+	);
 
 	// Finally, apply beat grouping logic
 	const groupedMeasure = applyBeatGrouping(restOptimizedMeasure);
@@ -569,7 +629,10 @@ function optimizeSixteenthPatterns(measure: Measure): Measure {
 }
 
 // Rest optimization function (extracted from original fixRender)
-function optimizeRests(measure: Measure, availableDurations: number[]): Measure {
+function optimizeRests(
+	measure: Measure,
+	availableDurations: number[],
+): Measure {
 	const result: Measure = [];
 	let i = 0;
 
@@ -594,7 +657,10 @@ function optimizeRests(measure: Measure, availableDurations: number[]): Measure 
 			// Check if combined duration is a valid note duration
 			if (availableDurations.includes(combinedDuration)) {
 				// Special case: 4 quarter rests = whole rest
-				if (j - i === 4 && measure.slice(i, j).every(note => note.dur === 24)) {
+				if (
+					j - i === 4 &&
+					measure.slice(i, j).every((note) => note.dur === 24)
+				) {
 					result.push({
 						start: currentNote.start,
 						dur: 96,
@@ -610,7 +676,10 @@ function optimizeRests(measure: Measure, availableDurations: number[]): Measure 
 				}
 			} else {
 				// Try partial combinations - look for smaller valid combinations
-				const optimizedRests = optimizeRestSequence(measure.slice(i, j), availableDurations);
+				const optimizedRests = optimizeRestSequence(
+					measure.slice(i, j),
+					availableDurations,
+				);
 				result.push(...optimizedRests);
 			}
 
@@ -631,7 +700,8 @@ function applyBeatGrouping(measure: Measure): Measure {
 	const BEAT_LENGTH = 24; // 24 ticks per beat
 
 	// Find the total length of the measure to determine number of beats
-	const measureLength = measure.length > 0 ? Math.max(...measure.map(n => n.start + n.dur)) : 0;
+	const measureLength =
+		measure.length > 0 ? Math.max(...measure.map((n) => n.start + n.dur)) : 0;
 	const numBeats = Math.ceil(measureLength / BEAT_LENGTH);
 
 	for (let beatIndex = 0; beatIndex < numBeats; beatIndex++) {
@@ -640,7 +710,7 @@ function applyBeatGrouping(measure: Measure): Measure {
 
 		// Get all notes that start within this beat
 		const beatNotes = measure
-			.filter(note => note.start >= beatStart && note.start < beatEnd)
+			.filter((note) => note.start >= beatStart && note.start < beatEnd)
 			.sort((a, b) => a.start - b.start);
 
 		if (beatNotes.length === 0) continue;
@@ -654,7 +724,12 @@ function applyBeatGrouping(measure: Measure): Measure {
 }
 
 // Process notes within a single beat, applying grouping rules
-function processBeatNotes(notes: Note[], beatStart: number, beatEnd: number): Note[] {
+function processBeatNotes(
+	notes: Note[],
+	beatStart: number,
+	// keyWord: unused?
+	_beatEnd: number,
+): Note[] {
 	if (notes.length === 0) return [];
 
 	const result: Note[] = [];
@@ -738,7 +813,10 @@ function processBeatNotes(notes: Note[], beatStart: number, beatEnd: number): No
 }
 
 // Helper function to optimize sequences of rests that can't be fully combined
-function optimizeRestSequence(rests: Note[], availableDurations: number[]): Note[] {
+function optimizeRestSequence(
+	rests: Note[],
+	availableDurations: number[],
+): Note[] {
 	if (rests.length <= 1) return rests;
 
 	const result: Note[] = [];
@@ -750,8 +828,13 @@ function optimizeRestSequence(rests: Note[], availableDurations: number[]): Note
 		let j = i + 1;
 
 		// Try combinations starting from current position
-		while (j < rests.length && rests[j]!.start === rests[j - 1]!.start + rests[j - 1]!.dur) {
-			const combinedDuration = rests.slice(i, j + 1).reduce((sum, rest) => sum + rest.dur, 0);
+		while (
+			j < rests.length &&
+			rests[j]!.start === rests[j - 1]!.start + rests[j - 1]!.dur
+		) {
+			const combinedDuration = rests
+				.slice(i, j + 1)
+				.reduce((sum, rest) => sum + rest.dur, 0);
 
 			// If this combination is valid, it's better than individual rests
 			if (availableDurations.includes(combinedDuration)) {
@@ -879,26 +962,27 @@ export function generateBeat(formData: BeatFormData): GeneratedBeat {
 		const measure = generateRhythm(
 			difficultyConfig.durations,
 			gridSize,
-			difficultyConfig.restProbability
+			difficultyConfig.restProbability,
 		);
 
 		// Log optimization details
-		const originalRests = measure.filter(n => n.isRest);
+		const originalRests = measure.filter((n) => n.isRest);
 		const optimizedMeasure = fixRender(measure);
-		const optimizedRests = optimizedMeasure.filter(n => n.isRest);
+		const optimizedRests = optimizedMeasure.filter((n) => n.isRest);
 
 		if (originalRests.length > 0 || optimizedRests.length > 0) {
 			console.log(`\n--- REST OPTIMIZATION ---`);
-			const originalRestStr = originalRests.map(r => `R${r.dur}@${r.start}`).join(' | ') || 'none';
+			const originalRestStr =
+				originalRests.map((r) => `R${r.dur}@${r.start}`).join(' | ') || 'none';
 			const optimizedRestStr =
-				optimizedRests.map(r => `R${r.dur}@${r.start}`).join(' | ') || 'none';
+				optimizedRests.map((r) => `R${r.dur}@${r.start}`).join(' | ') || 'none';
 
 			console.log(`Before: ${originalRestStr}`);
 			console.log(`After:  ${optimizedRestStr}`);
 
 			if (originalRests.length !== optimizedRests.length) {
 				console.log(
-					`✅ Reduced from ${originalRests.length} to ${optimizedRests.length} rest segments`
+					`✅ Reduced from ${originalRests.length} to ${optimizedRests.length} rest segments`,
 				);
 			} else {
 				console.log(`No optimization needed`);
@@ -907,10 +991,13 @@ export function generateBeat(formData: BeatFormData): GeneratedBeat {
 
 		return applyBalancing(
 			addOrnaments(
-				addDynamics(generateHandRuns(optimizedMeasure, difficultyConfig), difficultyConfig),
-				difficultyConfig
+				addDynamics(
+					generateHandRuns(optimizedMeasure, difficultyConfig),
+					difficultyConfig,
+				),
+				difficultyConfig,
 			),
-			difficultyConfig
+			difficultyConfig,
 		);
 	});
 
