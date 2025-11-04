@@ -149,6 +149,15 @@ label:hover + select {
 	border-color: var(--color-blue);
 }
 
+.FormField:has(> .HelpButton) > .HelpButton:not(:is(:hover, :focus)) {
+	opacity: 0;
+	transition: opacity 0.2s linear;
+}
+
+.FormField:has(> .HelpButton):hover > .HelpButton {
+	opacity: 1 !important;
+}
+
 /* Direct hover effects for inputs without labels */
 input:hover,
 textarea:hover,
@@ -179,6 +188,72 @@ input[type='file'] {
 	padding: 0.5rem;
 }
 
+input[type='range'] {
+	background: transparent;
+	border: none;
+	padding: 0;
+	height: 0.5rem;
+	cursor: pointer;
+}
+
+input[type='range']::-webkit-slider-track {
+	background: var(--color-light-gray);
+	border-radius: 0.5rem;
+	height: 0.5rem;
+}
+
+input[type='range']::-webkit-slider-thumb {
+	appearance: none;
+	width: 1.25rem;
+	height: 1.25rem;
+	border-radius: 50%;
+	background: var(--color-blue);
+	border: 2px solid var(--color-white);
+	cursor: pointer;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+/* input[type='range']::-webkit-slider-thumb:hover {
+	background: var(--color-light-blue);
+}
+
+input[type='range']::-moz-range-track {
+	background: var(--color-light-gray);
+	border-radius: 0.5rem;
+	height: 0.5rem;
+	border: none;
+}
+
+input[type='range']::-moz-range-thumb {
+	width: 1.25rem;
+	height: 1.25rem;
+	border-radius: 50%;
+	background: var(--color-blue);
+	border: 2px solid var(--color-white);
+	cursor: pointer;
+	box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+input[type='range']::-moz-range-thumb:hover {
+	background: var(--color-light-blue);
+}
+
+input[type='range']:focus {
+	outline: none;
+}
+
+input[type='range']:focus::-webkit-slider-thumb {
+	box-shadow:
+		0 0 0 2px var(--color-blue),
+		0 0 0 4px var(--color-white);
+}
+
+input[type='range']:focus::-moz-range-thumb {
+	box-shadow:
+		0 0 0 2px var(--color-blue),
+		0 0 0 4px var(--color-white);
+} */
+
 a {
 	text-decoration: none;
 }
@@ -188,6 +263,15 @@ a:hover {
 }
 
 /* Utility Classes */
+/* Sticking */
+.NoteSticking {
+	transition: opacity 0.2s linear;
+}
+
+.hideSticking .NoteSticking {
+	opacity: 0;
+}
+
 /* Shadows */
 .text-shadow {
 	font-weight: 500;
@@ -595,10 +679,6 @@ a:hover {
 	transform: translateX(0.1em);
 }
 
-.NoteAccent {
-	height: 0.5rem;
-}
-
 .NoteAccent:has(+ .NoteSymbol.is2Eigths) > span,
 .NoteAccent:has(+ .NoteSymbol.is4Sixteenths) > span,
 .NoteAccent:has(+ .NoteSymbol.isEighthTriplet) > span,
@@ -685,6 +765,36 @@ a:hover {
 .NoteSymbol.hasDrag::after {
 	content: 'N';
 	font-family: var(--font-musisync);
+}
+
+/* Adjustable Sizing */
+:root {
+	--display-font: 1rem;
+	--display-multiplier: 1;
+}
+
+.NoteDisplay {
+	--accent-size: calc(var(--display-font) * 1 * var(--display-multiplier));
+	--note-size: calc(var(--display-font) * 3 * var(--display-multiplier));
+	--rest-size: calc(var(--display-font) * 3 * var(--display-multiplier));
+	--sticking-size: calc(var(--display-font) * 1 * var(--display-multiplier));
+}
+
+.NoteDisplay .NoteAccent {
+	font-size: var(--accent-size);
+	height: calc(var(--accent-size) * 0.5);
+}
+
+.NoteDisplay .NoteSymbol {
+	font-size: var(--note-size);
+}
+
+.NoteDisplay .RestSymbol {
+	font-size: var(--rest-size);
+}
+
+.NoteDisplay .NoteSticking {
+	font-size: var(--sticking-size);
 }
 
 /* Reserve space for LastPass icon */
