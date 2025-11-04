@@ -1,8 +1,9 @@
 import { memo } from 'react';
-import { MeasureDisplay } from './MeasureDisplay';
+
+import { DisplayMeasure } from './DisplayMeasure';
 import { useBeatStore } from '@/stores';
 
-function MeasuresDisplayComponent() {
+function DisplayMeasuresComponent() {
 	const { currentBeat } = useBeatStore();
 
 	if (!currentBeat) {
@@ -10,9 +11,9 @@ function MeasuresDisplayComponent() {
 	}
 
 	return (
-		<div className='MeasuresDisplay flex flex-wrap justify-center gap-4 w-full'>
+		<div className='DisplayMeasures mx-auto flex flex-wrap justify-center gap-4 self-start'>
 			{currentBeat.measures.map((measure, measureIndex) => (
-				<MeasureDisplay
+				<DisplayMeasure
 					difficulty={currentBeat.difficulty}
 					measure={measure}
 					measureIndex={measureIndex}
@@ -23,4 +24,4 @@ function MeasuresDisplayComponent() {
 	);
 }
 
-export const MeasuresDisplay = memo(MeasuresDisplayComponent);
+export const DisplayMeasures = memo(DisplayMeasuresComponent);

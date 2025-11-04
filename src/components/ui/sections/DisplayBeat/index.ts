@@ -1,8 +1,11 @@
 export { DisplayBeat } from './DisplayBeat';
+export { DisplayBody } from './DisplayBody';
+export { DisplayFooter } from './DisplayFooter';
+export { DisplayMeasure } from './DisplayMeasure';
+export { DisplayMeasures } from './DisplayMeasures';
+export { DisplaySize } from './DisplaySize';
 export { HandLegend } from './HandLegend';
 export { MeasureContent } from './MeasureContent';
-export { MeasureDisplay } from './MeasureDisplay';
 export { MeasureError } from './MeasureError';
 export { MeasureHeader } from './MeasureHeader';
-export { MeasuresDisplay } from './MeasuresDisplay';
 export { NoteDisplay } from './NoteDisplay';
