@@ -2,35 +2,47 @@
 
 import { memo } from 'react';
 
-import { ClientOnly, EmptyState } from '@/components';
-import { HandLegend } from './HandLegend';
-import { MeasuresDisplay } from './MeasuresDisplay';
+import clsx from 'clsx';
+import { ClientOnly, EmptyState, useSticking } from '@/components';
+import { DisplayBody } from './DisplayBody';
+import { DisplayFooter } from './DisplayFooter';
 import { useBeatStore } from '@/stores';
 
 function DisplayBeatContentComponent() {
 	const { currentBeat, clearCorruptedBeat } = useBeatStore();
+	const { isStickingHidden } = useSticking();
 
 	if (!currentBeat) {
 		return <EmptyState message='Use the form above to create a beat!' />;
 	}
 
+	const displayBeatClassName =
+		'DisplayBeat border-light-gray flex flex-auto flex-col gap-4 rounded-lg border bg-white p-6 shadow-sm';
+
 	if (!Array.isArray(currentBeat.measures)) {
-		console.error('DisplayBeatContent: measures is not an array:', currentBeat.measures);
+		console.error(
+			'DisplayBeatContent: measures is not an array:',
+			currentBeat.measures,
+		);
 		clearCorruptedBeat();
 		return (
-			<div className='DisplayBeat flex flex-col gap-4 bg-white border border-light-gray rounded-lg shadow-sm p-6'>
-				<div className='text-red p-4 text-center'>
-					Error: Invalid beat data structure. Corrupted data has been cleared. Please generate a new
-					beat.
+			<div className={displayBeatClassName}>
+				<div className='text-red font-code p-4 text-center'>
+					Error: Invalid beat data structure. Corrupted data has been cleared.
+					Please generate a new beat.
 				</div>
 			</div>
 		);
 	}
 
 	return (
-		<div className='DisplayBeat flex flex-col gap-4 bg-white border border-light-gray rounded-lg shadow-sm w-full p-6'>
-			<MeasuresDisplay />
-			<HandLegend />
+		<div
+			className={clsx(displayBeatClassName, 'w-full', {
+				hideSticking: isStickingHidden,
+			})}
+		>
+			<DisplayBody />
+			<DisplayFooter />
 		</div>
 	);
 }

@@ -9,7 +9,7 @@ import type { TechniqueTypeName } from './ornament';
 
 export const DOMINANT_HANDS = ['left', 'right'] as const;
 
-export type DominantHand = (typeof DOMINANT_HANDS)[number];
+export type Sticking = (typeof DOMINANT_HANDS)[number];
 
 export type ChartData = Record<
 	DifficultyLevel,

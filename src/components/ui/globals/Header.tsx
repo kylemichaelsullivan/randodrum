@@ -1,13 +1,11 @@
 'use client';
 
-import { DominantHand, ThemeToggle, HydrationSafe } from '@/components';
+import { StickingButton, ThemeToggle } from '@/components';
 
 export function Header() {
 	return (
-		<header className='Header flex justify-between items-center border-b border-black p-1'>
-			<HydrationSafe fallback={<div className='w-10 h-10' />}>
-				<DominantHand />
-			</HydrationSafe>
+		<header className='Header flex items-center justify-between border-b border-black p-1'>
+			<StickingButton />
 			<h1 className='text-2xl font-bold'>RandoDrum</h1>
 			<ThemeToggle />
 		</header>

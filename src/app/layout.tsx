@@ -4,9 +4,9 @@ import { Geist } from 'next/font/google';
 import localFont from 'next/font/local';
 import { TRPCReactProvider } from '@/trpc';
 import {
-	DominantHandProvider,
 	HydrationErrorBoundary,
 	HydrationFix,
+	StickingProvider,
 	ThemeProvider,
 } from '@/components/providers';
 import type { Metadata } from 'next';
@@ -29,16 +29,18 @@ const musisync = localFont({
 	display: 'swap',
 });
 
-export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
+export default function RootLayout({
+	children,
+}: Readonly<{ children: ReactNode }>) {
 	return (
 		<html lang='en' className={`${geist.variable} ${musisync.variable}`}>
 			<body>
 				<HydrationFix />
 				<HydrationErrorBoundary>
 					<ThemeProvider>
-						<DominantHandProvider>
+						<StickingProvider>
 							<TRPCReactProvider>{children}</TRPCReactProvider>
-						</DominantHandProvider>
+						</StickingProvider>
 					</ThemeProvider>
 				</HydrationErrorBoundary>
 			</body>

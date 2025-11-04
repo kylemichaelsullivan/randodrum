@@ -3,7 +3,7 @@ import { useMemo } from 'react';
 import clsx from 'clsx';
 import { createMemoizedComponent } from '@/utils';
 import { getNoteSymbol, getRestSymbol } from '@/types';
-import { useDominantHand } from '@/components';
+import { useSticking } from '@/components';
 
 import type { DisplayUnit } from '@/types';
 
@@ -12,14 +12,15 @@ type NoteDisplayProps = {
 };
 
 function NoteDisplayComponent({ displayUnit }: NoteDisplayProps) {
-	const { dominantHand } = useDominantHand();
+	const { sticking } = useSticking();
 
 	const displayProps = useMemo(() => {
 		if (displayUnit.type === 'single') {
 			const note = displayUnit.note;
 			const isRest = note.isRest;
-			const noteSymbol =
-				isRest ? getRestSymbol(note.dur) : getNoteSymbol(note.dur, note.symbolOverride);
+			const noteSymbol = isRest
+				? getRestSymbol(note.dur)
+				: getNoteSymbol(note.dur, note.symbolOverride);
 
 			// Dynamic properties (only for notes, not rests)
 			const hasAccent = !isRest && note.dynamic === 'Accent';
@@ -28,7 +29,9 @@ function NoteDisplayComponent({ displayUnit }: NoteDisplayProps) {
 			const hasFlam = !isRest && note.ornament === 'Flam';
 
 			// Sticking properties (only for notes, not rests)
-			const isDisplayedAsDominant = isRest ? false : note.isDominant === (dominantHand === 'right');
+			const isDisplayedAsDominant = isRest
+				? false
+				: note.isDominant === (sticking === 'right');
 			const stickingColor = isDisplayedAsDominant ? 'text-green' : 'text-red';
 			const stickingLetter = isDisplayedAsDominant ? 'R' : 'L';
 
@@ -48,9 +51,12 @@ function NoteDisplayComponent({ displayUnit }: NoteDisplayProps) {
 			const [note1, note2, note3] = displayUnit.notes;
 
 			// Get properties for each note (handle rests)
-			const note1IsDominant = !note1.isRest && note1.isDominant === (dominantHand === 'right');
-			const note2IsDominant = !note2.isRest && note2.isDominant === (dominantHand === 'right');
-			const note3IsDominant = !note3.isRest && note3.isDominant === (dominantHand === 'right');
+			const note1IsDominant =
+				!note1.isRest && note1.isDominant === (sticking === 'right');
+			const note2IsDominant =
+				!note2.isRest && note2.isDominant === (sticking === 'right');
+			const note3IsDominant =
+				!note3.isRest && note3.isDominant === (sticking === 'right');
 
 			return {
 				type: 'triplet' as const,
@@ -63,11 +69,7 @@ function NoteDisplayComponent({ displayUnit }: NoteDisplayProps) {
 					hasDrag: !note1.isRest && note1.ornament === 'Drag',
 					hasFlam: !note1.isRest && note1.ornament === 'Flam',
 					stickingColor: note1IsDominant ? 'text-green' : 'text-red',
-					stickingLetter:
-						!note1.isRest ?
-							note1IsDominant ? 'R'
-							:	'L'
-						:	'',
+					stickingLetter: !note1.isRest ? (note1IsDominant ? 'R' : 'L') : '',
 				},
 				note2: {
 					isRest: note2.isRest,
@@ -76,11 +78,7 @@ function NoteDisplayComponent({ displayUnit }: NoteDisplayProps) {
 					hasDrag: !note2.isRest && note2.ornament === 'Drag',
 					hasFlam: !note2.isRest && note2.ornament === 'Flam',
 					stickingColor: note2IsDominant ? 'text-green' : 'text-red',
-					stickingLetter:
-						!note2.isRest ?
-							note2IsDominant ? 'R'
-							:	'L'
-						:	'',
+					stickingLetter: !note2.isRest ? (note2IsDominant ? 'R' : 'L') : '',
 				},
 				note3: {
 					isRest: note3.isRest,
@@ -89,11 +87,7 @@ function NoteDisplayComponent({ displayUnit }: NoteDisplayProps) {
 					hasDrag: !note3.isRest && note3.ornament === 'Drag',
 					hasFlam: !note3.isRest && note3.ornament === 'Flam',
 					stickingColor: note3IsDominant ? 'text-green' : 'text-red',
-					stickingLetter:
-						!note3.isRest ?
-							note3IsDominant ? 'R'
-							:	'L'
-						:	'',
+					stickingLetter: !note3.isRest ? (note3IsDominant ? 'R' : 'L') : '',
 				},
 			};
 		} else if (displayUnit.type === 'beamed') {
@@ -101,8 +95,8 @@ function NoteDisplayComponent({ displayUnit }: NoteDisplayProps) {
 			const [note1, note2] = displayUnit.notes;
 
 			// Get properties for each note
-			const note1IsDominant = note1.isDominant === (dominantHand === 'right');
-			const note2IsDominant = note2.isDominant === (dominantHand === 'right');
+			const note1IsDominant = note1.isDominant === (sticking === 'right');
+			const note2IsDominant = note2.isDominant === (sticking === 'right');
 
 			return {
 				type: 'beamed' as const,
@@ -130,9 +124,9 @@ function NoteDisplayComponent({ displayUnit }: NoteDisplayProps) {
 			const [note1, note2, note3] = displayUnit.notes;
 
 			// Get properties for each note
-			const note1IsDominant = note1.isDominant === (dominantHand === 'right');
-			const note2IsDominant = note2.isDominant === (dominantHand === 'right');
-			const note3IsDominant = note3.isDominant === (dominantHand === 'right');
+			const note1IsDominant = note1.isDominant === (sticking === 'right');
+			const note2IsDominant = note2.isDominant === (sticking === 'right');
+			const note3IsDominant = note3.isDominant === (sticking === 'right');
 
 			return {
 				type: 'syncopated' as const,
@@ -164,14 +158,14 @@ function NoteDisplayComponent({ displayUnit }: NoteDisplayProps) {
 				},
 			};
 		}
-	}, [displayUnit, dominantHand]);
+	}, [displayUnit, sticking]);
 
 	if (displayProps.type === 'single') {
 		if (displayProps.isRest) {
 			// Rest structure: just RestSymbol
 			return (
-				<div className='NoteDisplay flex flex-col items-center justify-center flex-1 text-center text-black h-full min-h-[5rem]'>
-					<span className='RestSymbol font-musisync text-5xl leading-none'>
+				<div className='NoteDisplay flex h-full min-h-[5rem] flex-1 flex-col items-center justify-center text-center text-black'>
+					<span className='RestSymbol font-musisync leading-none'>
 						{displayProps.noteSymbol}
 					</span>
 				</div>
@@ -179,16 +173,20 @@ function NoteDisplayComponent({ displayUnit }: NoteDisplayProps) {
 		} else {
 			// Note structure: NoteAccent + NoteSymbol + NoteSticking
 			// Apply is4Sixteenths class to syncopated patterns that span 4 sixteenth positions
-			const isSyncopatedPattern = ['š', 'm', 'o'].includes(displayProps.noteSymbol);
+			const isSyncopatedPattern = ['š', 'm', 'o'].includes(
+				displayProps.noteSymbol,
+			);
 
 			return (
-				<div className='NoteDisplay flex flex-col items-center justify-center flex-1 text-center text-black h-full min-h-[5rem]'>
-					<span className='NoteAccent text-sm font-bold'>
+				<div className='NoteDisplay flex h-full min-h-[5rem] flex-1 flex-col items-center justify-center text-center text-black'>
+					<span className='NoteAccent font-bold'>
 						{displayProps.hasAccent && '>'}
-						{displayProps.hasRimshot && <span className='hasRimshot'>{'>'}</span>}
+						{displayProps.hasRimshot && (
+							<span className='hasRimshot'>{'>'}</span>
+						)}
 					</span>
 					<span
-						className={clsx('NoteSymbol font-musisync text-5xl leading-none', {
+						className={clsx('NoteSymbol font-musisync leading-none', {
 							hasDrag: displayProps.hasDrag,
 							hasFlam: displayProps.hasFlam,
 							is4Sixteenths: isSyncopatedPattern,
@@ -196,7 +194,9 @@ function NoteDisplayComponent({ displayUnit }: NoteDisplayProps) {
 					>
 						{displayProps.noteSymbol}
 					</span>
-					<span className={`NoteSticking text-sm font-bold ${displayProps.stickingColor}`}>
+					<span
+						className={`NoteSticking font-bold ${displayProps.stickingColor}`}
+					>
 						{displayProps.stickingLetter}
 					</span>
 				</div>
@@ -205,24 +205,30 @@ function NoteDisplayComponent({ displayUnit }: NoteDisplayProps) {
 	} else if (displayProps.type === 'triplet') {
 		// Render triplet pattern (3 notes) - NoteAccent (grid-cols-3) + NoteSymbol + NoteSticking (grid-cols-3)
 		return (
-			<div className='NoteDisplay flex flex-col items-center justify-center flex-1 text-center text-black h-full min-h-[5rem]'>
-				<span className='NoteAccent grid grid-cols-3 text-sm font-bold w-full'>
+			<div className='NoteDisplay flex h-full min-h-[5rem] flex-1 flex-col items-center justify-center text-center text-black'>
+				<span className='NoteAccent grid w-full grid-cols-3 font-bold'>
 					<span>
 						{displayProps.note1.hasAccent && '>'}
-						{displayProps.note1.hasRimshot && <span className='hasRimshot'>{'>'}</span>}
+						{displayProps.note1.hasRimshot && (
+							<span className='hasRimshot'>{'>'}</span>
+						)}
 					</span>
 					<span>
 						{displayProps.note2.hasAccent && '>'}
-						{displayProps.note2.hasRimshot && <span className='hasRimshot'>{'>'}</span>}
+						{displayProps.note2.hasRimshot && (
+							<span className='hasRimshot'>{'>'}</span>
+						)}
 					</span>
 					<span>
 						{displayProps.note3.hasAccent && '>'}
-						{displayProps.note3.hasRimshot && <span className='hasRimshot'>{'>'}</span>}
+						{displayProps.note3.hasRimshot && (
+							<span className='hasRimshot'>{'>'}</span>
+						)}
 					</span>
 				</span>
 				<span
 					className={clsx(
-						'NoteSymbol font-musisync text-5xl leading-none',
+						'NoteSymbol font-musisync leading-none',
 						displayProps.className,
 						{
 							hasDrag:
@@ -232,12 +238,12 @@ function NoteDisplayComponent({ displayUnit }: NoteDisplayProps) {
 							'hasFlam-1': displayProps.note1.hasFlam,
 							'hasFlam-2': displayProps.note2.hasFlam,
 							'hasFlam-3': displayProps.note3.hasFlam,
-						}
+						},
 					)}
 				>
 					{displayProps.symbol}
 				</span>
-				<span className='NoteSticking grid grid-cols-3 text-sm font-bold w-full'>
+				<span className='NoteSticking grid w-full grid-cols-3 font-bold'>
 					<span className={displayProps.note1.stickingColor}>
 						{displayProps.note1.stickingLetter}
 					</span>
@@ -253,31 +259,35 @@ function NoteDisplayComponent({ displayUnit }: NoteDisplayProps) {
 	} else if (displayProps.type === 'beamed') {
 		// Render beamed pair - NoteAccent (grid) + NoteSymbol + NoteSticking (grid)
 		return (
-			<div className='NoteDisplay flex flex-col items-center justify-center flex-1 text-center text-black h-full min-h-[5rem]'>
-				<span className='NoteAccent grid grid-cols-2 text-sm font-bold w-full'>
+			<div className='NoteDisplay flex h-full min-h-[5rem] flex-1 flex-col items-center justify-center text-center text-black'>
+				<span className='NoteAccent grid w-full grid-cols-2 font-bold'>
 					<span>
 						{displayProps.note1.hasAccent && '>'}
-						{displayProps.note1.hasRimshot && <span className='hasRimshot'>{'>'}</span>}
+						{displayProps.note1.hasRimshot && (
+							<span className='hasRimshot'>{'>'}</span>
+						)}
 					</span>
 					<span>
 						{displayProps.note2.hasAccent && '>'}
-						{displayProps.note2.hasRimshot && <span className='hasRimshot'>{'>'}</span>}
+						{displayProps.note2.hasRimshot && (
+							<span className='hasRimshot'>{'>'}</span>
+						)}
 					</span>
 				</span>
 				<span
 					className={clsx(
-						'NoteSymbol font-musisync text-5xl leading-none',
+						'NoteSymbol font-musisync leading-none',
 						displayProps.className,
 						{
 							hasDrag: displayProps.note1.hasDrag || displayProps.note2.hasDrag,
 							'hasFlam-1': displayProps.note1.hasFlam,
 							'hasFlam-2': displayProps.note2.hasFlam,
-						}
+						},
 					)}
 				>
 					{displayProps.symbol}
 				</span>
-				<span className='NoteSticking grid grid-cols-2 text-sm font-bold w-full'>
+				<span className='NoteSticking grid w-full grid-cols-2 font-bold'>
 					<span className={displayProps.note1.stickingColor}>
 						{displayProps.note1.stickingLetter}
 					</span>
@@ -290,24 +300,30 @@ function NoteDisplayComponent({ displayUnit }: NoteDisplayProps) {
 	} else {
 		// Render syncopated pattern (3 notes) - NoteAccent (grid-cols-3) + NoteSymbol + NoteSticking (grid-cols-3)
 		return (
-			<div className='NoteDisplay flex flex-col items-center justify-center flex-1 text-center text-black h-full min-h-[5rem]'>
-				<span className='NoteAccent grid grid-cols-3 text-sm font-bold w-full'>
+			<div className='NoteDisplay flex h-full min-h-[5rem] flex-1 flex-col items-center justify-center text-center text-black'>
+				<span className='NoteAccent grid w-full grid-cols-3 font-bold'>
 					<span>
 						{displayProps.note1.hasAccent && '>'}
-						{displayProps.note1.hasRimshot && <span className='hasRimshot'>{'>'}</span>}
+						{displayProps.note1.hasRimshot && (
+							<span className='hasRimshot'>{'>'}</span>
+						)}
 					</span>
 					<span>
 						{displayProps.note2.hasAccent && '>'}
-						{displayProps.note2.hasRimshot && <span className='hasRimshot'>{'>'}</span>}
+						{displayProps.note2.hasRimshot && (
+							<span className='hasRimshot'>{'>'}</span>
+						)}
 					</span>
 					<span>
 						{displayProps.note3.hasAccent && '>'}
-						{displayProps.note3.hasRimshot && <span className='hasRimshot'>{'>'}</span>}
+						{displayProps.note3.hasRimshot && (
+							<span className='hasRimshot'>{'>'}</span>
+						)}
 					</span>
 				</span>
 				<span
 					className={clsx(
-						'NoteSymbol font-musisync text-5xl leading-none',
+						'NoteSymbol font-musisync leading-none',
 						displayProps.className,
 						{
 							hasDrag:
@@ -317,12 +333,12 @@ function NoteDisplayComponent({ displayUnit }: NoteDisplayProps) {
 							'hasFlam-1': displayProps.note1.hasFlam,
 							'hasFlam-2': displayProps.note2.hasFlam,
 							'hasFlam-3': displayProps.note3.hasFlam,
-						}
+						},
 					)}
 				>
 					{displayProps.symbol}
 				</span>
-				<span className='NoteSticking grid grid-cols-3 text-sm font-bold w-full'>
+				<span className='NoteSticking grid w-full grid-cols-3 font-bold'>
 					<span className={displayProps.note1.stickingColor}>
 						{displayProps.note1.stickingLetter}
 					</span>
@@ -338,4 +354,7 @@ function NoteDisplayComponent({ displayUnit }: NoteDisplayProps) {
 	}
 }
 
-export const NoteDisplay = createMemoizedComponent(NoteDisplayComponent, 'NoteDisplay');
+export const NoteDisplay = createMemoizedComponent(
+	NoteDisplayComponent,
+	'NoteDisplay',
+);

@@ -32,7 +32,11 @@ export type { ColorName } from './color';
 
 // Difficulty types
 export { DIFFICULTY_LEVELS } from './difficulty';
-export type { DifficultyConfig, DifficultyLevel, DurationWeightConfig } from './difficulty';
+export type {
+	DifficultyConfig,
+	DifficultyLevel,
+	DurationWeightConfig,
+} from './difficulty';
 
 // Dynamic types
 export { DYNAMICS } from './dynamic';
@@ -52,7 +56,12 @@ export {
 	isStraightDuration,
 	isTripletDuration,
 } from './duration';
-export type { Duration, DurationName, DurationType, DurationValue } from './duration';
+export type {
+	Duration,
+	DurationName,
+	DurationType,
+	DurationValue,
+} from './duration';
 
 // Symbol system
 export {
@@ -74,8 +83,13 @@ export { createConfigArray } from './type-utils';
 export type { NamedConfig } from './type-utils';
 
 // Store and state management types
-export type { BeatStore, DominantHandContextType, FormStore } from './store';
+export type {
+	BeatStore,
+	DisplayStore,
+	FormStore,
+	StickingStore,
+} from './store';
 
 // UI types
 export { DOMINANT_HANDS } from './ui';
-export type { ChartData, DominantHand } from './ui';
+export type { ChartData, Sticking } from './ui';

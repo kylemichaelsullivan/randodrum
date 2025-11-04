@@ -3,7 +3,7 @@
  */
 
 import type { BeatFormData, GeneratedBeat } from './beat';
-import type { DominantHand } from './ui';
+import type { Sticking } from './ui';
 
 export type BeatStore = {
 	currentBeat: GeneratedBeat | null;
@@ -14,11 +14,19 @@ export type BeatStore = {
 	clearCorruptedBeat: () => void;
 };
 
-export type DominantHandContextType = {
-	dominantHand: DominantHand;
+export type StickingStore = {
+	sticking: Sticking;
+	isStickingHidden: boolean;
 	isHydrated: boolean;
-	setDominantHand: (hand: DominantHand) => void;
-	toggleDominantHand: () => void;
+	setSticking: (hand: Sticking) => void;
+	toggleSticking: () => void;
+	hideSticking: () => void;
+};
+
+export type DisplayStore = {
+	displaySize: number;
+	setDisplaySize: (size: number) => void;
+	resetDisplaySize: () => void;
 };
 
 export type FormStore = {
