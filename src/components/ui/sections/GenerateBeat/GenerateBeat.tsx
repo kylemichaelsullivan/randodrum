@@ -29,14 +29,16 @@ export function GenerateBeat() {
 
 					result.data.beat.measures.forEach((measure, index) => {
 						const measureData = measure
-							.map(note => `${note.isRest ? 'R' : 'N'}${note.dur}@${note.start}`)
+							.map(
+								(note) => `${note.isRest ? 'R' : 'N'}${note.dur}@${note.start}`,
+							)
 							.join(' | ');
 
-						const noteCount = measure.filter(n => !n.isRest).length;
-						const restCount = measure.filter(n => n.isRest).length;
+						const noteCount = measure.filter((n) => !n.isRest).length;
+						const restCount = measure.filter((n) => n.isRest).length;
 
 						console.log(
-							`M${String(index + 1).padStart(2, '0')}: ${measureData} (${noteCount}N/${restCount}R)`
+							`M${String(index + 1).padStart(2, '0')}: ${measureData} (${noteCount}N/${restCount}R)`,
 						);
 					});
 
@@ -52,15 +54,16 @@ export function GenerateBeat() {
 
 	return (
 		<Form
-			className='GenerateBeat items-center flex flex-col gap-4 border-b border-black w-full pb-4'
-			onSubmit={e => {
+			className='flex w-full flex-col items-center justify-start gap-6 border-b border-black pb-4'
+			componentName='GenerateBeat'
+			onSubmit={(e) => {
 				e.preventDefault();
 				e.stopPropagation();
 				void form.handleSubmit();
 			}}
 		>
-			<div className='flex flex-col gap-4 w-full md:flex-row'>
-				<div className='flex flex-col gap-4 flex-2 w-full sm:flex-row'>
+			<div className='flex w-full flex-col gap-4 md:flex-row'>
+				<div className='flex w-full flex-2 flex-col gap-4 sm:flex-row'>
 					<BeatsField form={form} />
 					<MeasuresField form={form} />
 				</div>

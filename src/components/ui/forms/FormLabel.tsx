@@ -15,14 +15,14 @@ export const FormLabel = forwardRef<HTMLLabelElement, FormLabelProps>(
 	({ children, className = '', ...props }, ref) => {
 		return (
 			<label
-				className={clsx('FormLabel table text-sm font-medium', className)}
+				className={clsx('FormLabel text-sm font-medium', className)}
 				{...props}
 				ref={ref}
 			>
 				{children}
 			</label>
 		);
-	}
+	},
 );
 
 FormLabel.displayName = 'FormLabel';

@@ -9,16 +9,19 @@ import type { FormHTMLAttributes, ReactNode } from 'react';
 type FormProps = FormHTMLAttributes<HTMLFormElement> & {
 	children: ReactNode;
 	className?: string;
+	componentName?: string;
 };
 
 export const Form = forwardRef<HTMLFormElement, FormProps>(
-	({ children, className = '', ...props }, ref) => {
+	({ children, className = '', componentName, ...props }, ref) => {
+		const formComponentName = componentName ?? 'Form';
+
 		return (
-			<form ref={ref} className={clsx('Form', className)} {...props}>
+			<form ref={ref} className={clsx(formComponentName, className)} {...props}>
 				{children}
 			</form>
 		);
-	}
+	},
 );
 
 Form.displayName = 'Form';

@@ -1,8 +1,9 @@
 'use client';
 
+import clsx from 'clsx';
 import { createMemoizedComponent } from '@/utils';
 import { FormField, FormLabel } from '@/components';
-import { useFormStore } from '@/stores';
+import { defaultFormValues, useFormStore } from '@/stores';
 
 import type { BeatFormData, FormInputProps } from '@/types';
 
@@ -10,9 +11,10 @@ type NumberFieldProps = FormInputProps & {
 	name: keyof BeatFormData;
 	label: string;
 	className?: string;
+	componentName?: string;
 	min?: number;
 	max?: number;
-	defaultValue?: number;
+	title?: string;
 };
 
 function NumberFieldComponent({
@@ -20,24 +22,25 @@ function NumberFieldComponent({
 	name,
 	label,
 	className = 'flex-1',
+	componentName = 'NumberField',
 	min = 1,
 	max = 16,
-	defaultValue = 4,
+	title,
 }: NumberFieldProps) {
-	const { setFormValues } = useFormStore();
+	const { formValues, setFormValues } = useFormStore();
 
 	return form.Field({
 		name,
-		children: field => {
+		children: (field) => {
 			const handleChange = (value: string) => {
 				// Allow empty values during typing
-				const numValue = value === '' ? ('' as unknown as number) : parseInt(value, 10);
+				const numValue =
+					value === '' ? ('' as unknown as number) : parseInt(value, 10);
 				field.handleChange(numValue);
 				setFormValues({ [name]: numValue } as Partial<BeatFormData>);
 			};
 
 			const handleBlur = () => {
-				// Replace empty/invalid values with default and clamp to min/max on blur
 				const currentValue = field.state.value;
 				let validatedValue: number;
 
@@ -47,8 +50,11 @@ function NumberFieldComponent({
 					currentValue === undefined ||
 					isNaN(Number(currentValue))
 				) {
-					validatedValue = defaultValue;
+					// Use default value as fallback
+					const defaultValue = defaultFormValues[name] as number;
+					validatedValue = isNaN(Number(defaultValue)) ? min : defaultValue;
 				} else {
+					// Clamp value to min/max
 					validatedValue = Math.max(min, Math.min(max, Number(currentValue)));
 				}
 
@@ -59,16 +65,24 @@ function NumberFieldComponent({
 				field.handleBlur();
 			};
 
+			const numberFieldName = componentName ? `${componentName}` : name;
+
 			return (
-				<FormField className={className}>
+				<FormField className={className} title={title}>
 					<FormLabel htmlFor={name}>{label}</FormLabel>
 					<input
 						type='number'
-						className='w-full'
-						value={field.state.value}
+						className={clsx(numberFieldName, 'w-full')}
+						value={
+							field.state.value === null ||
+							field.state.value === undefined ||
+							isNaN(Number(field.state.value))
+								? (formValues[name] as number) || min
+								: field.state.value
+						}
 						min={min}
 						max={max}
-						onChange={e => handleChange(e.target.value)}
+						onChange={(e) => handleChange(e.target.value)}
 						onBlur={handleBlur}
 						id={name}
 					/>
@@ -78,4 +92,7 @@ function NumberFieldComponent({
 	});
 }
 
-export const NumberField = createMemoizedComponent(NumberFieldComponent, 'NumberField');
+export const NumberField = createMemoizedComponent(
+	NumberFieldComponent,
+	'NumberField',
+);

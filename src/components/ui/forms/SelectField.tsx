@@ -14,58 +14,96 @@ type SelectFieldProps = FormSelectProps & {
 	label: string;
 	options: readonly string[];
 	className?: string;
+	componentName?: string;
 	helpButton?: ReactNode;
-	defaultValue?: string;
+	title?: string;
 };
 
 function SelectFieldComponent({
 	form,
 	name,
 	label,
-	options,
 	className = 'flex-1',
+	componentName = 'SelectField',
 	helpButton,
-	defaultValue: _defaultValue,
+	options,
+	title,
 }: SelectFieldProps) {
-	const { setFormValues } = useFormStore();
+	const { formValues, setFormValues } = useFormStore();
 
 	const memoizedOptions = useMemo(() => options, [options]);
 
 	const handleChange = useCallback(
 		(
 			e: ChangeEvent<HTMLSelectElement>,
-			field: { handleChange: (value: BeatFormData[keyof BeatFormData]) => void }
+			field: {
+				handleChange: (value: BeatFormData[keyof BeatFormData]) => void;
+			},
 		) => {
 			const newValue = e.target.value as BeatFormData[keyof BeatFormData];
 			field.handleChange(newValue);
 			setFormValues({ [name]: newValue } as Partial<BeatFormData>);
 		},
-		[setFormValues, name]
+		[setFormValues, name],
 	);
+
+	const selectFieldName = componentName ? `${componentName}` : name;
 
 	return form.Field({
 		name,
-		children: field => (
-			<FormField className={`${className} relative`}>
-				<div className='flex gap-1 items-center justify-start'>
-					<FormLabel htmlFor={name}>{label}</FormLabel>
+		children: (field) => {
+			// Initialize store value if field value is empty/null/undefined
+			// Use setTimeout to avoid state updates during render
+			const currentValue = field.state.value;
+			const storeValue = formValues[name] as string;
+			if (
+				storeValue &&
+				(currentValue === null ||
+					currentValue === undefined ||
+					(currentValue as string) === '') &&
+				memoizedOptions.includes(storeValue) &&
+				currentValue !== storeValue
+			) {
+				setTimeout(() => {
+					field.handleChange(storeValue as BeatFormData[keyof BeatFormData]);
+					setFormValues({
+						[name]: storeValue,
+					} as Partial<BeatFormData>);
+				}, 0);
+			}
+
+			return (
+				<FormField className={`${className} relative`} title={title}>
+					<FormLabel htmlFor={name} className='pr-8'>
+						{label}
+					</FormLabel>
+					<FormSelect
+						className='p-1'
+						componentName={selectFieldName}
+						value={
+							field.state.value === null ||
+							field.state.value === undefined ||
+							(field.state.value as string) === ''
+								? (formValues[name] as string) || ''
+								: field.state.value
+						}
+						onChange={(e) => handleChange(e, field)}
+						id={name}
+					>
+						{memoizedOptions.map((option) => (
+							<option value={option} key={option}>
+								{option}
+							</option>
+						))}
+					</FormSelect>
 					{helpButton}
-				</div>
-				<FormSelect
-					className='p-1'
-					value={field.state.value}
-					onChange={e => handleChange(e, field)}
-					id={name}
-				>
-					{memoizedOptions.map(option => (
-						<option value={option} key={option}>
-							{option}
-						</option>
-					))}
-				</FormSelect>
-			</FormField>
-		),
+				</FormField>
+			);
+		},
 	});
 }
 
-export const SelectField = createMemoizedComponent(SelectFieldComponent, 'SelectField');
+export const SelectField = createMemoizedComponent(
+	SelectFieldComponent,
+	'SelectField',
+);

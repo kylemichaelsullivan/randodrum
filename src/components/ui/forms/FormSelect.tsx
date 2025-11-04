@@ -1,21 +1,29 @@
 'use client';
 
-import { createFormComponent } from '@/utils';
+import { forwardRef } from 'react';
 
-import type {
-	ForwardRefExoticComponent,
-	ReactNode,
-	RefAttributes,
-	SelectHTMLAttributes,
-} from 'react';
+import { clsx } from 'clsx';
+
+import type { ReactNode, SelectHTMLAttributes } from 'react';
 
 type FormSelectProps = SelectHTMLAttributes<HTMLSelectElement> & {
 	children: ReactNode;
 	className?: string;
+	componentName?: string;
 };
 
-export const FormSelect = createFormComponent<HTMLSelectElement>(
-	'select',
-	'FormSelect w-full',
-	'FormSelect'
-) as ForwardRefExoticComponent<FormSelectProps & RefAttributes<HTMLSelectElement>>;
+export const FormSelect = forwardRef<HTMLSelectElement, FormSelectProps>(
+	({ className = '', componentName, ...props }, ref) => {
+		const selectComponentName = componentName ?? 'FormSelect';
+
+		return (
+			<select
+				ref={ref}
+				className={clsx(selectComponentName, 'w-full', className)}
+				{...props}
+			/>
+		);
+	},
+);
+
+FormSelect.displayName = 'FormSelect';

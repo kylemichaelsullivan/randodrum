@@ -13,10 +13,12 @@ export function DifficultyField({ form }: FormSelectProps) {
 	return (
 		<SelectField
 			form={form}
+			componentName='DifficultyField'
 			name='difficulty'
 			label='Difficulty'
 			options={difficultyOptions}
 			helpButton={<HelpButton />}
+			title='Select Difficulty Level'
 		/>
 	);
 }
