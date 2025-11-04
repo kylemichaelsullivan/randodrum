@@ -3,4 +3,5 @@
  */
 
 export { useBeatStore } from './beat-store';
-export { useFormStore } from './form-store';
+export { defaultDisplaySize, useDisplayStore } from './display-store';
+export { defaultFormValues, useFormStore } from './form-store';
