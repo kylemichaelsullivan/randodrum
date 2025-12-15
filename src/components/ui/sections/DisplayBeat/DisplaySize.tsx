@@ -3,7 +3,7 @@
 import { useState } from 'react';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMagnifyingGlass } from '@fortawesome/free-solid-svg-icons';
+import { faEye } from '@fortawesome/free-solid-svg-icons';
 
 import { Button } from '@/components/ui/buttons';
 import { DisplaySizeModal, useDisplayMultiplier } from '@/components/ui/modals';
@@ -34,7 +34,7 @@ export function DisplaySize() {
 				onClick={() => setIsModalOpen(true)}
 			>
 				<FontAwesomeIcon
-					icon={faMagnifyingGlass}
+					icon={faEye}
 					className='text-black'
 					style={{ width: '1.25rem', height: '1.25rem' }}
 				/>
