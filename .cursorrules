@@ -6,7 +6,7 @@ ALL user-facing text MUST use the typographic apostrophe ’ instead of the stra
 
 ## Testing
 
-- Use `pnpm test:run` for running tests (not `pnpm test` which uses watch mode)
+- Use `bun test:run` for running tests (not `bun test` which uses watch mode)
 - Watch mode can be resource-intensive and may cause issues in some environments
-- Use `pnpm test:ui` for interactive debugging of failing tests
-- Use `pnpm test:coverage` for coverage analysis before committing
+- Use `bun test:ui` for interactive debugging of failing tests
+- Use `bun test:coverage` for coverage analysis before committing
