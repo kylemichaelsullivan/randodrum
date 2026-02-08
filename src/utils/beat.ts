@@ -213,8 +213,7 @@ export const createDisplayMeasure = (measure: Measure): DisplayMeasure => {
 		if (
 			currentNote.symbolOverride &&
 			['š', 'm', 'o'].includes(currentNote.symbolOverride) &&
-			currentNote.originalNotes &&
-			currentNote.originalNotes.length === 3
+			currentNote.originalNotes?.length === 3
 		) {
 			result.push({
 				type: 'syncopated',
