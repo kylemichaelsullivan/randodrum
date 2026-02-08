@@ -13,7 +13,10 @@ type BaseField = {
 
 type FormProps<F> = {
 	form: {
-		Field: (props: { name: keyof BeatFormData; children: (field: F) => ReactNode }) => ReactNode;
+		Field: (props: {
+			name: keyof BeatFormData;
+			children: (field: F) => ReactNode;
+		}) => ReactNode | Promise<ReactNode>;
 	};
 };
 
